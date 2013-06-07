@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>ActiveCMDB Login</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" /> 
+    <link href="/static/css/login.css" rel="stylesheet">
+	<script type="text/javascript" src="/static/js/jquery.js"> </script>
+	<script type="text/javascript" src="/static/js/panelslide.js"></script>
+</head>
+<body>
+
+<div id="container"><!--CONTAINER STARTS-->
+ 
+<div id="header"><!--HEADER STARTS-->
+ 
+<div id="slide-panel"><!--SLIDE PANEL STARTS-->
+<form action="[% c.uri_for('/login') %]" method="post" class="form">
+
+<img src="/static/images/ActiveCMDBLogo_v2_150dpi.png" />
+<p>Please login</p>
+<p><input type="text" class="textfield" value="username" name="username" size="30" maxlength="50" /></p>
+<p><input type="password" class="textfield" value="password"  name="password" size="31" maxlength="50" /></p>
+<p><input name="action" type="submit" class="form-btn" value="Authenticate" />
+<input name="" type="reset" class="form-btn" value="Reset" />
+
+</p>
+</form>
+</div><!--SLIDE PANEL ENDS-->
+
+<p class="slide"><a href="#" class="btn-slide">Login</a></p><!--LOGIN BUTTON TEXT-->
+
+</div><!--HEADER ENDS-->
+ 
+</div><!--CONTAINER ENDS-->
+
+
+</body>
+</html>

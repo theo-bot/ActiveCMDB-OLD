@@ -1,0 +1,338 @@
+/*
+ * 	Script:	main.css
+ * 	___________________________________________________________
+ *
+ * 	Copyright (C) 2011-2015 Theo Bot
+ *
+ * 	http://www.activecmdb.org
+ *
+ * 	Topic: Purpose
+ *
+ * 	ActiveCMDB Cascading Style Sheet
+ *
+ * 	About: License
+ *
+ * 	This program is free software; you can redistribute it and/or
+ * 	modify it under the terms of the GNU General Public License
+ * 	as published by the Free Software Foundation; either version 2
+ * 	of the License, or (at your option) any later version.
+ *
+ * 	This program is distributed in the hope that it will be useful,
+ * 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * 	GNU General Public License for more details.
+ *
+ *  Topic: Version Control
+ *
+ *  $Id: main.css 45 2011-05-01 12:54:25Z theob $
+ *
+ */
+
+body {
+	margin: 0; padding: 0;
+	font: 11px normal Arial, Helvetica, sans-serif;
+	padding-left: 10px;
+	margin-left: 5px;
+	margin-right: 10px;
+}
+
+P.logintext {
+    margin-left: auto;
+    margin-right: auto;
+    width: 6em
+}
+
+div.cmdbSelect {
+	width:90%;
+	padding:10px;
+	border:5px solid gray;
+	margin:0px;
+	position:fixed;
+	top: 120px;
+	left: 10px;
+	z-index: -1;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+}
+
+div.cmdb_data {
+	width:80%;
+	padding:10px;
+	border:5px solid gray;
+	margin:0px;
+	position:fixed;
+	top: 170px;
+	left: 10px;
+	z-index: -1;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+}
+
+div.cmdb_data1 {
+	width:80%;
+	padding:10px;
+	border:5px solid gray;
+	margin:0px;
+	position:fixed;
+	top: 250px;
+	left: 10px;
+	z-index: -1;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+}
+
+table.cmdb_table {
+	border: 0px;
+	padding: 3px;
+	border-spacing: 0px;
+}
+
+div.entityTree {
+	position:relative;
+	top:10px;
+	left:10px;
+}
+
+div.entityDetail {
+	position:absolute;
+	top:60px;
+	left:300px;
+	visibility:hidden;
+}
+
+div.interfaceList {
+	font-size: 90%;
+	position:relative;
+	top:10px;
+	left:10px;
+}
+
+div.interfaceDetail {
+	font-size: 90%;
+	position:absolute;
+	top:90px;
+	left:400px;
+	visibility:hidden;
+}
+
+div.cmdbDevDetails2 {
+	position:absolute;
+	top:50px;
+	left:350px;
+}
+
+div.topmenu {
+	width:100%;
+	height: 90px;
+	padding:10px;
+	border:none;
+	margin:0px;
+	position:fixed;
+	top: 0px;
+	left: 0px;
+	background: #000000 url('/static/images/ActiveCMDBLogo_v2_150dpi.png') no-repeat left top;
+	background-position: 5px 2px;
+}
+
+div.cmdbmenu {
+	position:absolute;
+	top:75px;
+	left:65px;
+}
+
+div.topmenu_small {
+	width:100%;
+	height: 10px;
+	padding:10px;
+	border:none;
+	margin:0px;
+	position:fixed;
+	top: 0px;
+	left: 0px;
+	background: #000000 url('/static/images/ActiveCMDBLogo_v2_small.png') no-repeat left top;
+	background-position: 5px 2px;
+}
+
+div.cmdb_search1 {
+	width:200px;
+	height:120px;
+	padding:10px;
+	border:5px solid gray;
+	margin:0px;
+	position:fixed;
+	top: 35px;
+	left: 5px;
+	z-index: -1;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+}
+
+div.cmdb_search2 {
+	width:170px;
+	height:120px;
+	padding:10px;
+	border:5px solid gray;
+	margin:0px;
+	position:fixed;
+	top: 35x;
+	left: 240px;
+	z-index: -1;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+}
+
+div.cmdb_scheme {
+	width:90%;
+	padding:10px;
+	border:5px solid gray;
+	margin:0px;
+	position:fixed;
+	top: 60px;
+	left: 10px;
+	z-index: -1;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+}
+
+div.configData {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 10px;
+	height: 512px;
+	overflow:scroll;
+}
+
+input.cmdbText {
+	font: 1.1em 'trebuchet ms',helvetica,sans-serif;
+}
+
+input.cmdbRadio {
+	font: bold 84% 'trebuchet ms',helvetica,sans-serif;
+	vertical-align: middle;
+}
+
+input.cmdbButton {
+	color:#b81900;
+	font: bold 84% 'trebuchet ms',helvetica,sans-serif;
+}
+
+input.cmdbButtonOff {
+	color:#ff0000;
+	font: bold 1.1em 'trebuchet ms',helvetica,sans-serif;
+}
+
+input.error {
+	background: #FFC;
+}
+
+button.cmdbButton {
+		color:#b81900;
+	font: bold 84% 'trebuchet ms',helvetica,sans-serif;
+}
+
+button.cmdbButtonOff {
+	color:#ff0000;
+	font: bold 1.1em 'trebuchet ms',helvetica,sans-serif;
+}
+
+select.cmdbList {
+	color:#b81900;
+	font: bold 84% 'trebuchet ms',helvetica,sans-serif;
+}
+
+select.cmdb_searchlist {
+	color:#050;
+	width: 170px;
+	font: bold 1.1em 'trebuchet ms',helvetica,sans-serif;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+}
+
+select.dualBox {
+	height:160px;
+	width:250px;
+	font: 10px normal Arial, Helvetica, sans-serif;
+}
+
+tr.cmdbRow {
+	background-color: #f1f1f1;
+}
+
+tr.cmdbRow:hover {
+	background-color: #d6dbde;
+}
+
+td.cmdb_int {
+	font-weight:bold;
+}
+
+td.cmdb_dev {
+	font-weight:bold;
+}
+
+div.cmdbTabDiv
+{
+	font-size: 84%;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	max-height: 245px;
+	height: expression( this.scrollHeight > 244 ? "245px" : "auto" );
+	overflow-x: hidden;
+	overflow-y: scroll;
+	color: black;
+	background-color: #FFFFFF;
+}
+
+table.cmdbTable {
+	border: 0px;
+	padding: 3px;
+	border-spacing: 0px;
+}
+
+table.cmdbTableFixed {
+	table-layout: fixed;
+	margin-left: 2em;
+	margin-right: 2em;
+	border: 0px;
+	padding: 3px;
+	border-spacing: 0px;
+}
+
+a.cmdbLink {
+	text-decoration: none;
+}
+
+.ui-autocomplete-loading { 
+	background: white url('/static/images/ui-anim_basic_16x16.gif') right center no-repeat; 
+}
+
+#city { width: 25em; }
+
+#fetcher {
+	font: 1.1em;
+	height: 22px;
+	vertical-align: middle;
+}
+
+#select {
+	height: 22px;
+	vertical-align: middle;
+}
+
+#devselect {
+	position: relative;
+	top: -20px;
+	right: -350px;
+}
+
+select.searchSelect {
+	width: 90%;
+}
+
+.ui-button .ui-button-txt
+{
+	padding: 0px 11px 0px 21px !important;
+	font-size: .72em !important;
+}
+
+td, th {
+	overflow: hidden;
+}

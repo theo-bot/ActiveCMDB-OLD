@@ -1,0 +1,11 @@
+[% WRAPPER wrapper.tt %]
+<div class="cmdbSelect">
+<center>
+<br>
+<br>
+	<p>You are not authorized to access this object</p>
+<br>
+<br>
+</center>
+</div>
+[% END %]

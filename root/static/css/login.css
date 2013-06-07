@@ -1,0 +1,74 @@
+/* MAIN BODY STYLES */
+ 
+* {
+	margin: 0px; /*NO MARGIN/*
+	padding: 0px; /*NO PADDING*/
+}
+ 
+body {
+	/* background-image: url(/images/bg.png); /*BACKGROUND IMAGE*/
+	background-repeat: repeat-x; /*REPEATS HORIZONTALLY*/
+	background-color: #E6E6E6; /*SETS BACKGROUND COLOR*/
+	margin: 0 auto; /*SETS TOP AND BOTTOM MARGIN TO 0. ALSO SETS LEFT AND RIGHT MARGIN TO AUTO*/
+	padding: 0; /*NO PADDING*/
+	font-family: Arial, Helvetica, sans-serif; /*SETS FONT FAMILY*/
+	font-size: 75%; /*FONT SIZE*/
+	line-height: 100%; /*LINE HEIGHT*/
+	color: #FFFFFF;
+}
+ 
+#container {
+	margin: auto; /*SETS MARGIN TO AUTO, THIS CENTER'S OUR WEBSITE*/
+	width: 900px; /*CONTAINER WIDTH*/
+}
+ 
+#header {
+	float: left; /*FLOATS HEAD LEFT*/
+	height: 165px; /*HEIGHT OF HEADER IMAGE*/
+	width: 900px; /*WIDTH OF WEBSITE*/
+	/* background-image: url(/images/header.png); /*OUR HEADER IMAGE*/
+	background-repeat: no-repeat; /*STOPS HEADER IMAGE REPEATING*/
+}
+
+/* SLIDING PANEL STYLES */
+ 
+#slide-panel {
+	height: 200px; /*HEIGHT OF HIDDEN SLIDE PANEL*/
+	width: 350px; /*WIDTH OF HIDDEN SLIDE PANEL*/
+	display: none; /*THE ELEMENT WILL NOT BE DISPLAYED*/
+	border-right-width: 2px; /*ADDS RIGHT BORDER OF 2PX*/
+	border-left-width: 2px; /*ADDS LEFT BORDER OF 2PK*/
+	border-right-style: solid; /*MAKES RIGHT BORDER SOLID*/
+	border-left-style: solid; /*MAKES LEFT BORDER SOLID*/
+	border-right-color: #626262; /*RIGHT BORDER COLOR*/
+	border-left-color: #626262; /*LEFT BORDER COLOR*/
+	background-color: #000000; /*SLIDE PANEL BACKGROUND COLOR*/
+	border-bottom-width: 2px; /*ADDS BOTTOM BORDER OF 2PX*/
+	border-bottom-style: solid; /*MAKES BOTTOM BORDER SOLID*/
+	border-bottom-color: #626262; /*BOTTOM BORDER COLOR*/
+	opacity: .8; /*SETS SLIDE PANEL BACKGROUND'S OPACITY TO 80%*/
+	margin: auto; /*CENTERS OUR SLIDE PANEL*/
+}
+ 
+.slide {
+	margin: 0; /*NO MARGIN*/
+	padding: 0; /*NO PADDING*/
+	background-image: url(/static/images/slide_button.png); /*ADDS OUR BUTTON IMAGE*/
+	background-repeat: no-repeat; /*STOPS BUTTON FROM REPEATING*/
+	background-position: center top; /*SETS BUTTON POSITION*/
+}
+ 
+.btn-slide {
+	text-align: center; /*ALIGNS TEXT CENTER*/
+	width: 191px; /*BUTTON WIDTH*/
+	height: 26px; /*BUTTON HEIGHT*/
+	display: block; /*DISPLAY AS A BLOCK*/
+	color: #fff; /*TEXT COLOR*/
+	text-decoration: none; /*REMOVES UNDERSCORE FROM LINK*/
+	font-family: Arial, Helvetica, sans-serif; /*FONT FAMILY*/
+	font-weight: bold; /*TURNS TEXT BOLD*/
+	font-size: 1em; /*FONT SIZE*/
+	margin-right: auto; /*MARGIN AUTO*/
+	margin-left: auto; /*MARGIN AUTO*/
+	line-height: 22px; /*LINE HEIGHT OF BUTTON TEXT*/
+}

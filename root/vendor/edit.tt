@@ -1,0 +1,42 @@
+[% WRAPPER wrapper.tt extra="vendor" nomenu=1 %]
+<form id="vendorForm">
+<table>
+<tr>
+	<td>Name</td>
+	<td><input class="cmdbText" id="name" type="text" value="[% vendor.vendor_name %]" name="name" /></td>
+</tr>
+<tr>
+	<td>Sales phone</td>
+	<td><input class="cmdbText" type="text" value="[% vendor.vendor_phone %]" name="salestel" /></td>
+</tr>
+<tr>
+	<td>Support phone</td>
+	<td><input type="text" class="cmdbText" value="[% vendor.vendor_support_phone %]" name="supporttel" /></td>
+</tr>
+<tr>
+	<td>Support e-mail</td>
+	<td><input type="email" id="email" class="cmdbText" value="[% vendor.vendor_support_email %]" name="supportmail" /></td>
+</tr>
+<tr>
+	<td>Support website</td>
+	<td><input type="url" id="web" class="cmdbText" value="[% vendor.vendor_support_www %]" name="supportweb" /></td>
+</tr>
+<tr>
+	<td>IETF Enterprise number</td>
+	<td><inout type="text" class="cmdbText" value="[% vendor.vendor_enterprises %]" name="enterprise" /></td>
+</tr>
+<tr valign="top">
+		<td>Details</td>
+		
+</tr>
+<tr>
+	<td colspan="2"><textarea rows="8" cols="80" name="details">[% vendor.vendor_details %]</textarea></td>
+</tr>
+</table>
+<input type="hidden" name="id" value="[% vendor.vendor_id %]" />
+
+<br>
+<button type="submit" id="saveVendor" class="cmdbButton" >save</button>&nbsp;
+<button id="deleteVendor" class="cmdbButton">delete</button><p id="response"></p>
+</form>
+[% END %]

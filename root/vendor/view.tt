@@ -1,0 +1,35 @@
+[% WRAPPER wrapper.tt %]
+<table>
+<tr>
+	<td>Name</td>
+	<td>[% vendor.vendor_name %]</td>
+</tr>
+<tr>
+	<td>Sales phone</td>
+	<td>[% vendor.vendor_phone %]</td>
+</tr>
+<tr>
+	<td>Support phone</td>
+	<td>[% vendor.vendor_support_phone %]</td>
+</tr>
+<tr>
+	<td>Support e-mail</td>
+	<td>[% vendor.vendor_support_email %]</td>
+</tr>
+<tr>
+	<td>Support website</td>
+	<td>[% vendor.vendor_support_www %]</td>
+</tr>
+<tr>
+	<td>IETF Enterprise number</td>
+	<td>[% vendor.vendor_enterprises %]</td>
+</tr>
+<tr valign="top">
+		<td>Details</td>
+		<td></td>
+</tr>
+<tr>
+	<td colspan="2"><textarea rows="8" cols="60" name="vendor_details">[% vendor.vendor_details %]</textarea></td>
+</tr>
+</table>
+[% END %]

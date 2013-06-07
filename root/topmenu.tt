@@ -1,0 +1,57 @@
+<div class="topmenu">
+<div class="cmdbmenu">
+<!-- Start PureCSSMenu.com MENU -->
+<ul class="pureCssMenu pureCssMenum0">
+	<li class="pureCssMenui0"><a class="pureCssMenui0" href="#"><span>Home</span><![if gt IE 6]></a><![endif]><!--[if lte IE 6]><table><tr><td><![endif]-->
+	<ul class="pureCssMenum">
+		<li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>Import</span><![if gt IE 6]></a><![endif]><!--[if lte IE 6]><table><tr><td><![endif]-->
+		<ul class="pureCssMenum">
+			<li class="pureCssMenui"><a class="pureCssMenui" href="#">Configuration</a></li>
+			<li class="pureCssMenui"><a class="pureCssMenui" href="#">Device list</a></li>
+		</ul>
+		<!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+		<li class="pureCssMenui"><a class="pureCssMenui" href="/logout">Logout</a></li>
+	</ul>
+	<!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+	<li class="pureCssMenui0"><a class="pureCssMenui0" href="#"><span>Objects</span><![if gt IE 6]></a><![endif]><!--[if lte IE 6]><table><tr><td><![endif]-->
+	<ul class="pureCssMenum">
+		<li class="pureCssMenui"><a class="pureCssMenui" href="#"><span>IP Devices</span><![if gt IE 6]></a><![endif]><!--[if lte IE 6]><table><tr><td><![endif]-->
+		<ul class="pureCssMenum">
+			<li class="pureCssMenui"><a class="pureCssMenui" href="/device">Manage devices</a></li>
+			<li class="pureCssMenui"><a class="pureCssMenui" href="/iptype">Device types</a></li>
+			<li class="pureCssMenui"><a class="pureCssMenui" href="#">VLAN Administration</a></li>
+			<li class="pureCssMenui"><a class="pureCssMenui" href="/ipdomain">IP Domains</a></li>
+		</ul>
+		<!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+		<li class="pureCssMenui"><a class="pureCssMenui" href="/vendor">Vendors</a></li>
+		<li class="pureCssMenui"><a class="pureCssMenui" href="/location">Locations</a></li>
+		<li class="pureCssMenui"><a class="pureCssMenui" href="/cmdb_contract_admin.php">Contracts</a></li>
+	</ul>
+	<!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+	<li class="pureCssMenui0"><a class="pureCssMenui0" href="#"><span>Discovery</span><![if gt IE 6]></a><![endif]><!--[if lte IE 6]><table><tr><td><![endif]-->
+	<ul class="pureCssMenum">
+		<li class="pureCssMenui"><a class="pureCssMenui" href="/cmdb_poll_scheme.php">Polling</a></li>
+	</ul>
+	<!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+	<li class="pureCssMenui0"><a class="pureCssMenui0" href="#"><span>Distribution</span><![if gt IE 6]></a><![endif]><!--[if lte IE 6]><table><tr><td><![endif]-->
+	<ul class="pureCssMenum">
+		<li class="pureCssMenui"><a class="pureCssMenui" href="/cmdb_dist_model.php">Models</a></li>
+		<li class="pureCssMenui"><a class="pureCssMenui" href="/cmdb_dist_endpoint.php">Endpoints</a></li>
+	</ul>
+	<!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+	<li class="pureCssMenui0"><a class="pureCssMenui0" href="#"><span>Admin</span><![if gt IE 6]></a><![endif]><!--[if lte IE 6]><table><tr><td><![endif]-->
+	<ul class="pureCssMenum">
+		<li class="pureCssMenui"><a class="pureCssMenui" href="/users">Users</a></li>
+		<li class="pureCssMenui"><a class="pureCssMenui" href="/roles">Roles</a></li>
+	</ul>
+	<!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+	<li class="pureCssMenui0"><a class="pureCssMenui0" href="#"><span>Help</span><![if gt IE 6]></a><![endif]><!--[if lte IE 6]><table><tr><td><![endif]-->
+	<ul class="pureCssMenum">
+		<li class="pureCssMenui"><a class="pureCssMenui" href="/cmdb_credits.php">Credits</a></li>
+	</ul>
+	<!--[if lte IE 6]></td></tr></table></a><![endif]--></li>
+</ul>
+
+<!-- End PureCSSMenu.com MENU -->
+</div>
+</div>

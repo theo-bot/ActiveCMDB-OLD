@@ -1,0 +1,17 @@
+[% WRAPPER wrapper.tt extra="role" nomenu=1 %]
+<br>
+<form id="roleForm">
+<input type="hidden" name="id" value="[% role.id %]">
+<table>
+<tr>
+	<td>Role name</td>
+	<td><input type="text" name="role" value="[% role.role %]" /></td>
+</tr>
+</table>
+</form>
+<br>
+[% IF role.id != 1 %]<input type="button" id="saveRole" class="cmdbButton" value="save" />[% END %][% IF role.id > 1 %]&nbsp;<input type="button" id="deleteRole" class="cmdbButton" value="delete" />[% END %]
+<br>
+<p id="response"></p>
+
+[% END %]

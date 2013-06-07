@@ -1,0 +1,64 @@
+[% WRAPPER wrapper.tt extra="structure" jquery="off" %]
+<div class="cmdbTabDiv">
+<div id="entityDetail" class="entityDetail" >
+<table>
+<tr>
+	<td width="120">Name</td>
+	<td>:</td>
+	<td id="entityName"></td>
+</tr>
+<tr valign="top">
+	<td>Description</td>
+	<td>:</td>
+	<td id="entityDesc"></td>
+</tr>
+<tr>
+	<td>Class</td>
+	<td>:</td>
+	<td id="entityClass"></td>
+</tr>
+<tr>
+	<td>Hardware revision</td>
+	<td>:</td>
+	<td id="entityHwRev"></td>
+</tr>
+<tr>
+	<td>Firmware revision</td>
+	<td>:</td>
+	<td id="entityFwRev"></td>
+</tr>
+<tr>
+	<td>Software revision</td>
+	<td>:</td>
+	<td id="entitySwRev"></td>
+</tr>
+<tr>
+	<td>Serial number</td>
+	<td>:</td>
+	<td id="entitySerial"></td>
+</tr>
+<tr>
+	<td>Logical unit</td>
+	<td>:</td>
+	<td id="logicalUnit"></td>
+</tr>
+</table>
+
+</div>
+
+<div id="dtree"></div>
+<script type="text/javascript">
+<!--
+	d = new dTree('d');
+	
+	[% FOREACH item IN tree %]
+	d.add([% item.entphysicalindex %],[% item.entphysicalcontainedin %],'[% item.entphysicalname %]','javascript:xEntityDetails([% device_id %],[% item.entphysicalindex %])','','','[% item.icon %]');
+	[% END %]
+	document.getElementById('dtree').innerHTML = d;
+	$('#dtree a').each(function() {
+		$(this).attr('style', 'color:black');
+	});
+//-->
+</script>
+</div>
+[% END %]

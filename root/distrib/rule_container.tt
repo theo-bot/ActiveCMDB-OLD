@@ -1,0 +1,6 @@
+[% WRAPPER wrapper.tt extra="distrib" %]
+<br>
+<table id="DistRuleTable"></table>
+<div id="DistRulePager"></div>
+
+[% END %]

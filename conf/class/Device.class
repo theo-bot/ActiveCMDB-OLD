@@ -1,0 +1,18 @@
+class "Device" {
+	
+	super '';
+	version '1.0';
+	enabled 1;
+	
+	interrogations {
+						system		1;
+						interfaces	2;
+						arp			3;
+						ipmib		3;
+						tcpservices	3;
+				};
+	
+	oidset [
+				'1.3.6'
+			];
+};

@@ -1,0 +1,99 @@
+[% WRAPPER wrapper.tt extra="location" %]
+<form name="siteForm" id="siteForm" method="post">
+<input type="hidden" id="location_id" name="location_id" value="[% site.location_id %]" />
+
+<div class="ui-widget">
+<table id="tblsite" border="0" padding="3">
+<tr align="left">
+	<td width="100">Name</td>
+	<td><input type="text" name="name" id="name" value="[% site.name %]" />&nbsp;<input type="button" class="cmdbButton" value="fetch" id="fetchSite" /></td>
+</tr>
+<tr>
+	<td>Type</td>
+	<td>
+		<select name="type" id="type" class="cmdbList">
+		[% FOREACH type IN types %]
+			<option value="[% type.id %]" [% IF type.id == site.type %]selected[% END %]>[% type.name %]</option>
+		[% END %]
+		</select> 
+	</td>
+</tr>
+<tr id='parent'>
+	<td>Parent</td>
+	<td>
+		<select name="parent_id" id="parent_id" class="cmdbList">
+			[% FOREACH parent IN parents %]
+			<option value="[% parent.location_id %]" [% IF parent.location_id == site.location_id %]selected[% END %]>[% parent.name %]</option>
+			[% END %]
+		</select>
+	</td>
+</tr>
+</table>
+<div id="building">
+<table>
+<tr>
+	<td width="100">Lattitude</td>
+	<td><input type="text" name="lattitude" id="lattitude" value="[% site.lattitude %]" size="10" /></td>
+</tr>
+<tr>
+	<td>Longitude</td>
+	<td><input type="text" name="longitude" id="longitude" value="[% site.longitude %]" size="10" /></td>
+</tr>
+</table>
+</div>
+<div id="building-room">
+<table>
+<tr>
+	<td width="100">Adres</td>
+	<td width="275"><input type="text" name="adres1" id="adres1" value="[% site.adres1 %]" /></td>
+	<td width="100">Classification</td>
+	<td>
+		<select name="classification" id="classification" class="cmdbList">
+		[% FOREACH  class IN classifs %]
+		<option value="[% class.key %]" [% IF site.classification == class.key %]selected[% END %]>[% class.value %]</option>
+		[% END %]
+		</select>
+	</td>
+</tr>
+<tr>
+	<td>&nbsp;</td>
+	<td><input type="text" name="adres2" id="adres2" value="[% site.adres2 %]" /></td>
+	<td>Primary contact</td>
+	<td><input type="text" name="primary_contact" id="primary_contact" value="[% site.primary_contact %]"/> </td>
+</tr>
+<tr>
+	<td>Zipcode</td>
+	<td><input type="text" name="zipcode" id="zipcode" value="[% site.zipcode %]" /></td>
+	<td>Primary phone</td>
+	<td><input type="text" name="primary_phone" id="primary_phone" value="[% site.primary_phone %]" /></td>
+</tr>
+<tr>
+	<td>Place</td>
+	<td><input type="text" name="place" id="place" value="[% site.place %]" /></td>
+	<td>Backup contact</td>
+	<td><input type="text" name="backup_contact" id="backup_contact" value="[% site.backup_contact %]"/> </td>
+</tr>
+<tr>
+	<td>&nbsp;</td>
+	<td>&nbsp;</td>
+	<td>Backup phone</td>
+	<td><input type="text" name="backup_phone" id="backup_phone" value="[% site.backup_phone %]" /></td>
+</tr>
+</table>
+</div>
+<table>
+<tr>
+	<td width="100" valign="top">Details</td>
+	<td><textarea id="details" name="details" rows="10" cols="80">[% site.details %]</textarea> </td>
+</tr>
+</table>
+
+&nbsp;<button type="submit" id="saveSite" class="cmdbButton" >save</button>&nbsp;<input type="button" class="cmdbButton" value="Reset" id="resetButton" onClick="locResetDetails();">
+<p id="response"></p>
+
+
+
+
+
+</form>
+[% END %]

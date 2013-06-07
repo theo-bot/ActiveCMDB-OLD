@@ -1,0 +1,18 @@
+{
+   "priority" : "00",
+   "serial" : 7,
+   "action" : {
+      "message.forward" : [
+         "itnm"
+      ]
+   },
+   "active" : 1,
+   "name" : "device.rule",
+   "rule" : {
+      "device.status" : [
+         "0",
+         "1"
+      ],
+      "message.subject" : "ProcessDevice"
+   }
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>ActiveCMDB</title>
+	<link rel="stylesheet" href="/static/css/main.css" />
+	<link rel="stylesheet" href="/static/css/colorbox.css" />
+	<script src="/static/js/jquery.js"></script>
+	<script src="/static/js/jquery.colorbox-min.js"></script>
+	<script src="/static/js/activecmdb.config.js"></script>
+</head>
+<body>
+<div>
+<div class="configData">
+[% IF devconfig.config_type == 'ASCII' %]
+[% devconfig.data2web %]
+[% END %]
+</div>
+<div>
+
+<table>
+<tr >
+	<th align="left">Hostname</th>
+	<td width="128">:[% device.hostname %]</td>
+	<th align="left">Checksum</th>
+	<td>:[% devconfig.config_checksum %]</td>
+</tr>
+<tr>
+	<th align="left">Date</th>
+	<td>:[% devconfig.date2str %]</td>
+</tr>
+<tr>
+	<th align="left">Filename</th>
+	<td>:[% devconfig.config_name %]</td>
+</tr>
+</table>
+</div>
+</div>
+</body>
+</html>

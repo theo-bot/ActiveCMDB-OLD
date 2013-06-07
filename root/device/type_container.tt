@@ -1,0 +1,8 @@
+[% WRAPPER wrapper.tt extra="iptype" %]
+<br>
+<center>
+<table id="typeTable"></table>
+<div id="typePager"></div>
+</center>
+
+[% END %]

@@ -1,0 +1,85 @@
+default:
+  version: 1
+  keyname: activecmdb
+  exchange: cmdb.common-x
+  queue: cmdb.common
+  maxproc: 1
+  server_id: 1
+  date_format: "%Y-%m-%d"
+   
+
+database:
+  dbhost: localhost
+  dbuser: activecmdb
+  dbpass: 000000013ce6b012811c3f639a192d6a60a6a3300b1f2ec75cfe870c6901e3e2a8cbdf45f5647ccfc41f558b603cbe53c6069b229e72fb081614521821759db550ae422cac6af6893851cefa73e4925e044ab909360dd971a7139f2908d176a913343bb11e6fbe53a9159f0742c85f990dbd8a56a8043f985ef60840ffd97b070eec5971b99ab523782564fe053d6f68d0f3233a5b2f1729494696b9718fc7511056ae88f3fd5d498932f98a29e5c1a415c28a4a2e5c9251ebf90952bf4daf5caf178d316f1ca97fc6f511e86de605dcf98f6ba81986ff1d4b86e9c86b5a85d344cdfd48d51b58130a34d84ae027316ad092ab42aa8bcc1fc6b114e6bba95fdeca033cc9
+  dbtype: mysql
+  dbname: ActiveCMDB
+  pwencr: 1
+  
+cloud:
+  host: http://127.0.0.1:8098
+  timeout: 950
+
+logging:
+  config: $CMDB_HOME/conf/log4perl.conf
+  logdir: $CMDB_HOME/var/log
+  
+broker:
+  typeof: RabbitMQ
+  uri: tcp://127.0.0.1:5672
+  user: guest
+  password: guest
+  pwencr: 0
+  prefix: cmdb.
+  
+process:
+  disco:
+    queue: cmdb.disco
+    exchange: cmdb.disco-x
+    maxproc: 2
+    path: $CMDB_HOME/sbin/cmdb_ip_disco.pl
+    follow_up: cmdbDistrib
+    managed: 1
+    max_rounds: 10
+  distrib:
+    queue: cmdb.distrib
+    exchange: cmdb.distrib-x
+    buckets:
+      rules: CmdbDistRules
+      rulemap: CmdbDistRuleMap
+    path: $CMDB_HOME/sbin/cmdb_ip_dist.pl
+    managed: 1
+    maxproc: 1
+  config:
+    queue: cmdb.config
+    exchange: cmdb.config-x
+    maxproc: 0
+    path: $CMDB_HOME/sbin/cmdb_ip_config.pl
+    landing_zone: tdevelop.localdomain:/var/lib/tftpboot
+    managed: 1
+  object:
+    queue: cmdb.object
+    exchange: cmdb.object-x
+    path: $CMDB_HOME/sbin/cmdb_ip_object.pl
+    follow_up: cmdbDisco,cmdbConfig
+    managed: 1
+    reprocess_limit: 60
+    reprocess_intervall: 86400
+    low_water: 60
+  process:
+    queue: cmdb.process
+    exchange: cmdb.process-x
+    maxproc: 1
+    path: $CMDB_HOME/sbin/cmdb_core_process.pl
+    managed: 0
+    
+  
+location:
+    types:
+      0: Country
+      1: State
+      2: Place
+      3: Site
+      4: Building
+      5: Room
+      6: Rack

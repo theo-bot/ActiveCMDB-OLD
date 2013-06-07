@@ -1,0 +1,66 @@
+[% WRAPPER wrapper.tt extra="interface" %]
+<div class="cmdbTabDiv">
+<div class="interfaceList">
+<table cellspacing="0" >
+<tr align="left">
+	<th width="6">ifIndex</th>
+	<th width="128">Name</th>
+	<th width="5">Enabled</th>
+	<th width="6">Status</th>
+	<th width="64">IP Address</th>
+</tr>
+[% FOREACH ifentry IN int %]
+<tr class="cmdbRow" onclick="xInterfaceDetails([% device_id %],[% ifentry.ifindex %]);">
+	<td>[% ifentry.ifindex %]</td>
+	<td>[% ifentry.ifdescr %]</td>
+	<td>[% ifentry.admin %]</td>
+	<td>[% ifentry.oper %]</td>
+	<td></td>
+</tr>
+[% END %]
+</table>
+</div>
+<div id="ifDetail" class="interfaceDetail">
+<table>
+<tr>
+	<td class="cmdb_int">ifDescr</td>
+	<td>:</td>
+	<td id="ifDescr"></td>
+</tr>
+<tr>
+	<td class="cmdb_int">ifName</td>
+	<td>:</td>
+	<td id="ifName"></td>
+</tr>
+<tr>
+	<td class="cmdb_int">ifAlias</td>
+	<td>:</td>
+	<td id="ifAlias"></td>
+</tr>
+<tr>
+	<td class="cmdb_int">ifIndex</td>
+	<td>:</td>
+	<td id="ifIndex"></td>
+</tr>
+<tr>
+	<td class="cmdb_int">ifSpeed</td>
+	<td>:</td>
+	<td id="ifSpeed"></td>
+</tr>
+<tr>
+	<td class="cmdb_int">ifType</td>
+	<td>:</td>
+	<td id="ifType"></td>
+</tr>
+<tr>
+	<td class="cmdb_int">ifPhysAddress</td>
+	<td>:</td>
+	<td id="ifPhysAddress"></td>
+</tr>
+</table>
+
+
+</div>
+</div>
+
+[% END %]

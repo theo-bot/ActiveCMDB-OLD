@@ -1,0 +1,53 @@
+[% WRAPPER wrapper.tt extra="process" %]
+<br>
+<form id="procForm" >
+<input type="hidden" name="name" value="[% process.process_name %]" />
+<table class="cmdbTable" >
+<tr>
+	<td>Name</td>
+	<td>:[% process.name %]</td>
+</tr>
+<tr>
+	<td>Server</td>
+	<td>:[% process.server_id %]</td>
+</tr>
+<tr>
+	<td>Instance</td>
+	<td>:[% process.instance %]</td>
+</tr>
+<tr>
+	<td>Parent</td>
+	<td>:[% process.parent %][% IF process.ppid > 0 %]([% process.ppid %])[% END %]</td>
+</tr>
+<tr>
+	<td>Process ID</td>
+	<td>:[% process.pid %]</td>
+</tr>
+<tr>
+	<td>Path</td>
+	<td>:[% process.path %]</td>
+</tr>
+<tr>
+	<td>Started</td>
+	<td>:[% process.exects %]</td>
+</tr>
+<tr>
+	<td>Last update</td>
+	<td>:[% process.updatets %]</td>
+</tr>
+
+<tr>
+	<td>Status</td>
+	<td>
+		<select name="procState" class="cmdbList">
+			[% FOREACH pstat IN states %]
+			<option value="[% pstat.key %]" [% IF pstat.key == process.status %]selected[% END %]>[% pstat.value %]</option>
+			[% END %]
+		</select>
+	</td>
+</tr>
+</table>
+<br>
+<input class="cmdbButton" type="button" value="Apply" id="updateProcess">
+</form>
+[% END %]

@@ -1,0 +1,56 @@
+[% WRAPPER wrapper.tt extra="user" nomenu=1 %]
+<form id="userForm">
+<input type="hidden" name="id" value="[% user.id %]" />
+<br>
+<table width="98%">
+<tr>
+	<td width="25%">Username</td>
+	<td width="25%"><input tabindex="1" type="text" class="cmdbText" name="username" value="[% user.username %]" /></td>
+	<td>New password</td>
+	<td><input tabindex="6" type="password" name="newpass1" class="cmdbText" /></td>
+</tr>
+
+<tr>
+	<td>First name</td>
+	<td><input tabindex="2" type="text" class="cmdbText" name="first_name" value="[% user.first_name %]" />
+	<td>Repeat password</td>
+	<td><input tabindex="7" type="password" name="newpass2" class="cmdbText" /></td>
+</tr>
+<tr>
+	<td>Last name</td>
+	<td><input tabindex="3" type="text" class="cmdbText" name="last_name" value="[% user.last_name %]" />
+</tr>
+<tr>
+	<td>e-mail</td>
+	<td><input tabindex="4" type="text" class="cmdbText" name="email" value="[% user.email_address %]" />
+	<td>Active</td>
+	<td><input tabindex="5" type="checkbox" name="active" value="1" [% IF user.active == 1 %]checked[% END %]></td>
+</tr>
+</table>
+<table>
+<tr>
+	<td>
+		
+		<select id="box1View" multiple="multiple" class="dualBox">[% FOREACH role IN available %]<option value="[% role.id %]">[% role.role %]</option>[% END %]</select><br/>
+		<span id="box1Counter" class="countLabel"></span>
+		<select id="box1Storage"></select>
+	</td>
+	<td align="center">
+		<button id="to2" type="button" class="cmdbButton">&nbsp;>&nbsp;</button><br>
+		<button id="allTo2" type="button" class="cmdbButton">>></button><br>
+		<button id="allTo1" type="button" class="cmdbButton"> << </button><br>
+		<button id="to1" type="button" class="cmdbButton">&nbsp;<&nbsp;</button>
+	</td>
+	<td>
+		<select id="box2View" multiple="multiple" name="userRoles" class="dualBox">[% FOREACH role IN assigned %]<option value="[% role.id %]">[% role.role %]</option>[% END %]</select><br/>
+		<span id="box2Counter" class="countLabel"></span>
+		<select id="box2Storage"></select>
+	</td>
+</tr>
+</table>
+</form>
+<br>
+<input type="button" id="saveUser" class="cmdbButton" value="save" />[% IF user.id > 0 %] &nbsp;<input type="button" id="deleteUser" class="cmdbButton" value="delete" />[% END %]
+<br>
+<p id="response"></p>
+[% END %]

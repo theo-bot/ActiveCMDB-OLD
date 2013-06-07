@@ -1,0 +1,8 @@
+[% WRAPPER wrapper.tt nomenu=1 %]
+<img width="300" src="data:[% mimetype %];base64,[% image %]" />
+<form method="post" enctype="multipart/form-data" action="/iptype/storeimage">
+<input type="hidden" name="id" value="[% type_id %]" />
+<br>
+Upload image: <input type="file" name="image" class="cmdbButton"><input type="submit" class="cmdbButton" value="Upload" />
+</form>
+[% END %]

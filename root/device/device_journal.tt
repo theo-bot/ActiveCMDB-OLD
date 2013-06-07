@@ -1,0 +1,7 @@
+[% WRAPPER wrapper.tt extra="devicejnl" %]
+<form><input type="hidden" id="device_id" value="[% device_id %]" /></form> 
+<br>
+<table id="jnlTable"></table>
+<div id="jnlPager"></div>
+</form>
+[% END %]

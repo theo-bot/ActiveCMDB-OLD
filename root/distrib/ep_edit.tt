@@ -1,0 +1,77 @@
+[% WRAPPER wrapper.tt extra="distrib" %]
+[% USE dumper %]
+<form name="epForm" action="save" method="post">
+<input type="hidden" name="id" value="[% ep.id %]" />
+<table class="cmdbTable">
+<tr>
+	<th align="left">Name</th>
+	<td>:<input name="name" id="name" type="text" class="cmdbText" value="[% ep.name %]">
+</tr>
+<tr>
+	<th align="left">Type</th>
+	<td>:<select name="method" id="method" class="cmdbList" onchange="ep_options()">
+	     	[% FOREACH method IN methods %]
+	     	<option value="[% method %]" [% IF ep.method == method %]selected[% END %]>[% method %]</option>
+	     	[% END %]
+	     </select>
+	</td>
+</tr>
+<tr>
+	<th align="left">Network</th>
+	<td>:<input type="text" class="cmdbText" name="network" id="network" value="[% ep.network %]" /></td>
+</tr>
+<tr>
+	<th align="left">User</th>
+	<td>:<input type="text" class="cmdbText" name="user" id="user" value="[% ep.user %]" autocomplete="off"/></td>
+</tr>
+<tr>
+	<th align="left">Password</th>
+	<td>:<input type="password" class="cmdbText" name="password" id="password" value="[% ep.password %]">&nbsp
+	     <input type="checkbox" alt="Encrypted key" [% IF ep.encrypt == 1 %]checked[% END %] onchange="epCrypt(this);">
+	</td> 
+</tr>
+<tr>
+	<th align="left">Active</th>
+	<td>:<input type="checkbox" [% IF ep.active == 1 %]checked[% END %] name="active" id="active" /></td>
+</tr>
+
+<tr>
+	<th align="left">IN</th>
+	<td>:<input type="text" class="cmdbText" name="dest_in" id="dest_in" value="[% ep.dest_in %]" /></td>
+</tr>
+<tr>
+	<th align="left">OUT</th>
+	<td>:<input type="text" class="cmdbText" name="dest_out" id="dest_out" value="[% ep.dest_out %]" /></td>
+</tr>
+
+</table>
+<br><b>Endpoint messages</b><br><br>
+<table id="subjectTable" class="cmdbTableFixed" width="640">
+<tr align="left">
+	<th width="156">Subject</th>
+	<th width="96">Active</th>
+	<th width="156">Mimetype</th>
+	<th width="128">Action</th>
+	<th>&nbsp;</th>
+</tr>
+[% FOREACH sub  IN ep.subjects %]
+[% msg = sub.value %]
+<tr>
+	<td><div class="ui-widget"><input type="text" name="subject" class="cmdbText" value="[% msg.subject %]" /></div></td>
+	<td><input type="button" class="cmdbButton" value="yes" onclick="toggleDistMsg(this); return false" /><input type="hidden" name="msgactive" value="yes" /></td>
+	<td><input type="text" name="mimetype" id="mime" class="cmdbText" value="[% msg.mimetype %]" /></td>
+	<td><img name="edit" src="/static/images/document_edit.png"  /></td>
+	<td>&nbsp;</td>
+</tr>
+<tr style="display: none" id="row[% msg.subject %]">
+	<td colspan="5"><textarea cols="64" rows="5" name="ep_message">[% msg.message %]</textarea></td>
+</tr>
+[% END %]
+</table>
+<br>
+<input type="button" value="Add message" class="cmdbButton" id="addMessage" />
+<input type="submit" value="Save" class="cmdbButton"/> 
+</form>
+
+
+[% END %]

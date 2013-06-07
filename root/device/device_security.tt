@@ -1,0 +1,76 @@
+[% WRAPPER wrapper.tt extra="devicesec" %]
+
+<div class="cmdbTabDiv" >
+<form name="deviceSec" id="deviceSec">
+<input type="hidden" name="device_id" value="[% device.device_id %]" />
+<table>
+<tr>
+	<td colspan="2"><b>Telnet/SSH Settings</b></td>
+</tr>
+<tr>
+	<td>Terminal user</td>
+	<td><input type="text" name="telnet_user" class="cmdbText" value="[% device.telnet_user %]" /></td>
+</tr>
+<tr>
+	<td>Terminal password</td>
+	<td><input type="password" name="telnet_pwd" class="cmdbText" value="[% device.telnet_pwd %]" /></td>
+</tr>
+<tr>
+	<td colspan="2"><b>SNMP Settings</b></td>
+</tr>
+<tr valign="top">
+	<td>SNMP Version</td>
+	<td>
+		<label for="number1"><input type="radio" value="1" name="snmpv" id="number1" class="cmdbRadio" [% IF device.snmpv == 1 %]CHECKED[% END %] onchange="snmpSelect();"> v1/2c</label>&nbsp;
+		<label for="number2"><input type="radio" value="3" name="snmpv" id="number2" class="cmdbRadio" [% IF device.snmpv > 1 %]CHECKED[% END %] onchange="snmpSelect();"> 3</label>
+	</td>
+</tr>
+</table>
+<div id="snmpv1">
+<table>
+<tr>
+	<td>Read-only</td>
+	<td><input type="password" name="snmp_ro" class="cmdbText" value="[% device.snmp_ro %]" /></td>
+</tr>
+<tr>
+	<td>Read-Write</td>
+	<td><input type="password" name="snmp_rw" class="cmdbText" value="[% device.snmp_rw %]" /></td>
+</tr>
+</table>
+</div>
+<div id="snmpv3">
+<table>
+<tr>
+	<td>SNMPv3 User</td>
+	<td><input type="text" name="snmpv3_user" class="cmdbText" value="[% device.snmpv3_user %]"  /></td>
+</tr>
+<tr>
+	<td>Auth key</td>
+	<td>
+		<input type="text" name="snmpv3_pass1" class="cmdbText" value="[% device.snmpv3_pass1 %]"  />&nbsp;
+		<select name="snmpv3_proto1" id="snmpv3_proto1" class="cmdbList" >
+			<option value="sha">SHA</option>
+			<option value="md5">MD5</option>
+		</select>
+	</td>
+</tr>
+<tr>
+	<td>Priv key</td>
+	<td>
+		<input type="text" name="snmpv3_pass2" class="cmdbText" value="[% device.snmpv3_pass2 %]"  />&nbsp;
+		<select name="snmpv3_proto2" id="snmpv3_proto2" class="cmdbList" >
+			<option value="des">DES</option>
+			<option value="aes">AES</option>
+		</select>
+	</td>
+</tr>
+</table>
+</div>
+<input type="button" value="Update security" class="cmdbButton" id="updateSecurity" />&nbsp<p id="response"></p>
+</form>
+</div>
+
+<script type="text/javascript">
+	snmpSelect();
+</script>
+[% END %]

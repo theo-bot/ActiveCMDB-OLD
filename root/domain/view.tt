@@ -1,0 +1,23 @@
+[% WRAPPER wrapper.tt extra="domain" %]
+<br>
+<form id="domainForm">
+<input type="hidden" name="domain_id" id="id" value="[% domain.domain_id %]" />
+<table>
+<tr>
+	<td>Domain</td>
+	<td><input type="text id="name" name="domain_name" class="cmdbText" value="[% domain.domain_name %]" /></td>
+	<td>Active</td>
+	<td><input type="checkbox" id="active" name="active" [% IF domain.active == 1 %]chekced[% END %] /></td>
+</tr>
+<tr>
+	<td>Resolvers</td>
+	<td><input type="text" id="resolvers" name="resolvers" class="cmdbText" value="[% domain.resolvers %]" /></td>
+	<td>Update servers</td>
+	<td><input type="checkbox" id="update" name="auto_update" [% IF domain.auto_update == 1 %]checked[% END %] /></td>
+</tr>
+</table>
+<br>
+<table id="netTable"></table>
+<div id="netPager"></div>
+</form>
+[% END %]

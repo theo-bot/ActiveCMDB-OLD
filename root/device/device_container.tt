@@ -1,0 +1,98 @@
+[% WRAPPER wrapper.tt extra="device" %]
+<style>
+	.ui-menu { position: absolute; width: 100px; }
+</style>
+<br>
+<form name="deviceForm" id="deviceForm" method="post">
+
+<input type="hidden" id="device_id" name="device_id" value="[% device.device_id %]"}"/>
+<div id="toolbarObj"></div>
+
+<table class="ui-widget">
+	<tr>
+		<td class="cmdbDev">Hostname</td>
+		<td>
+			<div class="ui-widget">
+					<input type="text" name="hostname" id="hostname" class="cmdbDev" value="[% device.hostname %]" autocomplete="off" /
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td class="cmdbDev">Management address</td>
+		<td><input type="text" name="mgtaddress" id="mgtaddress" value="[% device.mgtaddress %]" autocomplete="off" class="cmdbDev" /></td>
+	</tr>
+	<tr>
+		<td>Device type</td>
+		<td id="devtype">[% type.descr %][% IF type.descr != '' %]<a href="#" id="image">image</a>[% END %]</td>
+	</tr>
+	<tr>
+		<td>Vendor</td>
+		<td id="vendor"></td>
+	</tr>
+	<tr>
+		<td>Status</td>
+		<td><select name="status">[% statusOptions %]</select></td>
+	</tr>
+</table>
+</div>
+<br>
+<div id="tabs">
+	<ul>
+		<li><a id="devint" href="/device/interface?id=0">Interfaces</a></li>
+		<li><a id="devent" href="/device/stucture?id=0">Structure</a></li>
+		<li><a id="devcon" href="/device/connections?id=0">Connections</a></li>
+		<li><a id="devcir" href="/device/circuits?id=0">Circuits</a></a></li>
+		<li><a id="devloc" href="/device/site?id=0">Location</a></li>
+		<li><a id="devctr" href="/device/contract?id=0">Contract</a></li>
+		<li><a id="devsec" href="/device/security?id=0">Security</a></li>
+		<li><a id="devjnl" href="/device/journal?id=0">Journal</a></li>
+		<li><a id="devmnt" href="/device/maintenance?id=0">Maintenance</a></li>
+		<li><a id="devcfg" href="/device/devconfig?id=0">Configuration</a></li>
+	</ul>
+</div>
+<div class="cmdbDevDetails2">
+<table class="ui-widget">
+<tr>
+	<td>Date added</td>
+	<td>:</td>
+	<td id="added"></td>
+</tr>
+<tr>
+	<td>Last discovery</td>
+	<td>:</td>
+	<td id="disco"></td>
+</tr>
+<tr>
+	<td>Description</td>
+	<td>:</td>
+	<td id="sysdescr" title=""></td>
+</tr>
+<tr>
+	<td>Critical</td>
+	<td>:</td>
+	<td><input type="checkbox" id="isCritical" name="isCritical" value="1" default="0" /></td>
+</tr>
+</table>
+</div>
+
+</form>
+<div id="searchWin" title="Search device">
+<table width="75%" class="ui-widget">
+	<tr align="left"><th>Table</th><th>Field</th><th>Operator</th><th>Value</th></tr>
+	<tr>
+		<td><select id="devTable"><option>device</option><option>interface</option><option>entity</option></select></td>
+		<td><select id="devField"></select></td>
+		<td><select id="devOper"><option value="eq">==</option><option value="ne">!=</option><option value="lk">like</option></select></td>
+		<td><input type="text" name="searchStr" id="searchStr" /></td>
+	</tr>
+	<tr>
+		<td colspan="4" rowspan="6"><select class="searchSelect" multiple="true" size="10" id="#devFound"></select>
+	</tr>
+</table>
+</div>
+
+ <script src="/static/js/activecmdb.toolbar.js" ></script>
+ <script type="text/javascript">
+ 	document.getElementById('hostname').focus();
+ </script>
+[% END %]

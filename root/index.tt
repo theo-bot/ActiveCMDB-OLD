@@ -1,0 +1,7 @@
+<frameset rows="100,*" framespacing=1 border=1>
+	<frame id="frameHeader" scrolling="no" src="/menu/header">
+	<frameset cols="21%,*">
+		<frame src="/menu" name="frameMenu" id="frameMenu">
+		<frame src="/menu/empty" name="frameWork" id="frameWork">
+	</frameset">
+</frameset>

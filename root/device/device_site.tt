@@ -1,0 +1,100 @@
+[% WRAPPER wrapper.tt extra="location" %]
+
+<div class="cmdbTabDiv" >
+<form>
+<input type="hidden" id="siteType" name="siteType" value="[% site.ltype %]" >
+<input type="hidden" id="device_id" value="[% device.device_id %]" />
+<script type="text/javascript">
+	updateSiteForm($("#siteType").val());
+</script>
+<table >
+<tr>
+	<td width="100">Location tree</td>
+	<td>:</td>
+	<td id="parentString">[% site.site_parent %]</td>
+</tr>
+<tr>
+	<td>Site</td>
+	<td>:</td>
+	<td>
+		<select name="location_id" id="location_id" class="cmdbList" >
+		[% FOREACH object IN sites %]
+		<option value="[% object.location_id %]" [% IF object.location_id == device.location_id %]selected[% END %]>[% object.name %]</option>
+		[% END %]
+		</select><input type="button" value="fetch" id="locDevDetails" class="cmdbButton"  />
+	</td>
+</tr>
+<tr style="visibility:hidden">
+	<td>Type</td>
+	<td>:</td>
+	<td id="type"></td>
+</tr>
+</table>
+<table id="building">
+<tr>
+	<td width="100">Lattitude</td>
+	<td>:</td>
+	<td id="lattitude">[% site.lattitude %]</td>
+</tr>
+<tr>
+	<td>Longitude</td>
+	<td>:</td>
+	<td id="longitude">[% site.longitude %]</td>
+</tr>
+</table>
+<table id="building-room">
+<tr>
+	<td width="100">Adres</td>
+	<td>:</td>
+	<td width="275" id="adres1">[% site.adres1 %]</td>
+	<td width="100">Classification</td>
+	<td>:</td>
+	<td id="classification">[% site.classification %]</td>
+</tr>
+<tr>
+	<td>&nbsp;</td>
+	<td>&nbsp;</td>
+	<td id="adres2">[% site.adres2 %]</td>
+	<td>Primary contact</td>
+	<td>:</td>
+	<td id="primary_contact">[% site.primary_contact %]</td>
+</tr>
+<tr>
+	<td>Zipcode</td>
+	<td>:</td>
+	<td id="zipcode">[% site.zipcode %]</td>
+	<td>Primary phone</td>
+	<td>:</td>
+	<td id="primary_phone">[% site.primary_phone %]</td>
+</tr>
+<tr>
+	<td>Place</td>
+	<td>:</td>
+	<td id="place">[% site.place %]</td>
+	<td>Backup contact</td>
+	<td>:</td>
+	<td id="backup_contact">[% site.backup_contact %]</td>
+</tr>
+<tr>
+	<td>Type</td>
+	<td>:</td>
+	<td id="ltype">[% site.ltype %]</td>
+	<td>Backup phone</td>
+	<td>:</td>
+	<td id="backup_phone">[% site.backup_contact %]</td>
+</tr>
+</table>
+<table>
+<tr>
+	<td width="100" valign="top">Details</td>
+	<td>:</td>
+	<td id="details" >[% site.details %]</td>
+</tr>
+</table>
+<div id="parent_id" style="visibility:hidden" />
+
+<input type="button" id="setDeviceSite" class="cmdbButton" value="update" />
+</form>
+</div>
+
+[% END %]

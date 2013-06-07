@@ -1,0 +1,17 @@
+class "CiscoSwitch" {
+	
+	super 'Cisco';
+	version '1.0';
+	enabled 1;
+	
+	interrogations {
+					vmVlan	  4;
+					bridgemib 5;
+				};
+	
+	oidset [
+				'1.3.6.1.4.1.9.1.542'
+			];
+			
+	networkType 0;
+};

@@ -1,0 +1,24 @@
+[% WRAPPER wrapper.tt %]
+<center>
+<table class="cmdbTable" width="98%" >
+<tr align="left">
+	<th>User ID</th>
+	<th>Username</th>
+	<th>Firstname</th>
+	<th>Lastname</th>
+	<th>Active</th>
+</tr>
+[% FOREACH user IN users -%]
+<tr class="cmdbRow" onclick="[% IF admin == 1 %]edit_user[% ELSE %]setpass[% END %]([% user.id %])">
+	<td>[% user.id %]</td>
+	<td>[% user.username %]</td>
+	<td>[% user.first_name %]</td>
+	<td>[% user.last_name %]</td>
+	<td>[% user.active %]</td>
+</tr>
+[% END -%]
+</table>
+</center>
+<br>
+[% IF admin == 1 %]<input type="button" class="cmdbButton" id="new_user" value="Add user" onclick="edit_user(0);">[% END %]
+[% END %]

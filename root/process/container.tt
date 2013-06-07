@@ -1,0 +1,18 @@
+[% WRAPPER wrapper.tt extra="process" %]
+<script type="text/javascript">
+var f2Auto = false;
+var int;
+function enableAutrefresh(state) {
+	f2Auto = state;
+	if(f2Auto){int=self.setInterval('$("#processTable").trigger("reloadGrid")',5000)}
+    else{int=window.clearInterval(int)}
+}
+</script>
+<br>
+<center>
+<input type="hidden" id="serverId" value="[% server_id %]" />
+<table id="processTable"></table>
+<div id="processPager"></div>
+</center>
+<input type="checkbox" id="autorefresh" onclick="enableAutrefresh(this.checked)"> Enable Auto-Refresh
+[% END %]

@@ -1,0 +1,14 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/static/css/jqtree.css" />
+	<script src="/static/js/jquery.js"></script>
+	<script src="/static/js/tree.jquery.js"></script>
+	<script src="/static/js/activecmdb.menu.js"></script>
+</head>
+<body>
+<div id="cmdbMenu"></div>
+</body>
+</html>	

@@ -1,0 +1,15 @@
+[% WRAPPER wrapper.tt %]
+
+<center>
+<table class="cmdbTable" width="98%" >
+[% FOREACH role IN roles -%]
+<tr class="cmdbRow" onclick="edit_role([% role.id %])">
+	<td>[% role.id %]</td>
+	<td>[% role.role %]</td>
+</tr>
+[% END -%]
+</table>
+</center>
+<br>
+<input type="button" class="cmdbButton" id="new_role" value="Add role" onclick="edit_role(0);">
+[% END %]

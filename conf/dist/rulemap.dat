@@ -1,0 +1,48 @@
+{
+   "map" : {
+      "device.status" : {
+         "object" : "ActiveCMDB::Object::Device",
+         "objtype" : "rule",
+         "reftype" : "ARRAY",
+         "method" : "status"
+      },
+      "device.vendor" : {
+         "object" : "ActiveCMDB::Object::Device",
+         "objtype" : "rule",
+         "reftype" : "ARRAY,SCALAR",
+         "method" : "NULL"
+      },
+      "device.id" : {
+         "object" : "ActiveCMDB::Object::Device",
+         "objtype" : "rule",
+         "reftype" : "SCALAR",
+         "method" : "id"
+      },
+      "message.forward" : {
+         "object" : "ActiveCMDB::Object::Message",
+         "objtype" : "action",
+         "reftype" : "ARRAY",
+         "method" : "SendMessage"
+      },
+      "device.sysobjectid" : {
+         "object" : "ActiveCMDB::Object::Device",
+         "objtype" : "rule",
+         "reftype" : "ARRAY,SCALAR",
+         "method" : "sysobjectid"
+      },
+      "message.subject" : {
+         "object" : "ActiveCMDB::Object::Message",
+         "objtype" : "rule",
+         "reftype" : "SCALAR",
+         "method" : "subject"
+      },
+      "message.ack" : {
+         "object" : "ActiveCMDB::Object::Message",
+         "objtype" : "action",
+         "reftype" : "SCALAR",
+         "method" : "AckMessage"
+      }
+   },
+   "serial" : 6
+}
+

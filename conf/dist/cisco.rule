@@ -1,0 +1,14 @@
+{
+	"name" : "cisco",
+	"active" : 1,
+	"serial" : 1,
+	"priority" : "40",
+	"rule" : {
+				"message.subject" : "ProcessDevice",
+				"device.status" : [ 0, 1 ],
+				"device.vendor": [ 9 ]
+	},
+	"action": {
+				"message.forward" : [ "ciscoWorks" ]
+	}
+}

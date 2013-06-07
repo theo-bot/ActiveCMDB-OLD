@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<title>[% title %]</title>
+	<meta http-equiv="Content-Type" content="text/html" charset="iso-8859-1" />
+	<link rel="stylesheet" href="/static/css/dtree.css" />
+	
+	<link rel="stylesheet" href="/static/css/menu.css" />
+	<link rel="stylesheet" href="/static/css/main.css" />
+	[% IF jquery != 'off' %]
+	<link rel="stylesheet" href="/static/css/jquery-ui.css" />
+	<link rel="stylesheet" href="/static/css/colorbox.css" />
+	<link rel="stylesheet" href="/static/css/dualListBox.css" />
+	<script src="/static/js/jquery.js"></script>
+	<script src="/static/js/jquery-ui.js"></script>
+	<script src="/static/js/jquery.hoverIntent.minified.js"></script>
+	<script src="/static/js/jquery.colorbox-min.js"></script>
+	<script src="/static/js/jquery.dualListBox-1.3.min.js"></script>
+	<script src="/static/js/jquery.validate.min.js"></script>
+	[% END %]
+	<script src="/static/js/activecmdb.js"></script>
+	[% SWITCH extra %]
+		[% CASE "location" %]
+		<script src="/static/js/activecmdb.location.js"></script>
+		[% CASE "vendor" %]
+		<script src="/static/js/activecmdb.vendor.js"></script>
+		[% CASE "user" %]
+		<script src="/static/js/activecmdb.user.js"></script>
+		[% CASE "role" %]
+		<script src="/static/js/activecmdb.role.js"></script>
+		[% CASE "device" %]
+		<script src="/static/js/activecmdb.device.js"></script>
+		<link rel="stylesheet" type="text/css" href="/static/css/dhtmlxtoolbar_dhx_web.css" />
+		<script src="/static/js/dhtmlxcommon.js" ></script>
+		<script src="/static/js/dhtmlxtoolbar.js" ></script>
+		<script src="/static/js/activecmdb.device.js"></script>
+		[% CASE "domain" %]
+		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+		<script src="/static/js/i18n/grid.locale-en.js"></script>
+		<script src="/static/js/jquery.jqGrid.min.js"></script>
+		<script src="/static/js/activecmdb.domain.js"></script>
+		[% CASE "iptype" %]
+		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+		<script src="/static/js/i18n/grid.locale-en.js"></script>
+		<script src="/static/js/jquery.jqGrid.min.js"></script>
+		<script src="/static/js/activecmdb.iptype.js"></script>
+		[% CASE "interface" %]
+		<script src="/static/js/activecmdb.interface.js"></script>
+		[% CASE "structure" %]
+		<link rel="stylesheet" href="/static/css/dtree.css" />
+		<script src="/static/js/dtree.js"></script>
+		<script src="/static/js/activecmdb.structure.js"></script>
+		[% CASE "maintenance" %]
+		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+		<script src="/static/js/i18n/grid.locale-en.js"></script>
+		<script src="/static/js/jquery.jqGrid.min.js"></script>
+		<script src="/static/js/jquery.timepicker.js"></script>
+		<script src="/static/js/activecmdb.maintenance.js"></script>
+		[% CASE "devicemaint" %]
+		<script src="/static/js/activecmdb.devmaint.js"></script>
+		[% CASE "devicesec" %]
+		<script src="/static/js/activecmdb.devsec.js"></script>
+		[% CASE "devicejnl" %]
+		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+		<script src="/static/js/i18n/grid.locale-en.js"></script>
+		<script src="/static/js/jquery.jqGrid.min.js"></script>
+		<script src="/static/js/activecmdb.devjnl.js"></script>
+		[% CASE "process" %]
+		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+		<script src="/static/js/i18n/grid.locale-en.js"></script>
+		<script src="/static/js/jquery.jqGrid.min.js"></script>
+		<script src="/static/js/activecmdb.process.js"></script>
+		[% CASE "distrib" %]
+		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+		<style>
+			.ui-autocomplete-loading {
+				background: white url('/static/images/ui-anim_basic_16x16.gif') right center no-repeat;
+			}
+		</style>
+		<script src="/static/js/i18n/grid.locale-en.js"></script>
+		<script src="/static/js/jquery.jqGrid.min.js"></script>
+		<script src="/static/js/activecmdb.distrib.js"></script>
+	[% END %]
+</head>
+<body>
+[% content %]
+</body>
+</html>

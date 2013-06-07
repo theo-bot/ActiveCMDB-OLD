@@ -1,0 +1,21 @@
+[% WRAPPER wrapper.tt extra="devicemaint" %]
+
+<div class="cmdbTabDiv" >
+<form>
+<input type="hidden" id="device_id" value="[% device_id %]" />
+<table padding="5">
+<tr>
+	<td valign="top">Select maintenance schedules<td>
+	<td><select multiple name="devmaint" id="devmaint" class="cmdbList" size=[% IF size < 10  %][% size %][% ELSE %]10[% END %]>
+	[% FOREACH m IN maint %]<option value="[% m.key %]" [% IF m.value.device == 1 %]selected[% END %]>[% m.value.descr  %]</option>
+	[% END %]
+	</select></td>
+</tr>
+<tr>
+	<td><input type="button" id="setDeviceMaint" class="cmdbButton" value="update" /></td>
+	<td></td>
+</tr>
+</table>
+</form>
+</div>
+[% END %]

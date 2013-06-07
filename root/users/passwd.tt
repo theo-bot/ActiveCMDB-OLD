@@ -1,0 +1,22 @@
+[% WRAPPER wrapper.tt %]
+<br>
+<form id="passwdForm">
+<table>
+<tr>
+	<td>Current password</td>
+	<td><input type="password" name="curpass" /></td>
+</tr>
+<tr>
+	<td>New password</td>
+	<td><input type="password" name="newpass1" /></td>
+</tr>
+<tr>
+	<td>Repeat password</td>
+	<td><input type="password" name="newpass2" /></td>
+</tr>
+</table>
+</form>
+<input type="button" class="cmdbButton" id="updPasswd" value="save" />
+<br>
+<p id="response"></p>
+[% END %]

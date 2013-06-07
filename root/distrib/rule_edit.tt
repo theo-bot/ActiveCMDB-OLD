@@ -1,0 +1,54 @@
+[% WRAPPER wrapper.tt extra="distrib" %]
+<form name="distForm" id="distForm" action="save">
+<table class="cmdbTable">
+<tr>
+	<th align="left">Rule name</th>
+	<td>:</td>
+	<td><input name="rule_name" type="text" class="cmdbText" value="[% rule.name %]" /></td>
+</tr>
+<tr>
+	<th align="left">Priority</th>
+	<td>:</td>
+	<td><input name="rule_priority" type="text" class="cmdbText" size="2" value="[% rule.priority %]" /></td>
+</tr>
+<tr>
+	<th align="left">Active</th>
+	<td>:</td>
+	<td><input type="checkbox" name="rule_active" [% IF rule.active == 1 %]checked[% END %] /></td>
+</tr>
+</table>
+
+<b>Rules</b><br/>
+<table class="cmdbTable" id="ruleTable">
+[% FOREACH x IN rule.rule %]
+<tr>
+	<td><div class="ui-widget"><input type="text" name="rule_operator" value="[% x.key %]" /></div></td>
+	<td>:</td>
+	<td><div class="ui-widget"><input type="text" name="rule_value" value="[% x.value %]" /></div></td>
+	<td>
+		[% IF loop.count > 1 %]<img src="/static/images/delete.png" onclick="delrow(this);" />[% END %]
+	</td>
+</tr>
+[% END %]
+</table>
+&nbsp;&nbsp;<img id="ruleTableAdd" src="/static/images/add.png" onclick="addrow('#ruleTable', 'rule');"/>&nbsp;Add rule<br /><br />
+<b>Actions</b><br />
+<table class="cmdbTable" id='actionTable'>
+[% FOREACH x IN rule.action %]
+<tr>
+	<td><div class="ui-widget"><input type="text" name="action_operator" value="[% x.key %]" /></div></td>
+	<td>:</td>
+	<td><div class="ui-widget"><input type="text" name="action_value" value="[% x.value %]" /></div></td>
+	<td>
+		[% IF loop.count > 1 %]<img src="/static/images/delete.png" />[% END %]
+	</td>
+</tr>
+[% END %]
+</table>
+&nbsp;&nbsp;<img id="ruleTableAdd" src="/static/images/add.png" onclick="addrow('#actionTable','action');"/>&nbsp;Add action<br /><br />
+<br>
+<input type="hidden", name="serial" value="[% rule.serial %]" />
+<button type="submit" id="saveRule" class="cmdbButton" >save</button>&nbsp;
+<button id="deleteRule" class="cmdbButton">delete</button><p id="response"></p>
+</form>
+[% END %]
