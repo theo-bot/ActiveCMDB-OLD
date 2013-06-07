@@ -1,0 +1,14 @@
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/AppConfig.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/AppConfig/Args.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/AppConfig/CGI.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/AppConfig/File.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/AppConfig/Getopt.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/AppConfig/State.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/AppConfig/Sys.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/AppConfig.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/AppConfig::Args.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/AppConfig::CGI.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/AppConfig::File.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/AppConfig::Getopt.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/AppConfig::State.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/AppConfig::Sys.3

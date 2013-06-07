@@ -1,0 +1,9 @@
+/opt/ActiveCMDB/platform/Linux/x86_64/bin/format-sql
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/DBIx/Class/Storage/Debug/PrettyPrint.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/SQL/Abstract.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/SQL/Abstract/Test.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/SQL/Abstract/Tree.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/DBIx::Class::Storage::Debug::PrettyPrint.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/SQL::Abstract.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/SQL::Abstract::Test.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/SQL::Abstract::Tree.3

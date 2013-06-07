@@ -1,0 +1,14 @@
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/File/ChangeNotify.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/File/ChangeNotify/ConfigData.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/File/ChangeNotify/Event.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/File/ChangeNotify/Watcher.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/File/ChangeNotify/Watcher/Default.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/File/ChangeNotify/Watcher/Inotify.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/File/ChangeNotify/Watcher/KQueue.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/File::ChangeNotify.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/File::ChangeNotify::ConfigData.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/File::ChangeNotify::Event.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/File::ChangeNotify::Watcher.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/File::ChangeNotify::Watcher::Default.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/File::ChangeNotify::Watcher::Inotify.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/File::ChangeNotify::Watcher::KQueue.3

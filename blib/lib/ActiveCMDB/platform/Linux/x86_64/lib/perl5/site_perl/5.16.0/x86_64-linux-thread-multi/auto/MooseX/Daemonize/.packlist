@@ -1,0 +1,12 @@
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/MooseX/Daemonize.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/MooseX/Daemonize/Core.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/MooseX/Daemonize/Pid.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/MooseX/Daemonize/Pid/File.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/MooseX/Daemonize/WithPidFile.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/Test/MooseX/Daemonize.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/MooseX::Daemonize.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/MooseX::Daemonize::Core.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/MooseX::Daemonize::Pid.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/MooseX::Daemonize::Pid::File.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/MooseX::Daemonize::WithPidFile.3
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/Test::MooseX::Daemonize.3

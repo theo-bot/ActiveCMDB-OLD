@@ -1,0 +1,6 @@
+/opt/ActiveCMDB/platform/Linux/x86_64/bin/scandeps.pl
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/Module/ScanDeps.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/Module/ScanDeps/Cache.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/lib/perl5/site_perl/5.16.0/Module/ScanDeps/DataFeed.pm
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man1/scandeps.pl.1
+/opt/ActiveCMDB/platform/Linux/x86_64/man/man3/Module::ScanDeps.3
