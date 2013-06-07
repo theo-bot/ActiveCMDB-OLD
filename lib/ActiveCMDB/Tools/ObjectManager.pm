@@ -63,18 +63,17 @@ my %schemas = ();
 has 'schema_age'	=> ( is => 'rw', isa => 'Int' );
 has 'object_store'	=> (
 		traits	=> ['Hash'], 
-		is		=> 'ro',
-		isa		=> 'HashRef|Str',
-		default	=> { {} },
+		is		=> 'rw',
+		isa		=> 'HashRef',
+		default	=> sub { {} },
 		handles	=> {
 			store_object	=> 'set',
 			fetch_object	=> 'get',
 			delete_object	=> 'delete',
-		},
+		}
 	);
 	
 with 'ActiveCMDB::Tools::Common';
-
 
 sub init {
 	my($self, $args) = @_;

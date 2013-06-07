@@ -15,7 +15,6 @@ END {
 	sleep 1;
 }
 
-
 #
 # Process arguments
 #
