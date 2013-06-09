@@ -32,11 +32,6 @@
 
     $Rev$
 
-	Topic: Description
-	
-	This script genrates encryption keys
-	
-
 =cut
 
 use v5.16.0;
