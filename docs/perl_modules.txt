@@ -13,6 +13,7 @@ DateTime::Format::Strptime
 DBI
 DBD::mysql
 DBIx::Class
+DBIx::Schema
 Devel::StackTrace
 Digest::MD5
 File::Slurp
