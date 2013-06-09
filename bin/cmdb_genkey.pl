@@ -49,7 +49,6 @@ GetOptions(
 			'name=s'	=> \$keyname
 		  );
 
-
 if ( defined($keyname) && length($keyname) > 4 ) 
 {		  
 	cmdb_genkey($keyname);
