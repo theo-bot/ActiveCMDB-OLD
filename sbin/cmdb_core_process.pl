@@ -71,4 +71,3 @@ sub sigHandler
 	
 	$instance->raise_signal($signal);
 }
-
