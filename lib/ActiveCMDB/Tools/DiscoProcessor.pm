@@ -40,7 +40,8 @@ package ActiveCMDB::Tools::DiscoProcessor;
 	
 =cut
 
-
+#################################################################
+# Initialize modules
 use Moose;
 use Logger;
 use Switch;

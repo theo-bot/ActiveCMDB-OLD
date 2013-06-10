@@ -40,7 +40,7 @@ package ActiveCMDB::Tools::ProcessManager;
 	
 =cut
 
-#
+##################
 # Initialize modules
 #
 use Moose;
@@ -58,7 +58,6 @@ use Switch;
 use Data::Dumper;
 
 with 'ActiveCMDB::Tools::Common';
-
 
 use constant CMDB_PROCESSTYPE => 'process';
 use constant CMDB_INSTANCE    => 0;
@@ -111,7 +110,6 @@ sub init {
 							process   => $self->process,
 							subscribe => true
 						});
-	
 	
 	$self->start_childern();
 	
