@@ -116,3 +116,5 @@ sub _oidkey {
 	splice(@o, 0, $#b + 1);
 	return join('.', @o);
 }
+
+1;
