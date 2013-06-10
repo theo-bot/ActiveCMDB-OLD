@@ -46,7 +46,6 @@ use Data::UUID;
 use Net::DNS;
 use Moose::Role;
 
-
 has 'config'		=> ( is => 'rw', isa => 'Object' );
 has 'schema'		=> ( is => 'rw', isa => 'Object' );
 has 'broker'		=> ( is => 'rw', isa => 'Object' );		
