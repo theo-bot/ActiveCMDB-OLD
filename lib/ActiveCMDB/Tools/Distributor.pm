@@ -360,43 +360,43 @@ sub update_dist_rule
 	#Logger->debug(Dumper($self->ruleset));
 }
 
-sub update_rule_map
-{
-	my($self, $mapdata) = @_;
-	my $map = undef;
-	my $savemap = false;
-	if ( defined($mapdata) )
+	sub update_rule_map
 	{
-		$map = $self->json->decode($mapdata);
-		if ( $map->{serial} > $self->rulemap->{serial} ) {
-			$self->rulemap($map);
-			SaveMap($self->rulemap);
-		}
-	} else {
-		$map = LoadMap();
-		if ( $map->{serial} > $self->rulemap->{serial} ) {
-			$self->rulemap($map);
-			my $message = ActiveCMDB::Object::Message->new();
-			$message->from( $self->process->name );
-			$message->subject('UpdateRuleMap');
-			$message->to($self->config->section("cmdb::process::distrib::exchange"));
-			$message->payload($self->json->encode($map));
-			Logger->debug("Sending message to " . $message->to );
-			$self->broker->sendframe($message,{ priority => PRIO_HIGH } );
-			$self->set_muid($message->muid(), time());
+		my($self, $mapdata) = @_;
+		my $map = undef;
+		my $savemap = false;
+		if ( defined($mapdata) )
+		{
+			$map = $self->json->decode($mapdata);
+			if ( $map->{serial} > $self->rulemap->{serial} ) {
+				$self->rulemap($map);
+				SaveMap($self->rulemap);
+			}
+		} else {
+			$map = LoadMap();
+			if ( $map->{serial} > $self->rulemap->{serial} ) {
+				$self->rulemap($map);
+				my $message = ActiveCMDB::Object::Message->new();
+				$message->from( $self->process->name );
+				$message->subject('UpdateRuleMap');
+				$message->to($self->config->section("cmdb::process::distrib::exchange"));
+				$message->payload($self->json->encode($map));
+				Logger->debug("Sending message to " . $message->to );
+				$self->broker->sendframe($message,{ priority => PRIO_HIGH } );
+				$self->set_muid($message->muid(), time());
+			}
 		}
 	}
-}
 
-sub cleanup_muid
-{
-	my($self) = @_;
-	for my $pair ( $self->muid_pairs ) {
-		if ( time() - $pair->[1] > 300 ) {
-			$self->del_muid($pair->[0]);
+	sub cleanup_muid
+	{
+		my($self) = @_;
+		for my $pair ( $self->muid_pairs ) {
+			if ( time() - $pair->[1] > 300 ) {
+				$self->del_muid($pair->[0]);
+			}
 		}
 	}
-}
 
 }
 1;

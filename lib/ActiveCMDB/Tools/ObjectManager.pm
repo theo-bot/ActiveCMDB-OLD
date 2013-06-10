@@ -231,7 +231,7 @@ sub process_devices
 				}
 			);
 	
-	Logger->info("Fetching new devices");
+	Logger->info("Fetching new devices.");
 	#Logger->debug("Active schemas: ". $self->active_schemes());
 	
 	$rs = $self->schema->resultset('IpDevice')->search(

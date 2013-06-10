@@ -43,6 +43,7 @@ package ActiveCMDB::Tools::ConfigFetcher;
 #
 # Initialize modules
 #
+use 5.16.0;
 use Moose;
 use Digest::MD5;
 use Socket;

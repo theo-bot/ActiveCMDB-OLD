@@ -52,7 +52,6 @@ has 'disco'				=> (is => 'rw', isa => 'Int');
 
 has 'schema'			=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}) } );
 
-
 sub get_data
 {
 	my($self) = @_;
