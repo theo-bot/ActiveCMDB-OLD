@@ -37,6 +37,7 @@ package ActiveCMDB::Controller::Process;
 
 use namespace::autoclean;
 use POSIX;
+use Moose;
 use Data::Dumper;
 use ActiveCMDB::Common;
 use ActiveCMDB::Common::Conversion;
