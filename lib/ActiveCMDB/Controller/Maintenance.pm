@@ -1,4 +1,43 @@
 package ActiveCMDB::Controller::Maintenance;
+
+=begin nd
+
+    Script: ActiveCMDB::Controller::Maintenance.pm
+    ___________________________________________________________________________
+
+    Version 1.0
+
+    Copyright (C) 2012-2013 Theo Bot
+
+    http://www.activecmdb.org
+
+
+    Topic: Purpose
+
+    Catalyst Controller for managing maintenance schedules
+
+    About: License
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    Topic: Release information
+
+    $Rev$
+	
+	
+=cut
+
+#########################################################################
+# Initialize  modules
+
 use Moose;
 use namespace::autoclean;
 use DateTime;
@@ -9,18 +48,6 @@ use ActiveCMDB::Object::Maintenance;
 use ActiveCMDB::Common::Constants;
 
 BEGIN { extends 'Catalyst::Controller'; }
-
-=head1 NAME
-
-ActiveCMDB::Controller::Maintenance - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=head1 METHODS
-
-=cut
 
 my $config = ActiveCMDB::ConfigFactory->instance();
 $config->load('cmdb');
@@ -191,9 +218,6 @@ sub intervals :Local
 	$c->response->body($data);
 }
 
-
-
-
 sub moment2time
 {
 	my($moment) = @_;
@@ -205,19 +229,6 @@ sub moment2time
 	
 	return sprintf("%02d:%02d", $hours, $mins);
 }
-
-
-
-=head1 AUTHOR
-
-Theo Bot
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 __PACKAGE__->meta->make_immutable;
 

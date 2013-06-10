@@ -1,4 +1,40 @@
 package ActiveCMDB::Controller::Root;
+
+=begin nd
+
+    Script: ActiveCMDB::Controller::Root.pm
+    ___________________________________________________________________________
+
+    Version 1.0
+
+    Copyright (C) 2012-2013 Theo Bot
+
+    http://www.activecmdb.org
+
+
+    Topic: Purpose
+
+    Cayalyst Root Controller
+
+    About: License
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    Topic: Release information
+
+    $Rev$
+
+	
+=cut
+
 use Moose;
 use namespace::autoclean;
 
@@ -10,15 +46,6 @@ BEGIN { extends 'Catalyst::Controller' }
 #
 __PACKAGE__->config(namespace => '');
 
-=head1 NAME
-
-ActiveCMDB::Controller::Root - Root Controller for ActiveCMDB
-
-=head1 DESCRIPTION
-
-[enter your description here]
-
-=head1 METHODS
 
 =head2 index
 
@@ -59,16 +86,6 @@ Attempt to render a view, if needed.
 
 sub end : ActionClass('RenderView') {}
 
-=head1 AUTHOR
-
-Theo Bot
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 sub auto : Private {
 	my($self, $c) = @_;

@@ -1,22 +1,45 @@
 package ActiveCMDB::Controller::Users;
+
+=begin nd
+
+    Script: ActiveCMDB::Controller::Users.pm
+    ___________________________________________________________________________
+
+    Version 1.0
+
+    Copyright (C) 2012-2013 Theo Bot
+
+    http://www.activecmdb.org
+
+
+    Topic: Purpose
+
+    Catalyst Controller for managing users
+
+    About: License
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    Topic: Release information
+
+    $Rev$
+
+	
+=cut
+
 use Moose;
 use namespace::autoclean;
 use Data::Dumper;
 
 BEGIN { extends 'Catalyst::Controller'; }
-
-=head1 NAME
-
-ActiveCMDB::Controller::Users - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=head1 METHODS
-
-=cut
-
 
 =head2 index
 
