@@ -107,7 +107,6 @@ has 'riak'		=> (
 	} 
 );
 
-
 sub start {
 	my($self) = @_;
 	my($result, $pid);
