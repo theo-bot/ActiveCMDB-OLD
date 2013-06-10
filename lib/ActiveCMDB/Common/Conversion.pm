@@ -32,10 +32,6 @@ package ActiveCMDB::Common::Conversion;
 
     $Rev$
 
-	Topic: Description
-	
-	This module performs actions on the conversions table
-	
 	
 =cut
 
