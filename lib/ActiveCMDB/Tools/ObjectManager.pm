@@ -527,6 +527,20 @@ sub start_childern {
 	Logger->debug("Starting childern");
 }
 
+sub poll_managers
+{
+	my($self) = @_;
+	my($message);
+	
+	$message = ActiveCMDB::Object::Message->new();
+	$message->from( $self->process->name );
+	$message->reply_to( $self->config->section("cmdb::broker::prefix") . $self->process->process_name );
+	$message->subject('PollObjectMngr');
+	$message->to( $self->config->section("cmdb::process::object::exchange") );
+	
+	
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
