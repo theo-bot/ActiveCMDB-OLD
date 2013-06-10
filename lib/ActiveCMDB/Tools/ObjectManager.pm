@@ -156,6 +156,7 @@ sub manage {
 												   							priority	=> PRIO_HIGH
 												   						});
 												}
+				case 'PollObjectMngr'			{ $self->reply_challenge($msg); }
 				else	{ Logger->warn("Undefined message type ".$msg->subject ) }
 			}
 			$delay--;
@@ -322,8 +323,10 @@ sub process_device
 	{
 		Logger->debug("Sending message to $dest");
 		
+		$p = undef;
+		$p->{device}->{device_id } = $args->{device}->{device_id};
 		
-		
+		$message->payload( $p );
 		$message->to( $self->config->section("cmdb::broker::prefix") . $dest );
 		$message->cid($self->uuid());
 		$self->broker->sendframe($message, $args);
