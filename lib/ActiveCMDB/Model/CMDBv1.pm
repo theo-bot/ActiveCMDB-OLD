@@ -53,7 +53,6 @@ if ( $dbinfo->{pwencr} == 1 ) {
 	$dbinfo->{dbpass} = cmdb_decrypt($global->{keyname}, $dbinfo->{dbpass});
 }
 
-
 __PACKAGE__->config(
     schema_class => 'ActiveCMDB::Schema',
     
