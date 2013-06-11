@@ -159,14 +159,14 @@ __PACKAGE__->add_unique_constraint("sysObjectID_UNIQUE", ["sysobjectid"]);
 # Created by DBIx::Class::Schema::Loader v0.07025 @ 2012-10-30 14:31:29
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:eypxvWXNP5cSaG5QdGgfGw
 
-__PACKAGE__->has_many(
-	"vendors",
-	"ActiveCMDB::Schema::Result::Vendor",
-	{ "foreign.vendor_id" => "self.vendor_id"},
-	{ 
-		cascade_copy => 0, cascade_delete => 0 
-	},
-);
+#__PACKAGE__->has_many(
+#	"vendors",
+#	"ActiveCMDB::Schema::Result::Vendor",
+#	{ "foreign.vendor_id" => "self.vendor_id"},
+#	{ 
+#		cascade_copy => 0, cascade_delete => 0 
+#	},
+#);
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;
