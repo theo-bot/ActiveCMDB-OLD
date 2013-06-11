@@ -1,0 +1,20 @@
+CREATE TABLE location (
+  location_id int(11) NOT NULL AUTO_INCREMENT,
+  type int(11) NOT NULL DEFAULT '0',
+  parent_id int(11) NOT NULL DEFAULT '0',
+  name varchar(64) DEFAULT NULL,
+  lattitude varchar(32) DEFAULT NULL,
+  longitude varchar(32) DEFAULT NULL,
+  classification int(11) DEFAULT NULL,
+  primary_phone varchar(32) DEFAULT NULL,
+  primary_contact varchar(32) DEFAULT NULL,
+  backup_phone varchar(32) DEFAULT NULL,
+  backup_contact varchar(32) DEFAULT NULL,
+  details varchar(256) DEFAULT NULL,
+  adres1 varchar(256) DEFAULT NULL,
+  adres2 varchar(256) DEFAULT NULL,
+  zipcode varchar(16) DEFAULT NULL,
+  PRIMARY KEY (location_id),
+  UNIQUE KEY name (name),
+  KEY parent (parent_id)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
