@@ -66,6 +66,9 @@ process:
     reprocess_limit: 60
     reprocess_intervall: 86400
     low_water: 60
+    challenge:
+      interval: 60
+      timeout: 120
   process:
     queue: cmdb.process
     exchange: cmdb.process-x

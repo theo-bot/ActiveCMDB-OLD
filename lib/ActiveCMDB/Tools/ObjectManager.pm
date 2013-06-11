@@ -43,6 +43,7 @@ package ActiveCMDB::Tools::ObjectManager;
 use Moose;
 use Switch;
 use Time::localtime;
+use JSON::XS;
 use Logger;
 use ActiveCMDB::Tools::Common;
 use ActiveCMDB::ConfigFactory;
@@ -52,6 +53,8 @@ use ActiveCMDB::Model::CMDBv1;
 use ActiveCMDB::Schema;
 use ActiveCMDB::Object::Maintenance;
 use ActiveCMDB::Object::Process;
+use ActiveCMDB::Object::Device;
+use ActiveCMDB::Common::Crypto;
 
 use Data::Dumper;
 
@@ -60,7 +63,34 @@ use constant CMDB_PROCESSTYPE => 'object';
 my(@schemes) = ();
 my %schemas = ();
 
-has 'schema_age'	=> ( is => 'rw', isa => 'Int' );
+
+has 'schema_age'	=> ( 
+		is 		=> 'rw', 
+		isa 	=> 'Int', 
+		default => 0 
+	);
+has 'poll_age'		=> ( 
+		is		=> 'rw', 
+		isa 	=> 'Int', 
+		default => 0 
+	);
+has	'master'		=> (
+		is		=> 'rw',
+		isa		=> 'Bool',
+		default => 0
+);
+has 'json'			=> (
+		is		=> 'rw',
+		isa		=> 'Any',
+		default	=> sub { JSON::XS->new->allow_nonref; }
+);
+
+has 'challenge'		=> (
+		is		=> 'rw',
+		isa		=> 'Maybe[Str]',
+		default	=> ''
+);
+
 has 'object_store'	=> (
 		traits	=> ['Hash'], 
 		is		=> 'rw',
@@ -72,6 +102,19 @@ has 'object_store'	=> (
 			delete_object	=> 'delete',
 		}
 	);
+	
+has 'poll_store' => (
+		traits	=> ['Hash'],
+		is		=> 'rw',
+		isa		=> 'HashRef',
+		default => sub { {} },
+		handles => {
+			store_poll	 => 'set',
+			fetch_poll	 => 'get',
+			delete_poll	 => 'delete',
+		}
+	);
+
 	
 with 'ActiveCMDB::Tools::Common';
 
@@ -157,6 +200,7 @@ sub manage {
 												   						});
 												}
 				case 'PollObjectMngr'			{ $self->reply_challenge($msg); }
+				case 'ReplyPollObjectMngr'		{ $self->process_challenge($msg); }
 				else	{ Logger->warn("Undefined message type ".$msg->subject ) }
 			}
 			$delay--;
@@ -165,9 +209,26 @@ sub manage {
 		#
 		# Check if there are new devices to be processed
 		#
-		if ( $self->low_water() ) {
+		if ( $self->low_water() && $self->master ) {
 			$self->process_devices();
 			$delay--;
+		}
+	
+		#
+		# Check if we ave to challenge the other object managers
+		#
+		my $due = $self->config->section("cmdb::process::object::challenge::interval") + $self->config->section("cmdb::process::object::challenge::timeout");
+		if ( time() - $self->poll_age > $due )
+		{
+			$self->challenge_managers();
+		}
+		
+		#
+		# If the challenge has expired then check who has won
+		#
+		if ( time() - $self->poll_age > $self->config->section("cmdb::process::object::challenge::interval") )
+		{
+			$self->score_challenge();
 		}
 		
 		#
@@ -240,7 +301,7 @@ sub process_devices
 					status		=> 0,
 					disco		=> { '<' 		=> $ts },
 					device_id	=> { -not_in	=> $rs_inside->get_column("device_id")->as_query },
-					'sysoids.disco_scheme' => { -in => $self->active_schemes() }
+					#'sysoids.disco_scheme' => { -in => [ $self->active_schemes() ] }
 				},
 				{
 					join		=> 'sysoids',
@@ -530,18 +591,99 @@ sub start_childern {
 	Logger->debug("Starting childern");
 }
 
-sub poll_managers
+sub challenge_managers
 {
 	my($self) = @_;
-	my($message);
+	my($message, $request);
+	Logger->debug("Challenge Managers");
+	$request = undef;
+	$request->{id} = $self->uuid();
+	$request->{server_id} = $self->config->section("cmdb::default::server_id");
+	$request->{time} = time();
+	my $payload = $self->json->encode($request);
+	$payload = cmdb_encrypt('activecmdb', $payload);
 	
 	$message = ActiveCMDB::Object::Message->new();
 	$message->from( $self->process->name );
 	$message->reply_to( $self->config->section("cmdb::broker::prefix") . $self->process->process_name );
 	$message->subject('PollObjectMngr');
 	$message->to( $self->config->section("cmdb::process::object::exchange") );
+	$message->payload( $payload );
 	
+	$self->broker->sendframe($message, undef);
+	$self->poll_age( $request->{time} );
+	$self->store_poll($request->{id} => 0 );
+	$self->challenge( $request->{id} );
+}
+
+sub reply_challenge
+{
+	my($self, $msg) = @_;
+	my($message, $reply);
+	$message = ActiveCMDB::Object::Message->new();
+	$message->from( $self->process->name );
+	$message->subject('ReplyPollObjectMngr');
+	$message->to( $msg->reply_to );
+	my $data = cmdb_decrypt('activecmdb', $msg->payload);
+	if ( defined($data) )
+	{
+		my $request = $self->json->decode($data);
+		if ( defined( $request->{id} ) )
+		{
+			$reply = undef;
+			$reply->{id} 		= $request->{id};
+			$reply->{server_id} = $self->config->section("cmdb::default::server_id");
+			$reply->{time}		= time();
+			my $data = cmdb_encrypt ('activecmdb', $self->json->encode($reply) );
+		
+			$message->payload($data);
+			$self->broker->sendframe($message, undef);
+			Logger->debug(Dumper($request));
+		} else {
+			Logger->warn("Unable to decode payload");
+		}
+	} else {
+		Logger->warn("Unable to decrypt message");
+	}
+}
+
+sub process_challenge
+{
+	my($self, $msg) = @_;
+	my $data = cmdb_decrypt('activecmdb', $msg->payload);
+	if ( defined($data) )
+	{
+		my $request = $self->json->decode($data);
+		if ( defined( $request->{id} ) )
+		{
+			if ( $self->fetch_poll($request->{id}) < $request->{server_id} )
+			{
+				$self->store_poll( $request->{id} =>  $request->{server_id} );
+			} 
+		}
+	}
 	
+}
+
+sub score_challenge
+{
+	my($self) = @_;
+	if ( defined($self->challenge) )
+	{
+		my $winner = int( $self->fetch_poll( $self->challenge ) );
+		if ( $winner == $self->config->section("cmdb::default::server_id") )
+		{
+			Logger->info("The server is now MASTER");
+			$self->master(1);
+		} else {
+			Logger->info("Another server ($winner) is now master" );
+			$self->master(0);
+		}
+		$self->delete_poll( $self->challenge );
+		$self->challenge(undef);
+	} else {
+		Logger->info( "Challenge already expired" );
+	}
 }
 
 __PACKAGE__->meta->make_immutable;
