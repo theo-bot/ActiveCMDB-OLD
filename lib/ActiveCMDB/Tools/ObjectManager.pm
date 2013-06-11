@@ -55,6 +55,7 @@ use ActiveCMDB::Object::Maintenance;
 use ActiveCMDB::Object::Process;
 use ActiveCMDB::Object::Device;
 use ActiveCMDB::Common::Crypto;
+use ActiveCMDB::Object::Endpoint;
 
 use Data::Dumper;
 
@@ -383,12 +384,14 @@ sub process_device
 	foreach my $dest ( @{$args->{dest}} )
 	{
 		Logger->debug("Sending message to $dest");
+		my $ep = ActiveCMDB::Object::Endpoint->new( name => $dest );
+		$ep->get_data();
 		
 		$p = undef;
 		$p->{device}->{device_id } = $args->{device}->{device_id};
 		
 		$message->payload( $p );
-		$message->to( $self->config->section("cmdb::broker::prefix") . $dest );
+		$message->to( $ep->dest_in() );
 		$message->cid($self->uuid());
 		$self->broker->sendframe($message, $args);
 		$self->create_order($message, $dest);
