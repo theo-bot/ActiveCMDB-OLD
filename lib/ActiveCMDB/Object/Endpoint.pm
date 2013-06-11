@@ -106,6 +106,36 @@ sub get_data
 		} catch {
 			Logger->warn("Failed to fetch endpoint data for ". $self->id . ' ' . $_);
 		}
+	} elsif ( defined($self->name) ) {
+		Logger->info("Fetching data for distribution endpoint " . $self->name );
+		try {
+			my $row = $self->schema->resultset("DistEndpoint")->find( { ep_name => $self->name } );
+			if ( defined($row) ) {
+				$self->populate($row, \%map);
+			}
+			
+			my $rs = $self->schema->resultset("DistEpMessage")->search(
+				{
+					ep_id => $self->id
+				},
+				{
+					columns => qw/subject/
+				}
+			);
+			$row = undef;
+			Logger->info("Found ".$rs->count." messages");
+			if ( $rs->count > 0 ) 
+			{
+				while ( $row = $rs->next )
+				{
+						$self->subjects->{ $row->subject } = ActiveCMDB::Object::Endpoint::Message->new(id => $self->id, subject => $row->subject);
+						$self->subjects->{ $row->subject }->get_data();				
+				}
+			}
+			 
+		} catch {
+			Logger->warn("Failed to fetch endpoint data for ". $self->id . ' ' . $_);
+		}
 	}
 }
 
