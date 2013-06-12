@@ -74,7 +74,10 @@ process:
     exchange: cmdb.process-x
     maxproc: 1
     path: $CMDB_HOME/sbin/cmdb_core_process.pl
-    managed: 0
+    managed: 
+  syslog:
+    port: 8514
+    timeout: 2
     
   
 location:
