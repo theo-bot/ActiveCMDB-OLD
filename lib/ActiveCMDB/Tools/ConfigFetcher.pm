@@ -51,6 +51,9 @@ use Sys::Hostname;
 use Logger;
 use Switch;
 use File::Basename;
+use strict;
+use warnings;
+use IO::Socket::IP;
 
 use ActiveCMDB::ConfigFactory;
 use ActiveCMDB::Common::Broker;
@@ -118,27 +121,7 @@ sub init {
 						});
 	
 
-	#
-	# Initialize landing zone
-	#
-	my $data = undef;
-	foreach my $landing (split(/\,/, $self->config->section('cmdb::process::config::landing_zone') ) )
-	{
-		next unless ( $landing =~ /^(.+):(.+)/ );
-		next unless ( $1 eq hostname );
-		$data->{hostname}  = $1;
-		$data->{directory} = $2;
-		
-		foreach my $a ( $self->lookup($data->{hostname}) )
-		{
-			if ( $a !~ /^127\..+/ ) {
-				$data->{netaddr} = $a;
-				last;
-			}
-		}
-		$self->landing($data);
-		last;
-	}
+	
 	
 	#
 	# Disconnect fromn tty and start new session
@@ -193,10 +176,23 @@ sub process
 		# Make sure we don't start using too much cpu
 		#
 		if ( $delay > 0 ) {
+			$self->process->status(PROC_IDLE);
+			$self->process->action("Sleeping");
+			$self->process->pid($$);
+			$self->process->update($self->process->process_name);
 			sleep $delay;
 		}
 	}	
 }
+
+=item process_device
+
+Method: process_device
+Parameters:
+  $self		- Reference to object
+  $msg		- Message frame	
+
+=cut
 
 sub process_device
 {
@@ -210,6 +206,11 @@ sub process_device
 		$device = Class::Device->new( device_id => $msg->payload->{device}->{device_id} );
 		$device->get_data();
 		
+		# Update process status
+		$self->process->status(PROC_BUSY);
+		$self->process->action("Processing device " . $device->attr->hostname );
+		$self->process->update();
+		
 		my $device_class = $self->get_class_by_oid($device->attr->sysobjectid);
 		if ( $device_class ne 'Class::Device' ) {
 				Logger->debug("Switch device class to $device_class");
@@ -218,7 +219,6 @@ sub process_device
 				#
 				$device = $device_class->new(device_id => $device->device_id);
 				$device->get_data();
-				$self->process->action("Fetching config for " . $device->hostname );
 		}
 		
 		my %fetchers = ();
@@ -229,6 +229,10 @@ sub process_device
 			if ( $fetchers{$_} > $cycles ) { $cycles = $fetchers{$_}; }
 		}
 		
+		#
+		# Get a proper landing zone for the configuration
+		#
+		$self->get_landing_zone();
 		$result = undef;
 		for (my $i = 1; $i <= $cycles; $i++)
 		{
@@ -409,6 +413,59 @@ sub _get_filetype
 		return 'ASCII';
 	}
 }
+
+=item get_landing_zone
+
+Determine the best landing zone
+
+=cut
+
+sub get_landing_zone
+{
+	my ($self) = @_;
+	
+	#
+	# Initialize landing zone
+	#
+	my $data = undef;
+	my $index = 0;
+	foreach my $landing (split(/\,/, $self->config->section('cmdb::process::config::landing_zone') ) )
+	{
+		next unless ( $landing =~ /^(.+):(.+)/ );
+		next unless ( $1 eq hostname );
+		$data->{hostname}  = $1;
+		$data->{directory} = $2;
+		
+		foreach my $a ( $self->lookup($data->{hostname}) )
+		{
+			if ( $a !~ /^127\..+/ ) {
+				$data->{netaddr} = $a;
+				last;
+			}
+		}
+		
+		my $tftp = Net::TFTP->new($data->{netaddr},
+						Timeout		=> 2,
+						Retries		=> 1,
+					);
+		$tftp->get("CmdbTestFile.tst", "/dev/null");
+		if ( $tftp->error =~ /File not found/ )
+		{
+			$self->landing($data);
+			last;
+		}
+		
+	}
+}
+
+=item handle_signals
+
+Subroutine: handle_signals
+
+Handle incoming signals, this method guarantees that the 
+current work is completed properly
+
+=cut
 
 sub handle_signals
 {
