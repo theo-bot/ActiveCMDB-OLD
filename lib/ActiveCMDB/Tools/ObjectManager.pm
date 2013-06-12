@@ -152,9 +152,7 @@ sub init {
 							process   => $self->process,
 							subscribe => true
 						});
-	
-	$self->start_childern();
-	
+		
 }
 
 sub manage {
@@ -589,10 +587,6 @@ sub schema_max_age {
 	return 300;
 }
 
-sub start_childern {
-	my($self) = @_;
-	Logger->debug("Starting childern");
-}
 
 sub challenge_managers
 {
