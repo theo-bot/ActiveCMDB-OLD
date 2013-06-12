@@ -7,7 +7,7 @@ package Class::Device::TcpServices;
 
     Version 1.0
 
-    Copyright (C) 2008-2011 Theo Bot
+    Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 

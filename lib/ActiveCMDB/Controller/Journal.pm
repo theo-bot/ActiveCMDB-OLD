@@ -7,7 +7,7 @@ package ActiveCMDB::Controller::Journal;
 
     Version 1.0
 
-    Copyright (C) 2012-2013 Theo Bot
+    Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
