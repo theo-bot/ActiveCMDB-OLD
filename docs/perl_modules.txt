@@ -36,5 +36,6 @@ Net::Riak
 Net::SNMP
 Net::Stomp
 Net::Telnet
+Net::TFTP
 Pod::Usage
 Try::Tiny
