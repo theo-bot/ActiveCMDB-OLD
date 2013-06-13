@@ -106,13 +106,17 @@ sub init
 }
 
 
-sub manage
+sub processor
 {
 	my($self) = @_;
-	
+	my($msg, $delay);
 	
 	while ( $self->process->status != PROC_SHUTDOWN )
 	{
+		#
+		# Reset delay timer
+		#
+		$delay = 5;
 		
 		#
 		# Handle raised signals
@@ -124,6 +128,57 @@ sub manage
 			next;
 		}
 		
+		#
+		# Check for new syslog messages
+		#
+		my $logmsg = $self->server->get_message();
+		if ( defined($logmsg) )
+		{
+			$self->process_message($logmsg);
+		}
 		
+		#
+		# Check for messages at the broker
+		#
+		$msg = $self->broker->getframe({ process_type => $self->process->type });
+		if ( $msg )
+		{
+			switch( $msg->subject )
+			{
+				case 'Shutdown'			{ $self->process->status(PROC_SHUTDOWN) }
+				else 					{ Logger->warn("Undefined message type ".$msg->subject )}
+			}
+			$delay--;
+			
+			Logger->debug("Broker message processed");
+		}
+		
+		#
+		# Make sure we don't start using too much cpu
+		#
+		if ( $delay > 0 ) {
+			$self->process->action("Sleeping");
+			$self->process->status(PROC_IDLE);
+			$self->process->pid($$);
+			$self->process->update($self->process->process_name);
+			sleep $delay;
+		}
 	}
 }
+
+sub handle_signals
+{
+	my($self) = @_;
+	Logger->warn("Handling incoming signal");
+	foreach my $sig (keys $self->{signal})
+	{
+		Logger->debug("Processing signal $sig");
+		switch ($sig)
+		{
+			case 'INT'		{ $self->process->status(PROC_SHUTDOWN); }
+			case 'TERM'		{ $self->process->status(PROC_SHUTDOWN); }
+		}
+	}
+}
+
+1;
