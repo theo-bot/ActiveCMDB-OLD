@@ -49,8 +49,13 @@ use Net::Riak;
 use JSON::XS;
 use Data::Dumper;
 
+#
+# Create an intance of the global config
+#
 my $config = ActiveCMDB::ConfigFactory->instance();
 $config->load('cmdb');
+
+
 my $client = Net::Riak->new(
 				host		=> $config->section('cmdb::cloud::host'),
 				ua_timeout	=> $config->section('cmdb::cloud::timeout')
@@ -169,6 +174,7 @@ sub process_name {
 sub get_data {
 	my($self) = @_;
 	my($rs, $row);
+	Logger->debug("Fetching data for " . $self->process_name);
 	
 	$rs = $self->riak->get($self->process_name);
 	
@@ -177,7 +183,10 @@ sub get_data {
 		foreach my $attr (keys %map)
 		{
 			next if ( $attr =~ /name|server_id|instance|path/ );
-			$self->$attr($rs->{data}->{$attr})
+			if ( defined($rs->{data}->{$attr}) )
+			{
+				$self->$attr($rs->{data}->{$attr});
+			}
 			
 		}
 		$self->path($config->section("cmdb::process::" . $self->type . "::path"));
