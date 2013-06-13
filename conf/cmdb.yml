@@ -27,8 +27,8 @@ logging:
 broker:
   typeof: RabbitMQ
   uri: tcp://127.0.0.1:5672
-  user: guest
-  password: guest
+  user: cmdb
+  password: access
   pwencr: 0
   prefix: cmdb.
   
@@ -76,8 +76,13 @@ process:
     path: $CMDB_HOME/sbin/cmdb_core_process.pl
     managed: 
   syslog:
+    queue: cmdb.syslog
+    exchange: cmdb.syslog-x
+    path: $CMDB_HOME/sbin/cmdb_ip_syslog.pl
     port: 8514
     timeout: 2
+    expfile: $CMDB_HOME/conf/syslog.exp
+    expmaxage: 60
     
   
 location:

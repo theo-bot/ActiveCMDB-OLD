@@ -1,4 +1,4 @@
-package ActiveCMDB::Tool::SyslogServer;
+package ActiveCMDB::Tools::SyslogServer;
 
 =begin nd
 
@@ -46,17 +46,42 @@ use Switch;
 use Net::Syslogd;
 use strict;
 use warnings;
-use constant CMDB_PROCESSTYPE => 'syslog';
+use Tie::File::AsHash;
+use Data::Dumper;
+use ActiveCMDB::Common;
+use ActiveCMDB::Object::Process;
 use ActiveCMDB::Tools::Common;
 use ActiveCMDB::ConfigFactory;
 use ActiveCMDB::Common::Broker;
 use ActiveCMDB::Common::Constants;
+use ActiveCMDB::Common::Tempfile;
 use ActiveCMDB::Model::CMDBv1;
 use ActiveCMDB::Schema;
+
+use constant CMDB_PROCESSTYPE => 'syslog';
 
 has 'server'	=> (
 	is		=> 'rw',
 	isa		=> 'Object',
+);
+
+has 'expr'		=> (
+	traits	=> ['Array'],
+	is		=> 'rw',
+	isa		=> 'ArrayRef[Str]',
+	default	=> sub { [] },
+	handles	=> {
+		expr_add	=> 'push',
+		expressions	=> 'elements',
+		expr_clear	=> 'clear',
+		expr_count	=> 'count',
+	}
+);
+
+has 'expr_age'	=> (
+	is		=> 'rw',
+	isa		=> 'Int',
+	default	=> 0
 );
 
 with 'ActiveCMDB::Tools::Common';
@@ -70,10 +95,12 @@ sub init
 	$self->config->load('cmdb');
 	$self->process( ActiveCMDB::Object::Process->new(
 			name		=> CMDB_PROCESSTYPE,
+			type		=> CMDB_PROCESSTYPE,
 			instance	=> $args->{instance},
 			server_id	=> $self->config->section('cmdb::default::server_id')
 		)
 	);
+
 	$self->process->get_data();
 	$self->reset_signal(false);
 	$self->process->status(PROC_RUNNING);
@@ -84,7 +111,7 @@ sub init
 	#
 	# Connecting to database
 	#
-	$self->schema(ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}));
+	#$self->schema(ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}));
 	
 	#
 	# Connect to broker
@@ -132,9 +159,10 @@ sub processor
 		# Check for new syslog messages
 		#
 		my $logmsg = $self->server->get_message();
-		if ( defined($logmsg) )
+		if ( defined($logmsg) && $logmsg )
 		{
 			$self->process_message($logmsg);
+			$delay--;
 		}
 		
 		#
@@ -165,6 +193,51 @@ sub processor
 		}
 	}
 }
+
+sub process_message
+{
+	my($self, $message) = @_;
+	
+	if ( time() - $self->expr_age > $self->config->section("cmdb::process::syslog::expmaxage") )
+	{
+		$self->import_expressions();
+		$self->expr_age(time());
+	}
+	
+	if ( !defined($message->process_message()) )
+	{
+		Logger->warn(Net::Syslogd->error);
+	} else {
+		foreach my $expr ( $self->expressions )
+		{
+			if ( $message->message =~ /$expr/ ) {
+				Logger->info("Found message for $expr");
+			} else {
+				Logger->debug("Discarded message");
+			}
+		}
+	}
+}
+
+sub import_expressions
+{
+	my($self) = @_;
+	my $expr_file = subst_envvar( $self->config->section("cmdb::process::syslog::expfile") );
+	
+	if ( -f $expr_file )
+	{
+		$self->expr_clear;
+		my $fh = undef;
+		open($fh, "<", $expr_file);
+		while ( <$fh> )
+		{
+			$self->expr_add($_);
+		}
+		close($fh);
+		Logger->info("Loaded " . $self->expr_count . " expression(s)");
+	}
+}
+
 
 sub handle_signals
 {
