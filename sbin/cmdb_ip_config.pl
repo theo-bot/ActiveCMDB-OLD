@@ -39,7 +39,6 @@ use sigtrap qw(handler sigHandler INT TERM);
 use Getopt::Long;
 use Logger;
 
-
 #
 # Process arguments
 #
