@@ -53,6 +53,7 @@ our @ISA = ('Exporter');
 
 our @EXPORT = qw(
 	cmdb_get_host_by_ip
+	cmdb_gethostByAddr
 );
 #########################################################################
 # Routines
@@ -104,4 +105,59 @@ sub cmdb_get_host_by_ip
 			$hostname = $name
 		}
 	}
+	
+	return $hostname;
+}
+
+sub cmdb_gethostByAddr
+{
+	my($ip) = @_;
+	my($schema,$rs, $row, $hostname, $tally, $device_id, $device);
+	
+	$device_id = undef;
+	$device    = undef;
+	$hostname  = $ip;
+	#
+	# Connect to database
+	#
+	$schema = ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info});
+	
+	$tally = $schema->resultset("IpDevice")->search({ mgtaddress => $ip })->count;
+	if ( $tally > 0 )
+	{
+		$rs = $schema->resultset("IpDevice")->search({ mgtaddress => $ip });
+		$row = $rs->next;
+		$hostname = $row->hostname;
+		$device_id = $row->device_id;
+	}
+	
+	if ( $hostname eq $ip )
+	{
+		$tally = $schema->resultset("IpDeviceNet")->search({ ipadentaddr => $ip })->count;
+		if ( $tally > 0 )
+		{
+			$rs = $schema->resultset("IpDeviceNet")->search(
+				{
+					"me.ipadentaddr" => $ip
+				},
+				{
+					join 		=> 'ip_device',
+					'+select'	=> ['ip_device.hostname', 'ip_device.device_id'],
+					'+as'		=> ['hostname', 'device_id']
+				}
+			);
+			
+			$row = $rs->next;
+			$hostname = $row->get_column("hostname");
+			$device_id = $row->get_column("device_id");
+		}
+	}
+	
+	if ( defined($device_id) )
+	{
+		$device = ActiveCMDB::Object::Device->new(device_id => $device_id );
+		$device->get_data();
+	}
+	
+	return $device;
 }
