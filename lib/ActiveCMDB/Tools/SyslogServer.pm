@@ -55,6 +55,7 @@ use ActiveCMDB::ConfigFactory;
 use ActiveCMDB::Common::Broker;
 use ActiveCMDB::Common::Constants;
 use ActiveCMDB::Common::Tempfile;
+use ActiveCMDB::Common::Device;
 use ActiveCMDB::Model::CMDBv1;
 use ActiveCMDB::Schema;
 
@@ -62,7 +63,7 @@ use constant CMDB_PROCESSTYPE => 'syslog';
 
 has 'server'	=> (
 	is		=> 'rw',
-	isa		=> 'Object',
+	isa		=> 'Maybe[Object]',
 );
 
 has 'expr'		=> (
@@ -83,6 +84,9 @@ has 'expr_age'	=> (
 	isa		=> 'Int',
 	default	=> 0
 );
+
+my %deviceBuffer;
+
 
 with 'ActiveCMDB::Tools::Common';
 
@@ -125,11 +129,28 @@ sub init
 	#
 	# Initialize server
 	#
-	$self->server( Net::Syslogd->new( 
-								LocalPort => $self->config->section('cmdb::process::syslog::port'),
-								timeout   => $self->config->section('cmdb::process::syslog::timeout')  
-							) 
-				);
+	my $cfg = $self->config->section("cmdb::process::syslog::server");
+	my @cfg = ();
+	foreach ( keys( %{$cfg} ) )
+	{
+		push(@cfg, $_ => $cfg->{$_});
+	}
+	Logger->debug("Creating syslog server with arguments:\n" . Dumper($cfg) );
+	if ( $self->server( Net::Syslogd->new( @cfg ) ) )
+	{
+		Logger->info("Defined server object");
+	} else {
+		Logger->error("Failed to create server object " . Net::Syslogd->error);
+	}
+	
+	#
+	# Initialize device buffer
+	#
+	my $buffer = subst_envvar( $self->config->section("cmdb::process::syslog::buffer") );
+	tie %deviceBuffer, 
+		'Tie::File::AsHash', 
+		subst_envvar($self->config->section("cmdb::process::syslog::buffer")), 
+		split => ":";
 }
 
 
@@ -143,7 +164,7 @@ sub processor
 		#
 		# Reset delay timer
 		#
-		$delay = 5;
+		$delay = 2;
 		
 		#
 		# Handle raised signals
@@ -158,11 +179,20 @@ sub processor
 		#
 		# Check for new syslog messages
 		#
-		my $logmsg = $self->server->get_message();
+		Logger->debug("Checking for syslog messages");
+		my $logmsg = undef;
+		$logmsg = $self->server->get_message();
 		if ( defined($logmsg) && $logmsg )
 		{
 			$self->process_message($logmsg);
 			$delay--;
+		} else {
+			if ( $logmsg == 0 )
+			{
+				Logger->debug("Timeout on message reception");
+			} else {
+				Logger->warn("Syslog error :" . Net::Syslogd->error);
+			}
 		}
 		
 		#
@@ -198,6 +228,8 @@ sub process_message
 {
 	my($self, $message) = @_;
 	
+	Logger->debug("Processing syslog message");
+	
 	if ( time() - $self->expr_age > $self->config->section("cmdb::process::syslog::expmaxage") )
 	{
 		$self->import_expressions();
@@ -208,12 +240,24 @@ sub process_message
 	{
 		Logger->warn(Net::Syslogd->error);
 	} else {
+		my $match =false;
 		foreach my $expr ( $self->expressions )
 		{
+			Logger->debug("Testing message agains $expr");
+			
 			if ( $message->message =~ /$expr/ ) {
 				Logger->info("Found message for $expr");
-			} else {
-				Logger->debug("Discarded message");
+				$match = true;
+				last;
+			} 
+		}
+		if ( ! $match ) {
+			Logger->debug("Message did not match any expression");
+		} else {
+			my $device = cmdb_gethostByAddr( $message->remoteaddr );
+			if ( defined($device) )
+			{
+				$deviceBuffer{ $message->remoteaddr } = time();
 			}
 		}
 	}
@@ -222,6 +266,7 @@ sub process_message
 sub import_expressions
 {
 	my($self) = @_;
+	Logger->debug("Importing new expressions");
 	my $expr_file = subst_envvar( $self->config->section("cmdb::process::syslog::expfile") );
 	
 	if ( -f $expr_file )
@@ -231,6 +276,7 @@ sub import_expressions
 		open($fh, "<", $expr_file);
 		while ( <$fh> )
 		{
+			chomp;
 			$self->expr_add($_);
 		}
 		close($fh);

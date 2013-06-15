@@ -35,6 +35,7 @@ Net::RabbitMQ
 Net::Riak
 Net::SNMP
 Net::Stomp
+Net::Syslogd
 Net::Telnet
 Net::TFTP
 Pod::Usage
