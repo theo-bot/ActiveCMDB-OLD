@@ -1,3 +1,32 @@
+[%#
+ *
+ * 	Script:	root/index.tt
+ * 	___________________________________________________________
+ *
+ * 	Copyright (C) 2011-2015 Theo Bot
+ *
+ * 	http://www.activecmdb.org
+ *
+ * 	Topic: Purpose
+ *
+ * 	Template to generate the frames page 
+ *
+ * 	About: License
+ *
+ * 	This program is free software; you can redistribute it and/or
+ * 	modify it under the terms of the GNU General Public License
+ * 	as published by the Free Software Foundation; either version 2
+ * 	of the License, or (at your option) any later version.
+ *
+ * 	This program is distributed in the hope that it will be useful,
+ * 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * 	GNU General Public License for more details.
+ *
+ *  Topic: Version Control
+ *
+ *
+%]
 <frameset rows="100,*" framespacing=1 border=1>
 	<frame id="frameHeader" scrolling="no" src="/menu/header">
 	<frameset cols="21%,*">
