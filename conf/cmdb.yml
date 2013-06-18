@@ -82,11 +82,13 @@ process:
     follow_up: cmdbDisco,cmdbConfig
     server:
       LocalAddr: 192.168.178.20
-      LocalPort: 8514
+      LocalPort: 514
       timeout: 2
     buffer: $CMDB_HOME/var/tmp/syslog.dat
     expfile: $CMDB_HOME/conf/syslog.exp
     expmaxage: 60
+    delay_forward: 120
+    
     
   
 location:
