@@ -86,7 +86,7 @@ sub get_data {
 				Logger->warn("Unable to fetch row");
 			}
 		} catch {
-			Logger->warn("Failed to fect endpoint message.\n" . $_);
+			Logger->warn("Failed to fetch endpoint message.\n" . $_);
 		};
 	}
 }
@@ -114,14 +114,24 @@ sub parse {
 	while ( $msg =~ /(\[.+?\])/ )
 	{
 		my $x = $1;
+		Logger->debug("Found tag $x");
 	 	if ( $x =~ /\[(.+?)\.(.+)\]/ )
 	 	{
 	 		my $object = $1;
 	 		my $method = $2;
-	 		my $newval = $os->{$object}->$method();
-	 		$x =~ s/\[/\\\[/;
-	 		$x =~ s/\]/\\\]/;
-	 		$msg =~ s/$x/$newval/s;
+	 		Logger->debug("Using object $object with method $method");
+	 		if ( defined($os->{$object}) )
+	 		{
+	 			my $newval = $os->{$object}->$method();
+	 			$x =~ s/\[/\\\[/;
+	 			$x =~ s/\]/\\\]/;
+	 			$msg =~ s/$x/$newval/s;
+	 		} else {
+	 			Logger->warn("Object not found in object store");
+	 			my @keys = keys %{$os};
+	 			foreach (@keys) { Logger->debug("OS Key:" . $_); }
+	 			exit;
+	 		}
 	 	}
 	}	
 	return $msg;
