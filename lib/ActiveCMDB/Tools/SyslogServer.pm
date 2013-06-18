@@ -50,6 +50,8 @@ use Tie::File::AsHash;
 use Data::Dumper;
 use ActiveCMDB::Common;
 use ActiveCMDB::Object::Process;
+use ActiveCMDB::Object::Device;
+use ActiveCMDB::Object::Endpoint;
 use ActiveCMDB::Tools::Common;
 use ActiveCMDB::ConfigFactory;
 use ActiveCMDB::Common::Broker;
@@ -79,7 +81,25 @@ has 'expr'		=> (
 	}
 );
 
+has 'object_store'	=> (
+		traits	=> ['Hash'], 
+		is		=> 'rw',
+		isa		=> 'HashRef',
+		default	=> sub { {} },
+		handles	=> {
+			store_object	=> 'set',
+			fetch_object	=> 'get',
+			delete_object	=> 'delete',
+		}
+	);
+
 has 'expr_age'	=> (
+	is		=> 'rw',
+	isa		=> 'Int',
+	default	=> 0
+);
+
+has 'buffer_time' => (
 	is		=> 'rw',
 	isa		=> 'Int',
 	default	=> 0
@@ -151,6 +171,8 @@ sub init
 		'Tie::File::AsHash', 
 		subst_envvar($self->config->section("cmdb::process::syslog::buffer")), 
 		split => ":";
+		
+	$self->set_buffertime();
 }
 
 
@@ -195,6 +217,14 @@ sub processor
 			}
 		}
 		
+		#
+		# Process buffer contents
+		#
+		if ( time() - $self->buffer_time > $self->config->section("cmdb::process::syslog::delay_forward") )
+		{
+			$self->process_buffer();
+			$delay--;
+		}
 		#
 		# Check for messages at the broker
 		#
@@ -241,8 +271,10 @@ sub process_message
 		Logger->warn(Net::Syslogd->error);
 	} else {
 		my $match =false;
+		Logger->debug("Got message: " . $message->message);
 		foreach my $expr ( $self->expressions )
 		{
+			
 			Logger->debug("Testing message agains $expr");
 			
 			if ( $message->message =~ /$expr/ ) {
@@ -257,8 +289,43 @@ sub process_message
 			my $device = cmdb_gethostByAddr( $message->remoteaddr );
 			if ( defined($device) )
 			{
-				$deviceBuffer{ $message->remoteaddr } = time();
+				$deviceBuffer{ $device->device_id } = time();
+			} else {
+				Logger->debug("Unknown device " . $message->remoteaddr );
 			}
+		}
+	}
+}
+
+sub process_buffer
+{
+	my($self) = @_;
+	Logger->debug("Processing buffer entries");
+	my $delay = $self->config->section("cmdb::process::syslog::delay_forward");
+	my @followUp = split(/\,/, $self->config->section("cmdb::process::syslog::follow_up"));
+	my $action = 'ProcessDevice';
+	
+	foreach my $device_id ( keys %deviceBuffer )
+	{
+		if ( time() - $deviceBuffer{ $device_id } >= $delay )
+		{
+			
+			my $device = ActiveCMDB::Object::Device->new( device_id => $device_id);
+			$device->find();
+			$self->store_object('device', $device);
+			foreach my $ep_name (@followUp)
+			{
+				my $ep = ActiveCMDB::Object::Endpoint->new(name => $ep_name);
+				
+				$ep->get_data();
+				my $message = ActiveCMDB::Object::Message->new();
+				$message->from($self->process->name);
+				$message->to( $ep->dest_in );
+				$message->subject( $action );
+				$message->payload( $ep->subjects->{$action}->parse( $self->object_store ) );
+				$self->broker->sendframe($message, {});
+			} 
+			delete $deviceBuffer{$device_id};
 		}
 	}
 }
@@ -284,6 +351,15 @@ sub import_expressions
 	}
 }
 
+sub set_buffertime
+{
+	my($self) = @_;
+	foreach (keys %deviceBuffer) {
+		if ( $deviceBuffer{$_} < $self->buffer_time && $deviceBuffer{$_} > 0 ) {
+			$self->buffer_time($deviceBuffer{$_});
+		}
+	}
+}
 
 sub handle_signals
 {
