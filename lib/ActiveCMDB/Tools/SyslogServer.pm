@@ -1,11 +1,12 @@
 package ActiveCMDB::Tools::SyslogServer;
 
-=begin nd
+=head1 ActiveCMDB::Tools::SyslogServer
 
-    Script: ActiveCMDB::Tools::SyslogServer.pm
     ___________________________________________________________________________
 
     Version 1.0
+
+=head1 Copyright
 
     Copyright (C) 2011-2015 Theo Bot
 
@@ -16,7 +17,7 @@ package ActiveCMDB::Tools::SyslogServer;
 
     Syslog server to process config changes
 
-    About: License
+=head1 License
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -63,10 +64,24 @@ use ActiveCMDB::Schema;
 
 use constant CMDB_PROCESSTYPE => 'syslog';
 
+=head1 Attributes
+
+=head2 server
+
+Attribute server containts the Net::Syslogd listerner object.
+
+=cut
+
 has 'server'	=> (
 	is		=> 'rw',
 	isa		=> 'Maybe[Object]',
 );
+
+=head2 expr
+
+Attribute expr containts all expressions for matching syslog messages
+
+=cut
 
 has 'expr'		=> (
 	traits	=> ['Array'],
@@ -81,6 +96,18 @@ has 'expr'		=> (
 	}
 );
 
+=head2 object-store
+
+Attribute object_store is a hash with objects containing current object data
+
+$object_store{device} => Containts a ActiveCMDB::Object::Device object
+$object_store{message} => Containts a ActiveCMDB::Object::Message object
+
+This attribute can be passed on to the ActiveCMDB::Object::Enpoint::Message parse 
+method. So the parse function knows where to which which data
+
+=cut
+
 has 'object_store'	=> (
 		traits	=> ['Hash'], 
 		is		=> 'rw',
@@ -93,11 +120,25 @@ has 'object_store'	=> (
 		}
 	);
 
+=head2 expr_age
+
+Attribute expr_age containt an integer value with the time that the expressions
+were loaded.
+
+=cut
+
 has 'expr_age'	=> (
 	is		=> 'rw',
 	isa		=> 'Int',
 	default	=> 0
 );
+
+=head2 buffer_time
+
+Attribute buffer_time containts the oldest entry in the %deviceBuffer hash. So
+it can be used to trigger the process_buffer method.
+
+=cut
 
 has 'buffer_time' => (
 	is		=> 'rw',
@@ -105,16 +146,57 @@ has 'buffer_time' => (
 	default	=> 0
 );
 
+=head2 deviceBuffer
+
+The device buffer hash contains all device id's for we have received a syslog message
+that matched an expression and is managed in our database. It is via the 
+Tie::File::AsHash module connected to a file defined by the process:syslog::buffer entry
+in the cmdb.yml file 
+
+=cut
+
 my %deviceBuffer;
 
 
 with 'ActiveCMDB::Tools::Common';
+
+=head1 Methods
+
+=head2 init
+
+The init method initalizes the process and is triggered only once 
+
+Arguments:
+$self	- Reference to the object
+$args	- Hash reference containg the instance number
+
+The configuration is loaded in this method:
+
+ syslog:
+    queue: cmdb.syslog
+    exchange: cmdb.syslog-x
+    path: $CMDB_HOME/sbin/cmdb_ip_syslog.pl
+    follow_up: cmdbDisco,cmdbConfig
+    server:
+      LocalAddr: 192.168.178.20
+      LocalPort: 514
+      timeout: 2
+    buffer: $CMDB_HOME/var/tmp/syslog.dat
+    expfile: $CMDB_HOME/conf/syslog.exp
+    expmaxage: 60
+    delay_forward: 120
+
+=cut
 
 sub init 
 {
 	my($self, $args) = @_;
 	
 	Logger->info("Starting ip syslog manager");
+	
+	#
+	# Import configuration
+	#
 	$self->config(ActiveCMDB::ConfigFactory->instance());
 	$self->config->load('cmdb');
 	$self->process( ActiveCMDB::Object::Process->new(
@@ -125,17 +207,15 @@ sub init
 		)
 	);
 
+	#
+	# Initialize process status
+	#
 	$self->process->get_data();
 	$self->reset_signal(false);
 	$self->process->status(PROC_RUNNING);
 	$self->process->pid($$);
 	$self->process->update($self->process->process_name());
 	$self->process->disconnect();
-	
-	#
-	# Connecting to database
-	#
-	#$self->schema(ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}));
 	
 	#
 	# Connect to broker
@@ -175,6 +255,11 @@ sub init
 	$self->set_buffertime();
 }
 
+=head2 processor
+
+Main processing loop.
+
+=cut 
 
 sub processor
 {
@@ -254,6 +339,18 @@ sub processor
 	}
 }
 
+=head2 process_message
+
+Process a single syslog message. Decode a given message and match it against a
+number of expressions. These expression will be refressed automatically from the
+file configured in the cmdb.yml file (expfile). 
+
+Arguments:
+$self	: reference to object
+$message: Net::Syslogd->get_message() result
+
+=cut
+
 sub process_message
 {
 	my($self, $message) = @_;
@@ -290,12 +387,23 @@ sub process_message
 			if ( defined($device) )
 			{
 				$deviceBuffer{ $device->device_id } = time();
+				$self->set_buffertime();
 			} else {
 				Logger->debug("Unknown device " . $message->remoteaddr );
 			}
 		}
 	}
 }
+
+=head2 process_buffer
+
+Process the contents of the %deviceBuffer hash and check whether or not
+the follow ups have to be informed of the change. Forwarding is delayed 
+for a number of seconds. Configurations are often changed multiple times
+so the server will wait for a while before sending a ProcessDevice 
+message to the follow ups. 
+
+=cut
 
 sub process_buffer
 {
@@ -328,7 +436,15 @@ sub process_buffer
 			delete $deviceBuffer{$device_id};
 		}
 	}
+	
+	$self->set_buffertime();
 }
+
+=head2 import_expressions
+
+Import all regular expression from the expfile.
+
+=cut
 
 sub import_expressions
 {
@@ -351,6 +467,13 @@ sub import_expressions
 	}
 }
 
+=head2 set_buffertime
+
+Method set_buffertime sets the buffer_time attribute to the lowest value
+of the %deviceBuffer hash.
+
+=cut
+
 sub set_buffertime
 {
 	my($self) = @_;
@@ -360,6 +483,12 @@ sub set_buffertime
 		}
 	}
 }
+
+=head2 handle_signals
+
+Method handle_signals is the signal handler. The server stops at either an INT or TERM signal
+
+=cut
 
 sub handle_signals
 {
