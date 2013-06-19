@@ -1,22 +1,22 @@
 package ActiveCMDB::Object::Device;
 
-=begin nd
 
-    Script: ActiveCMDB::Object::Device.pm
+=head1 ActiveCMDB::Object::Device.pm
     ___________________________________________________________________________
 
-    Version 1.0
+=head1 Version 1.0
 
+=head1 Copyright
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 Description
 
     ActiveCMDB::Object::Device class definition
 
-    About: License
+=head1 License
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -87,14 +87,20 @@ has 'snmpv3_proto1'	=> (is => 'rw', isa => 'Proto1', default => 'md5');
 has 'snmpv3_proto2'	=> (is => 'rw', isa => 'Proto2', default => 'aes');
 
 # Schema
-has 'schema'		=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}) } );
+has 'schema'		=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Model::CMDBv1->instance() } );
 
 
-=item find
+=head1 Methods
+
+=head2 find
 
 Load device base tables ip_device and ip_device_sec. 
-Parameters
-- $self 
+=head3 arguments
+ $self - reference to object
+ 
+The device is must be set to the object. The ActiveCMDB::Common::Device 
+module contains functions to find devices by ip address or hostname and 
+return Device objects 
 
 =cut
 
@@ -138,17 +144,32 @@ sub find {
 	}
 }
 
+=head2 get_data
+
+This is an alias for find
+
+=cut
+
 sub get_data
 {
 	my $self = shift;
 	return $self->find(@_);
 }
+
+=head2 save
+
+Save object data to the data warehouse.  
+
+=cut
+
 sub save {
 	my($self) = @_;
 	my @colums = ();
 	my($rs, $data, $attr);
 	
+	#
 	# Save ip_device table data, which is in IpDevice
+	#
 	@colums = $self->schema->source("IpDevice")->columns;
 	$data = undef;
 	foreach $attr (@colums)
@@ -183,10 +204,16 @@ sub save {
 		return true;
 		
 	} catch {
-		Logger->warn("Failed to update device.");
+		Logger->warn("Failed to update device." . $_);
 		return false;
 	}
 }
+
+=head2 set_maint
+
+Store maintenance data in the dataware house (IpDeviceMaint). 
+
+=cut
 
 sub set_maint
 {
@@ -219,6 +246,12 @@ sub set_maint
 	}
 }
 
+=head2 get_maint
+
+Get the current maintenance schedules for this device
+
+=cut
+
 sub get_maint
 {
 	my($self) = @_;
@@ -244,6 +277,22 @@ sub get_maint
 	return @schedules;
 }
 
+=head2 journal
+
+Create a journal entry in the dataware house for the device.
+
+=head3 arguments
+
+ $self	: Reference to object
+ $data	: Hash reference with the 
+ following keys:
+		user	=> user who created the journal
+		prio	=> importance of the journal
+		date	=> the timestamp that the journal was entered
+		text	=> the journal message
+
+=cut
+
 sub journal {
 	my($self, $data) = @_;
 	
@@ -257,6 +306,12 @@ sub journal {
 		$journal->save();
 	}
 }
+
+=head2 configs
+
+This method returns a list of configuration objects
+
+=cut
 
 sub configs {
 	my ($self) = @_;
