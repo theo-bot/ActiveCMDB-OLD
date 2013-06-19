@@ -1,22 +1,21 @@
 package ActiveCMDB::Common;
 
-=begin nd
-
-    Script: AvtiveCMDB::Common.pm
+=head1 Module - AvtiveCMDB::Common.pm
     ___________________________________________________________________________
 
-    Version 1.0
+=head1 Version 
+1.0
 
+=head1 Copyright
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
-
-    Topic: Purpose
+=head1 Description
 
     Common System Library
 
-    About: License
+=head1 License
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,10 +27,6 @@ package ActiveCMDB::Common;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
-
 =cut
 
 use Exporter;
@@ -41,15 +36,39 @@ use Exporter;
 				subst_envvar reftype
 			);
 
+=head1 Functions
+
+=head2 subst_envvar
+
+This subroutine replaces all instances of an enviroment variable 
+in a string
+
+ Example:
+ my $data = subst_envvar('$CMDB_HOME/conf/myfile.txt');
+ print $data,"\n";
+ 
+ Results into:
+ /opt/ActiveCMDB/conf/myfile.txt
+ 
+
+=cut
+
 sub subst_envvar {
 	$data = shift;
 	
 	foreach $var (keys %ENV) {
-		$data =~ s/\$$var/$ENV{$var}/;
+		$data =~ s/\$$var/$ENV{$var}/g;
 	}
 	
 	return $data;
 }
+
+=head2 reftype
+
+
+
+=cut
+
 sub reftype
 {
    return ref $_[0] ? ref $_[0] : "SCALAR";
