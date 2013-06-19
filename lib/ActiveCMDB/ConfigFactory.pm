@@ -1,22 +1,22 @@
 package ActiveCMDB::ConfigFactory;
 
-=begin nd
-
-    Script: ActiveCMDB::ConfigFactory
+=head1 Module - ActiveCMDB::ConfigFactory
     ___________________________________________________________________________
 
-    Version 1.0
+=head1 Version 
+	1.0
 
+=head1 Copyright
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 Description
 
     Configuration System Library
 
-    About: License
+=head1 License
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,9 +28,6 @@ package ActiveCMDB::ConfigFactory;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
 
 =cut
 
@@ -39,6 +36,14 @@ use Config::JFDI;
 use File::stat;
 use Data::Dumper;
 
+=head1 Methods
+
+=head2 instance
+
+Create an instance. Since it is a singleton object, all processes
+using this object get the same data.
+
+=cut
 
 sub _new_instance {
 	my $class = shift;
@@ -47,6 +52,12 @@ sub _new_instance {
 	
 	return $self;
 }
+
+=head2 load
+
+Import a configuration file from the $ENV{CMDB_HOME}/conf directory.
+
+=cut
 
 sub load {
 	my($self, $name) = @_;
@@ -77,10 +88,26 @@ sub load {
 			}
 			
 		} else {
-			print "Failed to open logfile, $!\n";
+			print "Failed to open configfile, $!\n";
 		}
 	}
 }
+
+=head2 section
+
+Returns a part of the configuration. 
+
+ Argurments:
+ $self		- Reference to object instance
+ $section	- Double colon seprated list of the config
+ 
+ Example:
+
+ $data = $config->section("cmdb::default::version");
+ 
+ cmdb is the file which is loaded (cmdb.yml).
+
+=cut
 
 sub section {
 	my($self, $section) = @_;
@@ -93,6 +120,12 @@ sub section {
 	
 	return $cfg;
 }
+
+=head2 config
+
+Return the configuration
+
+=cut
 
 sub config {
 	my ($self) = @_;
