@@ -1,22 +1,24 @@
 package ActiveCMDB::Common::Broker;
 
-=begin nd
-
-    Script: AvtiveCMDB::Common::Broker.pm
+=head1 MODULE -  AvtiveCMDB::Common::Broker.pm
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
     Abstraction Module for Brokers
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,14 +30,31 @@ package ActiveCMDB::Common::Broker;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
-
 =cut
 
 use ActiveCMDB::ConfigFactory;
 use Data::Dumper;
+
+=head1 METHODS
+
+=head2 new
+
+Create a new instance of this class.
+
+=head3 Arguments
+
+ $config - Hash reference with attributes:
+ 			typeof   - RabbitMQ / ActiveMQ
+ 			uri      - Connection URI, ie tcp://127.0.0.1:5672
+ 			user     - Username
+ 			password - Password
+ 			pwencr   - Is the password encrypted (0: No, 1: Yes)
+ 			prefix   - Default prefix for destinations
+
+
+It does B<not> automatically subscribe to queue's/exchanges
+
+=cut
 
 sub new {
 	my($class, $config) = @_;
@@ -64,6 +83,19 @@ sub new {
 	return $self;
 }
 
+=head2 init
+
+Connect to a broker. If $args->{subscribe} is true then initiate
+subscribtions.
+
+ Arguments
+ $self - Reference to object
+ $args - Hash reference may containt keys like:
+           subscribe - 0, Do not initiate subscribtions, 1, Initiate subscriptions
+           process   - ActiveCMDB::Object::Process object.
+
+=cut
+
 sub init {
 	my($self, $args) = @_;
 	
@@ -73,6 +105,12 @@ sub init {
 	}
 }
 
+=head2 config
+
+Get or Set the broker configurationl
+
+=cut
+
 sub config {
 	my($self, $cfg) = @_;
 	if ( defined($cfg) ) {
@@ -80,4 +118,5 @@ sub config {
 	}
 	return $self->{config};
 }
+
 1;

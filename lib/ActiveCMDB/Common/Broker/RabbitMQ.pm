@@ -1,22 +1,24 @@
 package ActiveCMDB::Common::Broker::RabbitMQ;
 
-=begin nd
-
-    Script: ActiveCMDB::Common::Broker::RabbitMQ.pm
+=head1 MODULE - ActiveCMDB::Common::Broker::RabbitMQ.pm
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
     RabbitMQ plugin for Broker Object
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,15 +30,6 @@ package ActiveCMDB::Common::Broker::RabbitMQ;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
-
-	Topic: Description
-	
-	
-	
-	
 =cut
 
 use Net::RabbitMQ;
@@ -49,6 +42,24 @@ use constant MQ_CHANNEL     => 1;
 use constant MQ_ROUTING_KEY => '';
 
 my $queue_name = '';
+
+=head1 METHODS
+
+=head2 connect
+
+Connect to a RabbitMQ broker.
+
+=head3 Arguments:
+   $self   - Reference to object
+   $config - Hash reference with attributes:
+ 			typeof   - RabbitMQ
+ 			uri      - Connection URI, ie tcp://127.0.0.1:5672
+ 			user     - Username
+ 			password - Password
+ 			pwencr   - Is the password encrypted (0: No, 1: Yes)
+ 			prefix   - Default prefix for destinations
+ 		
+=cut
 
 sub connect {
 	my($self, $config) = @_;
@@ -88,6 +99,15 @@ sub connect {
 	}
 }
 
+=head2 subscribe
+
+RabbitMQ does not really let you subscribe to a queue, this
+method rather registers the queue name so it will be ready from 
+during a C<getframe> call.
+If the queue was not declared yet if will be done here as well
+
+=cut
+
 sub subscribe
 {
 	my($self, $queue) = @_;
@@ -96,6 +116,17 @@ sub subscribe
 	Logger->info("Declaring non-durable queue $queue");
 	$self->mq->queue_declare(MQ_CHANNEL, $queue, { durable => 0} );
 }
+
+=head2 getframe
+
+This function returns a message frame if one is available from
+a subscribed queue.
+
+ Returns:
+ undef - If no frame is available
+ $msg  - An ActiveCMDB::Object::Message object if a frame is available
+
+=cut
 
 sub getframe {
 	my($self) = @_;
@@ -117,7 +148,7 @@ sub getframe {
 				Logger->debug("Decoding body");
 				$msg->decode_from_json($frame->{body});
 			} else {
-				Logger->debug("Unknown content type " . $msg->content_type() );
+				Logger->warn("Unknown content type " . $msg->content_type() );
 			}
 			return $msg
 		} else {
@@ -127,6 +158,27 @@ sub getframe {
 	
 	return false;
 }
+
+=head2 sendframe
+
+Send a frame to a RabbitMQ broker. Destinations can be either queue or
+exchanges. But because sending to exchanges is handled differently than
+sending to queues, exchange destinations are expected to end with '-x'
+
+Example:
+
+ Queue destination:
+ cmdb.disco-1-1
+ 
+ Exchange destination:
+ cmdb.disco-x
+
+ Arguments:
+ $self  - Reference to object
+ $msg   - ActiveCMDB::Object::Message object
+ $args  - Extra AMQP properties (like priority, content_type, etc..)
+
+=cut
 
 sub sendframe {
 	my($self, $msg, $args) = @_;
@@ -167,10 +219,29 @@ sub sendframe {
 	
 }
 
+=head2 disconnect
+
+Close connection to the broker
+
+=cut
+
 sub disconnect {
 	$mq->disconnect();
 	$mq = undef;
 }
+
+=head2 mq
+
+Get or set mq attribute, this is the Net::RabbitMQ object.
+
+ Attributes:
+ $self - reference to object
+ $mq   - Net::RabbitMQ object
+ 
+ Returns:
+ $self->{mq} - Net::RabbitMQ object
+
+=cut
 
 sub mq {
 	my($self, $mq) = @_;
@@ -182,6 +253,15 @@ sub mq {
 	return $self->{mq};
 }
 
+=head2 create exchange
+
+Declare RabbitMQ exchange destination in the broker.
+
+ Arguments:
+ $self  - Reference to object
+ $xchng - Exchange name, string
+=cut
+
 sub create_exchange {
 	my($self, $xchng) = @_;
 	
@@ -192,6 +272,22 @@ sub create_exchange {
 		Logger->warn("Inavlid exchange name");
 	}
 }
+
+=head2 cmdb_init
+
+Initialize broker connection for ActiveCMDB back-end processing.
+ - Subscribe to group queue
+ - Subscribe to private queue, ie private to the process
+ - Desclare exchanges
+ - Bind queue's to exchanges
+ 
+ Arguments:
+ $self - Reference to object
+ $args - hash reference with keys like:
+ 			process   - ActiveCMDB::Object::Process object
+ 			subscribe - Initiate broker back-end type connection/subscribtion
+
+=cut
 
 sub cmdb_init {
 	my($self, $args ) = @_;
