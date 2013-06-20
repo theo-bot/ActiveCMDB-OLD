@@ -65,7 +65,8 @@ sub subst_envvar {
 
 =head2 reftype
 
-
+Returns reference type if it $_[0] is a reference, otherwise
+it returns "SCALAR".
 
 =cut
 
