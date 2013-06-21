@@ -145,6 +145,13 @@ sub getframe
 
 =head2 sendframe
 
+Send a message to an ActiveCMDB broker. 
+
+ Arguments:
+ $self  - Reference to object
+ $msg   - ActiveCMDB::Object::Message object
+ $args  - Extra header arguments
+ 
 =cut
 
 sub sendframe
@@ -206,6 +213,49 @@ sub timeout
 		$self->{timeout} = $t;
 	}
 	return $self->{timeout};
+}
+
+=head2 cmdb_init
+
+Initialize broker connection for ActiveCMDB back-end processing.
+ - Subscribe to group queue
+ - Subscribe to private queue, ie private to the process
+ - Bind queue's to exchanges
+ 
+ Arguments:
+ $self - Reference to object
+ $args - hash reference with keys like:
+ 			process   - ActiveCMDB::Object::Process object
+ 			subscribe - Initiate broker back-end type connection/subscribtion
+
+ In an ActiveCMDB enviroment the broker factory is predefined, ie the clients
+ cannot define the queues and/or topics
+ 
+ 
+
+=cut
+
+sub cmdb_init
+{
+	my $broker_config = $self->config->section('cmdb::broker');
+	my $process_config = $self->config->section('cmdb::process::'.$args->{process}->name);
+	
+	my $private_queue = sprintf("%s-%d-%d",
+								$self->config->section('cmdb::process::' . $args->{process}->name . '::queue'),
+								$args->{process}->server_id,
+								$args->{process}->instance
+							);
+							
+	my $group_queue = $self->config->section('cmdb::process::' . $args->{process}->name . '::queue');
+	my $common_queue = $self->config->section('cmdb::default::queue');
+	
+	push( @{ $self->{xchngs} }, $self->{config}->section('cmdb::default::exchange') );
+	push( @{ $self->{xchngs} }, $self->{config}->section('cmdb::process::' . $args->{process}->name . '::exchange') );
+	
+	
+	$self->subscribe($group_queue);
+	$self->subscribe($private_queue);
+	$self->subscribe($common_queue);
 }
 
 1;

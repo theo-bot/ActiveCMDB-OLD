@@ -278,7 +278,7 @@ sub create_exchange {
 Initialize broker connection for ActiveCMDB back-end processing.
  - Subscribe to group queue
  - Subscribe to private queue, ie private to the process
- - Desclare exchanges
+ - Declare exchanges
  - Bind queue's to exchanges
  
  Arguments:
@@ -286,6 +286,27 @@ Initialize broker connection for ActiveCMDB back-end processing.
  $args - hash reference with keys like:
  			process   - ActiveCMDB::Object::Process object
  			subscribe - Initiate broker back-end type connection/subscribtion
+
+ 
+=head3 Broker setup
+                                +-------------+
+                                | group queue |
+                                +-------------+
+            
+  +------------------+          +---------------+
+  | process exchange | -------> | private queue |
+  +------------------+          +---------------+
+                                      ^
+  +------------------+                |
+  | default exchange |----------------+
+  +------------------+
+
+ - The group queue is used for ProcessDevice messages which process first get
+   is hands on it will process the message.
+ - With the private queue it is possible to send a message to a single process.
+ - The process exchange can be used to send a message so a single type
+   of process
+ - With the default exchange one can send a message to all processes
 
 =cut
 
