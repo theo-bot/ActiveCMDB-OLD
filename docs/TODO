@@ -1,6 +1,12 @@
 2013061201: Implement the Endpoint object to its full extend in all the tools
 
-2013061202: Create a syslog probe
+2013061202: Create a syslog collector
+			Done
 
 2013061203: Have the configuration manager probe the tftp port.
-            Done. 
+            Done.
+            
+2013062101: Implement contract management
+
+2013062102: Implement device circuit management
+
