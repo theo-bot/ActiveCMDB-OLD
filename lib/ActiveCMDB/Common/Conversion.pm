@@ -1,22 +1,24 @@
 package ActiveCMDB::Common::Conversion;
 
-=begin nd
-
-    Script: ActiveCMDB::Common::Conversion.pm
+=head1 MODULE - ActiveCMDB::Common::Conversion
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
     Manage conversions
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,11 +30,6 @@ package ActiveCMDB::Common::Conversion;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
-
-	
 =cut
 
 #########################################################################
@@ -56,6 +53,22 @@ our @EXPORT = qw(
 #########################################################################
 # Routines
 
+=head1 FUNCTIONS
+
+=head2 cmdb_convert
+
+Convert a name/value pair
+
+=head3 Arguments
+ $name		- Conversation set name
+ $value		- Conversation item in the named set
+
+=head3 Return
+ SCALAR		- Converted name/value pair
+ undef		- If now conversation was found
+ 
+=cut
+
 sub cmdb_convert
 {
 	my($name, $value) = @_;
@@ -77,6 +90,16 @@ sub cmdb_convert
 		return $row->conversion;
 	}
 }
+
+=head2 cmdb_add_conversion
+
+Add a conversion to the database.
+
+=head3 Arguments
+ $name			- Conversion set name
+ $value			- Conversation item in set
+ $conversion	- Converted value
+=cut
 
 sub cmdb_add_conversion
 {
