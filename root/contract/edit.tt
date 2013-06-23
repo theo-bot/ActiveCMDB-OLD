@@ -1,0 +1,56 @@
+[% WRAPPER wrapper.tt extra="distrib" %]
+[%#
+ *
+ * 	Script:	root/contract/edit.tt
+ * 	___________________________________________________________
+ *
+ * 	Copyright (C) 2011-2015 Theo Bot
+ *
+ * 	http://www.activecmdb.org
+ *
+ * 	Topic: Purpose
+ *
+ * 	Template to edit contracts
+ *
+ * 	About: License
+ *
+ * 	This program is free software; you can redistribute it and/or
+ * 	modify it under the terms of the GNU General Public License
+ * 	as published by the Free Software Foundation; either version 2
+ * 	of the License, or (at your option) any later version.
+ *
+ * 	This program is distributed in the hope that it will be useful,
+ * 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * 	GNU General Public License for more details.
+ *
+ *  Topic: Version Control
+ *
+ *
+%]
+<form name="contractForm" id="contractForm" action="save">
+<table class="cmdbTable">
+<tr>
+	<th align="left">Number</th>
+	<td colspan="3">:<input type="text" class="cmdbText" name="number" value="[% contract.number %]"></td>
+</tr>
+<tr>
+	<th align="left">Description</th>
+	<td colspan="3">:<input type="text" class="cmdbText" name="descr" value="[% contract.descr %]"></td>
+</tr>
+<tr>
+	<th align="left">Vendor</th>
+	<td colspan="3">:<select name="vendor_id" class="cmdbText">[% FOREACH vendor IN  vendors %]<option value="[% vendor.key %]" [% IF contract.vendor_id == vendor.key %]selected[% END %] >[% vendor.value %]</option>[% END %]</select>
+</tr>
+<tr>
+	<th align="left">Valid from</th>
+	<td>:<input type="text" class="cmdbText" size="9" value="[% contract.start_date %]"></td>
+	<th align="left">&nbsp;Until</th>
+	<td>:<input type="text" class="cmdbText" size="9" value="[% contract.end_date %]"></td>
+</tr>
+<tr>
+	<th>Service hours</th>
+</tr>
+</table>
+</form>
+[% END %]

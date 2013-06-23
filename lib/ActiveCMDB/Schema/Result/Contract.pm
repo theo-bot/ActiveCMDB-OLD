@@ -155,6 +155,9 @@ __PACKAGE__->add_unique_constraint("CMDB110801", ["contract_number"]);
 # Created by DBIx::Class::Schema::Loader v0.07025 @ 2012-10-30 14:31:29
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:R3LeFv56yxZJ54ehkYMIfw
 
+__PACKAGE__->belongs_to(
+	vendor => 'ActiveCMDB::Schema::Result::Vendor', { vendor_id => 'vendor_id' } 
+);
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;

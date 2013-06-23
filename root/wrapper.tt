@@ -102,6 +102,11 @@
 		<script src="/static/js/i18n/grid.locale-en.js"></script>
 		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.process.js"></script>
+		[% CASE "contract" %]
+		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+		<script src="/static/js/i18n/grid.locale-en.js"></script>
+		<script src="/static/js/jquery.jqGrid.min.js"></script>
+		<script src="/static/js/activecmdb.contract.js"></script>
 		[% CASE "distrib" %]
 		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
 		<style>

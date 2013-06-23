@@ -42,7 +42,7 @@ var data = [
             },
             { label: '<img src="/static/images/menu/site.png" /> Locations', url: '/location' },
             { label: '<img src="/static/images/menu/vendor.png" /> Vendors', url: '/vendor' },
-            { label: '<img src="/static/images/menu/contract.png" /> Contracts'},
+            { label: '<img src="/static/images/menu/contract.png" /> Contracts', url: '/contract' },
             { 
             	label: '<img src="/static/images/menu/distrib.png" /> Distribution',
             	children: [
