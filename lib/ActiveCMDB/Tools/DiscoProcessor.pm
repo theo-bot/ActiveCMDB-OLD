@@ -52,7 +52,6 @@ use ActiveCMDB::ConfigFactory;
 use ActiveCMDB::Common::Broker;
 use ActiveCMDB::Common::Constants;
 use ActiveCMDB::Model::CMDBv1;
-use ActiveCMDB::Schema;
 use Data::Dumper;
 use Carp qw(cluck);
 
@@ -94,7 +93,7 @@ sub init {
 	#
 	# Connecting to database
 	#
-	$self->schema(ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}));
+	$self->schema(ActiveCMDB::Model::CMDBv1->instance());
 	
 	#
 	# Connect to broker
