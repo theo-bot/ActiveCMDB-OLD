@@ -59,11 +59,11 @@ our @EXPORT = qw(
 
 Convert a name/value pair
 
-=head3 Arguments
+ Arguments
  $name		- Conversation set name
  $value		- Conversation item in the named set
 
-=head3 Return
+ Returns
  SCALAR		- Converted name/value pair
  undef		- If now conversation was found
  
@@ -95,7 +95,7 @@ sub cmdb_convert
 
 Add a conversion to the database.
 
-=head3 Arguments
+ Arguments
  $name			- Conversion set name
  $value			- Conversation item in set
  $conversion	- Converted value
@@ -121,6 +121,16 @@ sub cmdb_add_conversion
 	}
 }
 
+=head2 cmdb_del_conversion
+
+Delete a conversion from a conversion set.
+
+ Arguments
+ $name	- Name of the conversion set
+ $value	- Conversion item in set
+
+=cut
+
 sub cmdb_del_conversion
 {
 	my($name, $value) = @_;
@@ -139,6 +149,16 @@ sub cmdb_del_conversion
 		return $row->delete;
 	}
 }
+
+=head2 cmdb_list_byname
+Get a list of value/conversion pairs for a specific conversion set
+
+ Arguments
+ $name	- String containing the name of the conversion set
+ 
+ Returns
+ @list	- Array containing the list of pairs
+=cut
 
 sub cmdb_list_byname
 {
@@ -166,6 +186,16 @@ sub cmdb_list_byname
 	
 	return @list;
 }
+
+=head2 cmdn_name_set
+Get an assciative list of value/conversion for a specific set
+
+ Arguments:
+ $name	- String containing a set name
+ 
+ Returns:
+ %set	- Hash containing the value/conversions
+=cut
 
 sub cmdb_name_set
 {
