@@ -1,22 +1,23 @@
 package ActiveCMDB::Common::Location;
-
-=begin nd
-
-    Script: ActiveCMDB::Common::Location.pm
+=head1 MODULE - ActiveCMDB::Common::Location
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
-    Manage conversions
+    Common site functions
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,19 +29,17 @@ package ActiveCMDB::Common::Location;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
-
-	Topic: Description
-	
-	
-	
-	
 =cut
 
-#########################################################################
-# Initialize  modules
+=head1 IMPORTS
+ use Exporter;
+ use Logger;
+ use ActiveCMDB::Model::CMDBv1;
+ use Try::Tiny;
+ use strict;
+ use Data::Dumper;
+=cut
+
 use Exporter;
 use Logger;
 use ActiveCMDB::Model::CMDBv1;
@@ -54,8 +53,13 @@ our @ISA = ('Exporter');
 our @EXPORT = qw(
 	cmdb_get_sites
 );
-#########################################################################
-# Routines
+
+=head1 FUNCTIONS
+
+=head2 cmdb_get_sites
+
+Return an array of locations  
+=cut
 
 sub cmdb_get_sites
 {
@@ -64,7 +68,7 @@ sub cmdb_get_sites
 	#
 	# Connect to database
 	#
-	$schema = ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info});
+	$schema = ActiveCMDB::Model::CMDBv1->instance();
 	$rs = $schema->resultset("Location")->search(
 			undef,
 			{
@@ -78,6 +82,6 @@ sub cmdb_get_sites
 		Logger->debug("Added ". $row->location_id. ' - '.$row->name );
 		push(@sites,{ location_id => $row->location_id, name => $row->name } );
 	}
-	Logger->debug(Dumper(@sites));
+	#Logger->debug(Dumper(@sites));
 	return @sites;
 }
