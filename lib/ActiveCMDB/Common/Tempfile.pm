@@ -1,22 +1,23 @@
 package ActiveCMDB::Common::Tempfile;
-
-=begin nd
-
-    Script: ActiveCMDB::Common::Tempfile.pm
+=head1 MODULE - ActiveCMDB::Common::Tempfile
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
     Manage temporary files
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,27 +29,54 @@ package ActiveCMDB::Common::Tempfile;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
+=cut
 
-    $Rev$
+=head1 IMPORTS
 
-	Topic: Description
-	
-	This module performs actions on the conversions table
-	
-	
+ use Moose;
+ use File::Basename;
+ use IO::File;
+ use Logger;
 =cut
 
 use Moose;
+use MooseX::MethodPrivate;
 use File::Basename;
 use IO::File;
 use Logger;
 
+=head1 ATTRIBUTES
+
+=head2 filename
+
+String containing full pathname
+=cut
 has filename	=> ( is => 'rw', isa => 'Str' );
+
+=head2 template
+
+String containing a format for filenames. During file creation
+2 or more consecutive X's will be replaced by random characters
+=cut
 has template	=> ( is => 'ro', isa => 'Str' );
+
+=head2 path
+
+String containing the folder where the tempfile will be created
+=cut
 has path		=> ( is => 'ro', isa => 'Str' );
+
+=head2 suffix
+
+String containing the suffix for the file
+=cut
 has suffix		=> ( is => 'ro', isa => 'Str' );
-has fh			=> ( is => 'rw', isa => 'Any' );
+
+=head2 fh
+
+FileHandle to opened file
+=cut
+has fh			=> ( is => 'rw', isa => 'FileHandle' );
 
 my @chars = (
 			qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
@@ -58,17 +86,15 @@ my @chars = (
 	);
 	
 
-sub create
-{
-	my $self = shift;
-	if ( defined($self->template) && defined($self->path) )
-	{
-		$self->mkfile();
-	}
-}
+=head1 METHODS
 
-sub mkfile
-{
+=head2 mkfile
+
+Private method to construct a full pathname for the file
+
+=cut
+
+private 'mkfile' => sub {
 	my $self = shift;
 	
 	my $fn = $self->template;
@@ -82,7 +108,34 @@ sub mkfile
 	$fn = $self->path . '/' . $fn;
 	if ( defined($self->suffix) ) { $fn .= $self->suffix; }
 	$self->filename($fn);
+};
+
+=head2 create
+
+Create a ful path name with all required attributes
+=cut
+
+sub create
+{
+	my $self = shift;
+	if ( defined($self->template) && defined($self->path) )
+	{
+		$self->mkfile();
+	}
 }
+
+=head2 open
+
+Open handle to a file on the disk, using the path and filename attributes
+
+ Arguments
+ $self		- Reference to object
+ $mode		- <,>, >>
+ 
+ Returns
+ $self->fh	- IO::File object
+
+=cut
 
 sub open
 {
@@ -110,5 +163,6 @@ sub close
 	
 	$self->fh->close();
 }
+
 __PACKAGE__->meta->make_immutable;
 1;
