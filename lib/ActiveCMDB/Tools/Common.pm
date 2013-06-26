@@ -53,21 +53,25 @@ use Moose::Role;
 =head1 ATTRIBUTES
 
 =head2 config
+
 Local copy of the configuration instance
 =cut
 has 'config'		=> ( is => 'rw', isa => 'Object' );
 
 =head2 schema
+
 Database connection
 =cut
 has 'schema'		=> ( is => 'rw', isa => 'Object' );
 
 =head2 broker
+
 Connection to the default broker
 =cut
 has 'broker'		=> ( is => 'rw', isa => 'Object' );
 
 =head2 process
+
 Contains a ActiveCMDB::Object::Process object
 =cut		
 has 'process'		=> (is => 'rw', isa => 'Object');
@@ -76,6 +80,7 @@ has 'process'		=> (is => 'rw', isa => 'Object');
 =head1 METHODS
 
 =head2
+
 Wrapper for the ActiveCMDB::Object::Process::instance method
 =cut
 sub instance {
@@ -85,6 +90,7 @@ sub instance {
 }
 
 =head2 raise_signal
+
  Signal handler for tools. No IO operations in this routine.
 
  Arguments
