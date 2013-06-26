@@ -1,23 +1,24 @@
 use utf8;
 package ActiveCMDB::Tools::ProcessManager;
-
-=begin nd
-
-    Script: ActiveCMDB::Tools::ProcessManager.pm
+=head1 MODULE - ActiveCMDB::Tools::ProcessManager
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
-    ActiveCMDB::Tools::ProcessManager class definition
+    Module to handle process management
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -29,20 +30,26 @@ package ActiveCMDB::Tools::ProcessManager;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
-
-	Topic: Description
-	
-	This is the process manager
-	
-	
 =cut
 
-##################
-# Initialize modules
-#
+
+=head1 IMPORTS
+
+ use Moose;
+ use POSIX qw(:sys_wait_h :signal_h);
+ use ActiveCMDB::ConfigFactory;
+ use ActiveCMDB::Tools::Common;
+ use ActiveCMDB::Model::CMDBv1;
+ use ActiveCMDB::Common::Broker;
+ use ActiveCMDB::Common::Constants;
+ use ActiveCMDB::Object::Process;
+ use ActiveCMDB::Common::Database;
+ use ActiveCMDB::Schema;
+ use Logger;
+ use Switch;
+ use Data::Dumper;
+=cut
+
 use Moose;
 use POSIX qw(:sys_wait_h :signal_h);
 use ActiveCMDB::ConfigFactory;
@@ -62,7 +69,9 @@ with 'ActiveCMDB::Tools::Common';
 use constant CMDB_PROCESSTYPE => 'process';
 use constant CMDB_INSTANCE    => 0;
 
-=item init
+=head1 METHODS
+
+=head2 init
 
 Initialize process manager
 
@@ -100,7 +109,7 @@ sub init {
 	#
 	# Connecting to database
 	#
-	$self->schema(ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}));
+	$self->schema(ActiveCMDB::Model::CMDBv1->instance());
 	
 	#
 	# Connect to broker
@@ -114,6 +123,10 @@ sub init {
 	$self->start_childern();
 	
 }
+
+=head2 start_childern
+Start managed processes. 
+=cut
 
 sub start_childern {
 	my($self) = @_;
@@ -155,6 +168,12 @@ sub start_childern {
 	}
 	
 }
+
+=head2 procs
+
+Return the managed processes structure
+
+=cut
 
 sub procs {
 	my $self = shift;
