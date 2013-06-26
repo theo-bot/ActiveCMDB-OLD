@@ -1,22 +1,23 @@
 package ActiveCMDB::Common::Device;
-
-=begin nd
-
-    Script: ActiveCMDB::Common::Device.pm
+=head1 MODULE - ActiveCMDB::Common::Device
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
     Common device operations
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,23 +29,22 @@ package ActiveCMDB::Common::Device;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
-
-	Topic: Description
-	
-	
-	
-	
 =cut
 
 #########################################################################
 # Initialize  modules
+=head1 IMPORTS
+ use Exporter;
+ use Logger;
+ use ActiveCMDB::Model::CMDBv1;
+ use Try::Tiny;
+ use strict;
+ use Socket;
+=cut
+
 use Exporter;
 use Logger;
 use ActiveCMDB::Model::CMDBv1;
-use ActiveCMDB::Schema;
 use Try::Tiny;
 use strict;
 use Socket;
@@ -55,8 +55,20 @@ our @EXPORT = qw(
 	cmdb_get_host_by_ip
 	cmdb_gethostByAddr
 );
-#########################################################################
-# Routines
+
+=head1 FUNCTIONS
+
+=head2 cmdb_get_host_by_ip
+
+Get an ip device's hostname via it's netowrk adres
+
+ Arguments:
+ $ip		- String containing a network address
+ 
+ Returns:
+ $hostname	- String containing a device hostname
+
+=cut
 
 sub cmdb_get_host_by_ip
 {
@@ -67,7 +79,7 @@ sub cmdb_get_host_by_ip
 	#
 	# Connect to database
 	#
-	$schema = ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info});
+	$schema = ActiveCMDB::Model::CMDBv1->instance();
 	
 	$tally = $schema->resultset("IpDevice")->search({ mgtaddress => $ip })->count;
 	if ( $tally > 0 )
@@ -109,6 +121,18 @@ sub cmdb_get_host_by_ip
 	return $hostname;
 }
 
+=head2 cmdb_gethostByAddr
+
+Get an ip device's hostname via it's netowrk adres
+
+ Arguments:
+ $ip		- String containing a network address
+ 
+ Returns:
+ $device	- ActiveCMDB::Object::Device object
+ 
+=cut
+
 sub cmdb_gethostByAddr
 {
 	my($ip) = @_;
@@ -120,7 +144,7 @@ sub cmdb_gethostByAddr
 	#
 	# Connect to database
 	#
-	$schema = ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info});
+	$schema = ActiveCMDB::Model::CMDBv1->instance();
 	
 	$tally = $schema->resultset("IpDevice")->search({ mgtaddress => $ip })->count;
 	if ( $tally > 0 )
