@@ -1,23 +1,24 @@
 use utf8;
 package ActiveCMDB::Tools::DiscoProcessor;
-
-=begin nd
-
-    Script: ActiveCMDB::Tools::DiscoProcessor.pm
+=head1 MODULE - ActiveCMDB::Tools::DiscoProcessor
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
-    ActiveCMDB::Tools::DiscoProcessor class definition
+    This is the actual discovery processor
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -29,19 +30,25 @@ package ActiveCMDB::Tools::DiscoProcessor;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
-
-	Topic: Description
-	
-	This is the actual discovery processor
-	
-	
 =cut
 
-#################################################################
-# Initialize modules
+
+=head1 IMPORTS
+
+ use Moose;
+ use Logger;
+ use Switch;
+ use DateTime;
+ use ActiveCMDB::Object::Process;
+ use ActiveCMDB::Tools::Common;
+ use ActiveCMDB::ConfigFactory;
+ use ActiveCMDB::Common::Broker;
+ use ActiveCMDB::Common::Constants;
+ use ActiveCMDB::Model::CMDBv1;
+ use Data::Dumper;
+ use Carp qw(cluck);
+=cut
+
 use Moose;
 use Logger;
 use Switch;
@@ -56,10 +63,37 @@ use Data::Dumper;
 use Carp qw(cluck);
 
 with 'ActiveCMDB::Tools::Common';
+
+=head1 ATTRIBUTES
+
+=head2 disco
+
+=cut
+
 has 'disco' 	=> (is => 'rw', isa => 'Hash' );
 use constant CMDB_PROCESSTYPE => 'disco';
 
 no strict 'refs';
+
+=head1 METHODS
+
+=head2 init
+
+Initialize discovery processor
+ - Import configuration
+ - Initialize internal process administration
+ - Discover interrogations
+ - Load device classes
+ - Connect to the data warehouse
+ - Connect to broker
+ - Deamonize
+  
+ Arguments:
+ $self		- Reference to discovery object
+ $args		- Hash reference
+ 				{instance} - process instance
+ 				
+=cut
 
 sub init {
 	my($self, $args) = @_;
@@ -114,7 +148,7 @@ sub init {
 
 
 
-=item process
+=head2 processor
 
 Process messages to discover devices
 
@@ -170,6 +204,17 @@ sub processor
 	}	
 }
 
+=head2 process_device
+
+Process a single device, where the device is is stored in the passed
+message payload. This function mostly handles the administration
+around the discovery.
+
+ Arguments:
+ $self	- Reference to discovery object
+ $msg	- ActiveCMDB::Object::Message object
+=cut
+
 sub process_device
 {
 	my($self, $msg) = @_;
@@ -192,6 +237,9 @@ sub process_device
 		$t1 = time();
 		$t2 = undef;
 		
+		#
+		# Update process data
+		#
 		$self->process->status(PROC_BUSY);
 		$self->process->action("Processing device " . $device->attr->hostname );
 		$self->process->update();
@@ -249,6 +297,16 @@ sub process_device
 	}
 }
 
+=head2 discover
+
+Discover, or interrogate, a device.
+
+ Arguments
+ $self		- Reference to discovery object
+ $device	- Class::* object
+
+=cut
+
 sub discover
 {
 	my($self, $device) = @_;
@@ -301,8 +359,6 @@ sub discover
 			#
 			# Save discovered data
 			#
-			
-		
 			Logger->info("Saving data");
 			foreach my $key (@discos)
 			{
@@ -310,7 +366,9 @@ sub discover
 				$device->$method($result->{$key});
 			}
 			
+			#
 			# Reset @discos, so we don't have to save 'm again
+			#
 			@discos =();
 			
 		}
@@ -321,6 +379,12 @@ sub discover
 	$device->DESTROY;
 	
 }
+
+=head2 handle_signals
+
+Discovery process specific signal handler
+
+=cut
 
 sub handle_signals
 {
@@ -336,6 +400,20 @@ sub handle_signals
 		}
 	}
 }
+
+=head2 interrogations
+
+Find interrogations for a specific device class.
+
+ Arguments
+ $self		- Reference to discovery object
+ $class		- String containing the name of the class
+ %disco		- Hash containing the interrogations of related device classes
+ 
+ Returns:
+ %disco		- hash containing all interrogations of passed and related device classes
+
+=cut
 
 sub interrogations
 {
