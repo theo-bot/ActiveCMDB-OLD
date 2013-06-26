@@ -1,22 +1,24 @@
 package ActiveCMDB::Tools::Common;
 
-=begin nd
-
-    Script: ActiveCMDB::Tools::Common.pm
+=head1 MODULE - ActiveCMDB::Tools::Common
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
-    ActiveCMDB::Tools::Common class definition
+    Common methods for all tools classes
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,15 +30,17 @@ package ActiveCMDB::Tools::Common;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
+=cut
 
-    $Rev$
+=head1 REQUIREMENTS
 
-	Topic: Description
-	
-	Common methods for all tools classes
-	
-	
+ use strict;
+ use ActiveCMDB::Common::Constants;
+ use Logger;
+ use Data::UUID;
+ use Net::DNS;
+ use Moose::Role;
+ 
 =cut
 
 use strict;
@@ -46,17 +50,51 @@ use Data::UUID;
 use Net::DNS;
 use Moose::Role;
 
+=head1 ATTRIBUTES
+
+=head2 config
+Local copy of the configuration instance
+=cut
 has 'config'		=> ( is => 'rw', isa => 'Object' );
+
+=head2 schema
+Database connection
+=cut
 has 'schema'		=> ( is => 'rw', isa => 'Object' );
-has 'broker'		=> ( is => 'rw', isa => 'Object' );		
+
+=head2 broker
+Connection to the default broker
+=cut
+has 'broker'		=> ( is => 'rw', isa => 'Object' );
+
+=head2 process
+Contains a ActiveCMDB::Object::Process object
+=cut		
 has 'process'		=> (is => 'rw', isa => 'Object');
 
+
+=head1 METHODS
+
+=head2
+Wrapper for the ActiveCMDB::Object::Process::instance method
+=cut
 sub instance {
 	my($self) = @_;
 	
 	return $self->process->instance;
 }
 
+=head2 raise_signal
+ Signal handler for tools. No IO operations in this routine.
+
+ Arguments
+ $self		- Reference to object
+ $signal	- Signal 
+ 
+ Returns
+ $self->{signal_raised}	- Returns true if a signal has been set, otherwise false
+ 
+=cut
 sub raise_signal {
 	my($self, $signal) = @_;
 	
@@ -68,12 +106,23 @@ sub raise_signal {
 	return $self->{signal_raised};
 }
 
+=head2 reset_signal
+
+Reset the signal_raised status to false.
+
+=cut
 sub reset_signal {
 	my($self) = @_;
 	$self->{signal_raised} = false;
 	
 	return $self->{signal_raised};
 }
+
+=head2 uuid
+
+Generate new conventional uuid string
+
+=cut
 
 sub uuid {
 	my($self) = @_;
@@ -84,6 +133,18 @@ sub uuid {
 	
 	return $self->{uuid_generator}->create_str();
 }
+
+=head2 get_class_by_oid
+Find device class by SysObjectID.
+
+ Arguments
+ $self		- Reference to object
+ $sysoid	- String containting a valid SysObjectID
+ 
+ Returns
+ $class		- Undef if no class has been found
+              String containing the class name if one is found 
+=cut
 
 sub get_class_by_oid {
 	my($self, $sysoid) = @_;
@@ -107,6 +168,10 @@ sub get_class_by_oid {
 	Logger->info("SysObjectID matched to class $class with a score of $score");
 	return $class;
 }
+
+=head2 class_loader
+ Import device class modules and associated class definition files.
+=cut
 
 sub class_loader {
 	my($self) = @_;
@@ -157,6 +222,19 @@ sub class_loader {
 	closedir(DIR);
 	
 }
+
+=head2 lookup
+
+Perform a name to address lookup. 
+
+ Arguments
+ $self	- Reference to object
+ $name	- Network device name
+ 
+ Returns
+ @addrs	- Array of network addresses
+
+=cut
 
 sub lookup
 {
