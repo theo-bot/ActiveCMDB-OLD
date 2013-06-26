@@ -1,22 +1,23 @@
 package ActiveCMDB::Common::Database;
-
-=begin nd
-
-    Script: ActiveCMDB::Common::Database.pm
+=head1 MODULE - ActiveCMDB::Common::Database
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
     Provide database information for objects
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,19 +29,20 @@ package ActiveCMDB::Common::Database;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
-
-	Topic: Description
-	
-	This module performs actions on the conversions table
-	
-	
 =cut
 
-use Data::Dumper;
+=head1 METHODS
 
+=head2 connect_info
+Return associative config data for the database connection
+
+Returns
+$connect_info	-  {
+			dsn => 'dbi:' . $dbinfo->{dbtype} . ':' . $dbinfo->{dbname},
+			user => $dbinfo->{dbuser},
+			password => $dbinfo->{dbpass},
+		}
+=cut
 sub connect_info {
 	my($self) = @_;
 	
