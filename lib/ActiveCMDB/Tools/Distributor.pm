@@ -1,23 +1,26 @@
 use utf8;
 package ActiveCMDB::Tools::Distributor
 {
-=begin nd
-
-    Script: ActiveCMDB::Tools::Distributor.pm
+=head1 MODULE - ActiveCMDB::Tools::Distributor
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
     ActiveCMDB::Tools::Distributor class definition
+    This is the actual distribution processor
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -29,15 +32,32 @@ package ActiveCMDB::Tools::Distributor
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
+=cut
 
-    $Rev$
+=head1 IMPORTS
 
-	Topic: Description
-	
-	This is the actual distribution processor
-	
-	
+ use strict;
+ use warnings;
+ use Moose;
+ use Logger;
+ use Switch;
+ use DateTime;
+ use ActiveCMDB::Common;
+ use ActiveCMDB::Object::Process;
+ use ActiveCMDB::Object::Device;
+ use ActiveCMDB::Tools::Common;
+ use ActiveCMDB::ConfigFactory;
+ use ActiveCMDB::Common::Broker;
+ use ActiveCMDB::Common::Constants;
+ use ActiveCMDB::Common::Tempfile;
+ use ActiveCMDB::Model::CMDBv1;
+ use ActiveCMDB::Dist::Loader;
+ use ActiveCMDB::Object::Distrule;
+ use JSON::XS;
+ use Data::Dumper;
+ use Carp qw(cluck);
+
+ with 'ActiveCMDB::Tools::Common';
 =cut
 
 use strict;
@@ -55,7 +75,6 @@ use ActiveCMDB::Common::Broker;
 use ActiveCMDB::Common::Constants;
 use ActiveCMDB::Common::Tempfile;
 use ActiveCMDB::Model::CMDBv1;
-use ActiveCMDB::Schema;
 use ActiveCMDB::Dist::Loader;
 use ActiveCMDB::Object::Distrule;
 use JSON::XS;
@@ -63,10 +82,33 @@ use Data::Dumper;
 use Carp qw(cluck);
 
 with 'ActiveCMDB::Tools::Common';
-has 'distrib' 	=> (is => 'rw', isa => 'Hash' );
+
+=head1 ATTRIBUTES
+
+=head2 ruleset
+
+Hash reference containing all the rules 
+=cut
 has 'ruleset'	=> (is => 'rw', isa => 'HashRef' );
+
+=head2 rulemap
+
+Contains the rule mappings. This is is a table that maps
+distribution rules to objects, ref types and object types
+=cut
 has 'rulemap'	=> (is => 'rw', isa => 'HashRef' );
+
+=head2 json
+
+JSON encoder/decoder object, initialized during startup
+=cut
 has 'json'		=> (is => 'rw', isa => 'Object' );
+
+=head2
+
+Internal administrator for sent messages, to prevent 
+routing loops
+=cut
 has 'messages'	=> (
 	is 		=> 'ro',
 	traits	=> ['Hash'],
@@ -82,6 +124,10 @@ has 'messages'	=> (
 	},
 );
 
+=head2 cloud
+
+Connection handle object to distributed storage
+=cut
 has 'cloud' => (
 	is => 'rw', 
 	isa => 'Object',
@@ -91,10 +137,30 @@ use constant CMDB_PROCESSTYPE => 'distrib';
 
 no strict 'refs';
 
+=head1 METHODS
+
+=head2 BUILD
+
+ Constructor for the distributor object
+ - Connect to distributes storage and store connection object in cloud attribute
+=cut
+
 sub BUILD {
 	my $self = shift;
 	$self->cloud( ActiveCMDB::Model::Cloud->new() );
 }
+
+=head2 init
+
+Initialize distributor object. 
+ - Import configuration
+ - Initalize process data
+ - Initialize JSON encode/decoder
+ - Initialize database connection
+ - Initialize broker connection
+ - Import rules and rulemap
+ 
+=cut
 
 sub init {
 	my($self, $args) = @_;
@@ -151,6 +217,15 @@ sub init {
 	$self->rulemap(LoadMap());
 	Logger->debug(Dumper($self->ruleset));
 }
+
+=head2 processor
+
+Main processing loop
+ - Check for signals
+ - Check for messages at the broker
+ - Refresh rules and rulemap periodically
+
+=cut
 
 sub processor
 {
@@ -218,21 +293,38 @@ sub processor
 	}	
 }
 
+=head2 process_message
+
+Process a message according to the ruleset
+
+ Arguments
+ $self 		- Reference to distributor object
+ $ruleset	- Complete ruleset
+ $msg		- ActiveCMDB::Object::message object
+=cut
+
 sub process_message
 {
-   my($ruleset, $msg) = @_;
+   my($self, $ruleset, $msg) = @_;
 
+   #
+   # %data object store (os)
+   #
    my %data = ();
 
+   #
+   # Store entire message in os
+   #
    $data{message} = $msg;
    my $pl = $msg->payload;
    
    my %map = (
-           'device' => 'ActiveCMDB::Object::Device'
+           'device'  => 'ActiveCMDB::Object::Device',
+           'message' => 'ActiveCMDB::Object::Message'
    );
 
    #
-   # Import data from message
+   # Import data from message to object store
    #     
    foreach (keys %{$pl})
    {
@@ -269,7 +361,7 @@ sub process_message
            Logger->info("\tExecuting actions for $objrule");
            foreach my $action (keys %{$ruleset->{$objrule}->{action}})
            {
-               process_action($action, $ruleset->{$objrule}->{action}->{$action});
+               $self->process_action($action, $ruleset->{$objrule}->{action}->{$action});
            }
        }
        if ( defined($ruleset->{$objrule}->{continue}) )
@@ -288,9 +380,19 @@ sub process_message
 
 }
 
+=head2 process_action
+
+Execute the requested action
+
+ Arguments
+ $self		- Reference to distributor object
+ $action	- Requested action
+ $val		- Scalar or Reference to array of values
+ 
+=cut
 sub process_action
 {
-   my($action, $val) = @_;
+   my($self,$action, $val) = @_;
    my @vals = ();
    if ( reftype($val) eq 'ARRAY' )
    {
@@ -301,6 +403,9 @@ sub process_action
 
    foreach (@vals) {
        Logger->info("\tExecuting action $action with value ".$_);
+       #
+       # TODO: Make sure the actual action is executed
+       #
    }
 }
 
@@ -321,6 +426,12 @@ sub SCALAR_COMPARE
    if ( $val eq $y ) { return true; }
 }
 
+=head2 handle_signals
+
+Signal handler for distributor server
+
+=cut
+
 sub handle_signals
 {
 	my($self) = @_;
@@ -336,29 +447,41 @@ sub handle_signals
 	}
 }
 
-sub update_dist_rule
-{
-	my($self, $data) = @_;
+=head2 update_dist_rule
+
+Update distribution rule from a broker message.
+When an UpdateDistRule message arrives from the broker, the data will
+be imported into a ActiveCMDB::Object::Distrule object and saved if the old 
+and new rules have different serial numbers
+
+ Arguments
+ $self	- Reference to distributor object
+ $data	- ActiveCMDB::Object::Message->payload data
+=cut
+
+	sub update_dist_rule
+	{
+		my($self, $data) = @_;
 	
-	Logger->info("Updating distrule " . $data->{name});
-	my $newrule = ActiveCMDB::Object::Distrule->new();
-	$newrule->from_json( $data );
+		Logger->info("Updating distrule " . $data->{name});
+		my $newrule = ActiveCMDB::Object::Distrule->new();
+		$newrule->from_json( $data );
 	
-	my $oldrule = ActiveCMDB::Object::Distrule->new();
-	$oldrule->name( $newrule->name() );
-	$oldrule->get_data();
+		my $oldrule = ActiveCMDB::Object::Distrule->new();
+		$oldrule->name( $newrule->name() );
+		$oldrule->get_data();
 	
-	Logger->info("New serial " . $newrule->serial . " , Old serial " . $oldrule->serial );
-	if ( $newrule->serial > $oldrule->serial ) {
-		Logger->info("Saving rule");
-		$newrule->save();
-		$self->ruleset(RulesLoader());
-	} else {
-		Logger->warn("Invalid serial " . $newrule->serial );
+		Logger->info("New serial " . $newrule->serial . " , Old serial " . $oldrule->serial );
+		if ( $newrule->serial > $oldrule->serial ) {
+			Logger->info("Saving rule");
+			$newrule->save();
+			$self->ruleset(RulesLoader());
+		} else {
+			Logger->warn("Invalid serial " . $newrule->serial );
+		}
+	
+		#Logger->debug(Dumper($self->ruleset));
 	}
-	
-	#Logger->debug(Dumper($self->ruleset));
-}
 
 	sub update_rule_map
 	{
