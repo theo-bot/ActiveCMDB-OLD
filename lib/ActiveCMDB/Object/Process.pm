@@ -1,22 +1,24 @@
 package ActiveCMDB::Object::Process;
-
-=begin nd
-
-    Script: ActiveCMDB::Object::Process.pm
+=head1 MODULE - ActiveCMDB::Object::Process
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
     ActiveCMDB::Object::Process class definition
+    Object to hold process information for the process manager
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,15 +30,19 @@ package ActiveCMDB::Object::Process;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
+=cut
 
-    $Rev$
+=head1 IMPORTS
 
-	Topic: Description
-	
-	Object to hold process information for the process manager
-	
-	
+ use ActiveCMDB::Common;
+ use ActiveCMDB::Common::Constants;
+ use Try::Tiny;
+ use Logger;
+ use Moose;
+ use POSIX qw(setsid);
+ use Net::Riak;
+ use JSON::XS;
+ use Data::Dumper;
 =cut
 
 use ActiveCMDB::Common;
@@ -78,23 +84,100 @@ my %map = (
 			instance	=> 1
 		);
 
+=head1 ATTRIBUTES
+
+=head2 instance
+
+Integer number representing the nth instance of that type of process 
+on that server.
+=cut
 has 'instance'		=> ( is => 'ro', isa => 'Int' );
+
+=head2 name
+
+String name of the process
+=cut
 has 'name'			=> ( is => 'ro', isa => 'Str' );
+
+=head2 path
+
+String, full pathname of the process to be executed
+=cut
 has 'path'			=> ( is => 'rw', isa => 'Str|Undef' );
+
+=head2 type
+
+String, type of the process, derrived from cmdb.yml process section
+=cut
 has 'type'			=> ( is => 'rw', isa => 'Str|Undef' );
+
+=head2 pid
+
+String, process identifier in the Linux process table.
+=cut
 has 'pid'			=> ( is => 'rw', isa => 'Int|Undef', default => 0 );
+
+=head2 ppid
+
+Integer, parent process identifier in the Linux process table
+=cut
 has 'ppid'			=> ( is => 'rw', isa => 'Int|Undef', default => 0 );
+
+=head2 exectime
+
+Integer, representing the unixtime that the process was started 
+=cut
 has 'exectime'		=> ( is => 'rw', isa => 'Int|Undef', default => 0 );
+
+=head2 status
+
+Integer, set to the status of the current process. See also
+ActiveCMDB::Common::Constants
+=cut
 has 'status'		=> ( is => 'rw', isa => 'Int|Undef' );
+
+=head2 server_id
+
+Integer of the server_id derrived from the cmdb.yml file. 
+=cut
 has 'server_id'		=> ( is => 'ro', isa => 'Int|Undef' );
+
+=head2 running
+
+Integer 
+=cut
 has 'running'		=> ( is => 'rw', isa => 'Int|Undef' );
 has 'comms'			=> ( is => 'rw', isa => 'Str|Undef' );
+
+=head2 activity
+
+String, description of the current activity
+=cut
 has 'activity'		=> ( is => 'rw', isa => 'Any|Undef' );
+
+=head2 updated_by
+
+String containg the name of the entity that updated the process data
+=cut
 has 'updated_by'	=> ( is => 'rw', isa => 'Str|Undef' );
+
+=head2 updated_at
+
+Unix timestamp that the process data was updated
+=cut
 has 'updated_at'	=> ( is => 'rw', isa => 'Int|Undef' );
+
+=head2 parent
+
+Processname of the parent process
+=cut
 has 'parent'		=> ( is => 'rw', isa => 'Str|Undef' );
 
+=head2 coder
 
+JSON::XS coder object. Allows to encode/decode hash references to
+JSON data and reverse 
+=cut
 has 'coder'			=> ( 
 	is => 'rw', 
 	isa => 'Object',
@@ -103,7 +186,10 @@ has 'coder'			=> (
 	} 
 );
 
-# Schema
+=head2 riak
+
+Bucket in distributes storage. Process data is stored in distributed storage
+=cut
 has 'riak'		=> (
 	is => 'rw', 
 	isa => 'Object', 
@@ -111,6 +197,13 @@ has 'riak'		=> (
 		$client->bucket('CmdbProcess');		
 	} 
 );
+
+=head1 METHODS
+
+=head2 start
+
+Start a managed process.
+=cut
 
 sub start {
 	my($self) = @_;
@@ -146,6 +239,11 @@ sub start {
 	}
 }
 
+=head2 disconnect
+
+Disconnect process from tty and start a new session
+=cut
+
 sub disconnect
 {
 	my($self) = @_;
@@ -164,6 +262,10 @@ sub disconnect
 	open(STDIN, "<", "/dev/null");
 }
 
+=head2 process_name
+
+Return full process name, including name, sever_id and instance (disco-1-1).
+=cut
 sub process_name {
 	my $self = shift;
 	
@@ -171,6 +273,10 @@ sub process_name {
 	return $self->name . '-' . $self->server_id . '-' .$self->instance;
 }
 
+=head2 get_data
+
+Fetch data from distributed storage.
+=cut
 sub get_data {
 	my($self) = @_;
 	my($rs, $row);
@@ -194,6 +300,10 @@ sub get_data {
 	}
 }
 
+=head2 update
+
+Update process data in distributed software.
+=cut
 sub update {
 	my($self, $user) = @_;
 	my($data);
@@ -224,6 +334,14 @@ sub update {
 	}
 }
 
+=head2 action
+
+Update activity data and update it in storage
+
+ Arguments
+ $self	- Reference to process object 
+ $data	- String containing a description of the current activity
+=cut
 sub action {
 	my($self, $data) = @_;
 	
@@ -235,6 +353,10 @@ sub action {
 	return $self->activity;
 }
 
+=head2 kill
+
+Kill the process itself
+=cut
 sub kill {
 	my($self) = @_;
 	
@@ -242,6 +364,10 @@ sub kill {
 	kill 15, $self->pid;
 }
 
+=head2 exects
+
+Get human readable starttime of the process
+=cut
 sub exects {
 	my($self) = @_;
 	my $t = sprintf("%s", DateTime->from_epoch( epoch => $self->exectime || 0 ));
@@ -249,6 +375,10 @@ sub exects {
 	return $t;
 }
 
+=head2 updatets
+
+Get human readable updated_at time of the process
+=cut
 sub updatets {
 	my($self) = @_;
 	
@@ -256,6 +386,11 @@ sub updatets {
 	$t =~ s/T/ /;
 	return $t;
 }
+
+=head2 cleanup
+
+Cleanup/Reset process data
+=cut 
 sub cleanup {
 	my($self) = @_;
 	my($row);
