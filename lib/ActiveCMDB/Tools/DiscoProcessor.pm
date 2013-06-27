@@ -242,7 +242,7 @@ sub process_device
 		#
 		$self->process->status(PROC_BUSY);
 		$self->process->action("Processing device " . $device->attr->hostname );
-		$self->process->update();
+		$self->process->update($self->process->process_name);
 		
 		if ( defined($device->attr->mgtaddress()) ) {
 			if ( $device->ping() ) 
