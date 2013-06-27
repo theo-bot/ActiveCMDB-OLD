@@ -181,6 +181,16 @@ sub procs {
 	return $self->{procs}
 }
 
+=head2 manage
+
+Main processing loop.
+ 
+ - Check for any raised signals
+ - Check for frames at the broker
+ 
+
+=cut
+
 sub manage {
 	my($self) = @_;
 	
@@ -218,6 +228,12 @@ sub manage {
 	
 }
 
+=head2 proc_shutdown
+
+Kill all managed processes and set status to shutdown
+
+=cut
+
 sub proc_shutdown {
 	my($self, $proc_name) = @_;
 	Logger->warn("Received shutdown message for $proc_name");
@@ -225,12 +241,19 @@ sub proc_shutdown {
 	if ( $proc_name eq $self->process->process_name() )
 	{
 		$self->process->status(PROC_SHUTDOWN);
+		$self->process->update($self->process->process_name);
 	} else {
 		my @p = split(/\-/, $proc_name);
 		$self->{procinfo}->{$p[0]}->{$p[2]}->get_data();
 		$self->{procinfo}->{$p[0]}->{$p[2]}->kill();
 	}
 }
+
+=head2 handle_signals
+
+Process manager specfic signal handler
+
+=cut
 
 sub handle_signals
 {
@@ -249,12 +272,18 @@ sub handle_signals
 	$self->reset_signal();
 }
 
+=head2 reaper
+
+Reap dead processes and start them again if required.
+
+=cut
+
 sub reaper {
 	my($self) = @_;
 	my($pid);
 	
 	#
-	# Resetting signal flah
+	# Resetting signal flag
 	#
 	$self->{signal}->{CHLD} = false;
 	
@@ -283,6 +312,12 @@ sub reaper {
 		}
 	}
 }
+
+=head2 killall
+
+Kill all managed processes.
+
+=cut
 
 sub killall {
 	my($self) = @_;
