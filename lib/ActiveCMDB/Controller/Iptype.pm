@@ -82,8 +82,8 @@ sub list :Local {
 	#
 	# Get total for the query
 	#
-	$c->log->debug("$search");
-	$json->{records} = $c->model('CMDBv1::IpDeviceType')->search( $search, { join => 'vendors'} )->count;
+	#$c->log->debug("$search");
+	$json->{records} = $c->model('CMDBv1::IpDeviceType')->search( {} , { join => 'vendors'} )->count;
 	if ( $json->{records} > 0 ) {
 		$json->{total} = ceil($json->{records} / $rows );
 	} else {
