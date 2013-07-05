@@ -1,22 +1,24 @@
 package ActiveCMDB::Controller::Vendor;
 
-=begin nd
-
-    Script: ActiveCMDB::Controller::Vendor.pm
+=head1 MODULE - ActiveCMDB::Controller::Vendor
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
     Catalyst Controller for managing vendors
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,11 +30,14 @@ package ActiveCMDB::Controller::Vendor;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
+=cut
 
-    $Rev$
+=head1 IMPORTS
 
-	
+ use Moose;
+ use namespace::autoclean;
+ use Try::Tiny;
+ use Data::Dumper;
 =cut
 
 use Moose;
@@ -41,6 +46,8 @@ use Try::Tiny;
 use Data::Dumper;
 
 BEGIN { extends 'Catalyst::Controller'; }
+
+=head1 METHODS
 
 =head2 index
 
@@ -69,6 +76,10 @@ sub index :Private {
     $c->stash->{template} = 'vendor/list.tt';
 }
 
+=head2 view
+
+View or edit vendor data
+=cut
 sub view :Local {
 	my( $self, $c ) = @_;
 	
@@ -89,6 +100,10 @@ sub view :Local {
 	
 }
 
+=head2 save
+
+Save vendor data
+=cut
 sub save :Local {
 	my( $self, $c ) = @_;
 	my($data);
