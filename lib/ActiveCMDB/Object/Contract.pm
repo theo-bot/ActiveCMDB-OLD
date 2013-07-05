@@ -252,16 +252,6 @@ sub save
 	};
 }
 
-#sub vendor_name
-#{
-#	my ($self) = @_;
-	
-#	my $vendor = ActiveCMDB::Object::Vendor->new( id => $self->vendor_id );
-#	$vendor->find();
-	
-#	return $vendor->name;
-#}
-
 sub service_start
 {
 	my($self) = @_;
