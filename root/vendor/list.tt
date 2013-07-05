@@ -29,23 +29,10 @@
  *
 %]
 <center>
-<table class="cmdbTable" width="98%" >
-<tr align="left">
-	<th width="100">Name</th>
-	<th width="75">Support phone</th>
-	<th width="150">Support e-mail</th>
-	<th>Support website</th>
-</tr>
-[% FOREACH vendor IN vendors %]
-<tr class="cmdbRow" onclick="viewVendor([% vendor.vendor_id %])">
-	<td>[% vendor.vendor_name %]</td>
-	<td>[% vendor.vendor_support_phone %]</td>
-	<td><a target="_blank" class="cmdbLink" href="mailto:[% vendor.vendor_support_email %]">[% vendor.vendor_support_email %]</td>
-	<td><a target="_blank" class="cmdbLink" href="[% vendor.vendor_support_www %]">[% vendor.vendor_support_www %]</a></td>
-</tr>
-[% END %]
-</table>
+<br>
+<input type="hidden" id="dateFormat" value="[% dateFormat %]" /> 
+<table id="vendorTable"></table>
+<div id="vendorPager"></div>
 </center>
 <br/>
-[% IF admin == 1 %]<input type="button" id="addVendor" class="cmdbButton" onclick="viewVendor(0)" value="add vendor" />[% END %]
 [% END %]

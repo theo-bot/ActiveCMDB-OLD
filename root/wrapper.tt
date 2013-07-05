@@ -55,6 +55,9 @@
 		[% CASE "location" %]
 		<script src="/static/js/activecmdb.location.js"></script>
 		[% CASE "vendor" %]
+		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+		<script src="/static/js/i18n/grid.locale-en.js"></script>
+		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.vendor.js"></script>
 		[% CASE "user" %]
 		<script src="/static/js/activecmdb.user.js"></script>

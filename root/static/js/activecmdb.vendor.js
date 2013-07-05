@@ -72,6 +72,91 @@ $(document).ready(function(){
 		}
 
 	});
+	
+	jQuery("#vendorTable").jqGrid({ 
+		url:'/vendor/api?oper=list', 
+		datatype: "json",
+		colNames:['Name','Support phone', 'E-Mail','Website'],
+		colModel: [
+		            {
+		            	name:'vendor_name',
+		            	index:'vendor_name',
+		            	width:128
+		            },
+		            {
+		            	name:'vendor_support_phone',
+		            	index:'vendor_support_phone',
+		            	width:196
+		            },
+		            {
+		           		name:'vendor_support_email',
+		           		index:'vendor_support_email',
+		           		width: 128
+		           	},
+		           	{
+		           		name:'vendor_support_www',
+		           		index:'vendor_support_www',
+		           		width:128, 		           		
+		           	}
+		          ],
+		rowNum:10, 
+		rowList:[10,20,30], 
+		pager: '#vendorPager', 
+		sortname: 'vendor_id', 
+		hidegrid: false,
+		viewrecords: true, 
+		sortorder: "asc", 
+		editurl: "/vendor/api", 
+		caption: "Vendor Maintenance",
+		ondblClickRow: function(id) {
+			$.colorbox({
+				iframe:true,
+				width:740,
+				height:650,
+				initialWidth:640,
+				initialHeight:650,
+				href:'/vendor/edit?id=' + id,
+				onClosed:function(){ 
+					$("#vendorTable").trigger("reloadGrid");
+				} 
+			});
+		},
+		
+	});
+	
+	jQuery("#vendorTable").jqGrid('navGrid',"#vendorPager",
+			{	view:false, 
+				edit:false, 
+				add:true, 
+				save:false, 
+				del:false, 
+				addfunc: function() { 
+					$.colorbox({iframe:true,width:740,height:650,initialWidth:640,initialHeight:650,href:'/vendor/add' });
+				},
+				editfunc: function() {
+					$.colorbox({
+						iframe:true,
+						width:740,
+						height:650,
+						initialWidth:640,
+						initialHeight:650,
+						href:'/vendor/edit',
+						onClosed:function(){ 
+							$("#vendorTable").trigger("vendor");
+							alert('CBOX Closed');
+						} 
+					});
+				}
+			},
+			{height:350,reloadAfterSubmit:true, jqModal:false, closeOnEscape:true},
+			{height:350,reloadAfterSubmit:true,jqModal:false, closeOnEscape:true,bottominfo:"Fields marked with (*) are required", closeAfterAdd: true},
+			{reloadAfterSubmit:false,jqModal:false, closeOnEscape:true},
+			{closeOnEscape:true},
+			{height:350,jqModal:false,closeOnEscape:true}
+	); 
+	
+	jQuery("#vendorTable").jqGrid('inlineNav',"#vendorPager", {edit: false, add:false, cancel:false, save:false});
+	
 });
 
 

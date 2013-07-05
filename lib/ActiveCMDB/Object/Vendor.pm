@@ -51,7 +51,7 @@ use Logger;
 
 INTEGER, Unique id for vendor
 =cut
-has 'id'			=> (is => 'ro',	isa => 'Int');
+has 'id'			=> (is => 'rw',	isa => 'Int');
 
 =head2 name
 
@@ -66,7 +66,24 @@ has 'enterprises'	=> (is => 'rw', isa => 'Any');
 has 'details'		=> (is => 'rw', isa => 'Any');
 
 # Schema
-has 'schema'		=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}) } );
+has 'schema'		=> (
+	is => 'rw',
+	isa => 'Object', 
+	default => sub { ActiveCMDB::Model::CMDBv1->instance(); } 
+);
+
+my %map = (
+	id				=> 'vendor_id',
+	name			=> 'vendor_name',
+	phone			=> 'vendor_phone',
+	support_phone	=> 'vendor_support_phone',
+	support_email	=> 'vendor_support_email',
+	support_www		=> 'vendor_support_www',
+	enterprises		=> 'vendor_enterprises',
+	details			=> 'vendor_details'
+);
+
+with 'ActiveCMDB::Object::Methods';
 
 sub find
 {
@@ -76,10 +93,13 @@ sub find
 	$row = $self->schema->resultset("Vendor")->find({vendor_id => $self->id});
 	if ( defined($row) )
 	{
-		foreach $attr (qw/name phone support_phone support_email support_www enterprises details/)
+		foreach $attr (keys %map)
 		{
-			my $m = 'vendor_' . $attr;
-			$self->$attr($row->$m());
+			my $field = $map{$attr};
+			if ( defined($row->$field()) )
+			{
+				$self->$attr($row->$field());
+			}
 		}
 	}
 	
@@ -91,5 +111,48 @@ sub get_data
 	
 	return $self->find();
 }
+
+sub save 
+{
+	my($self) = @_;
+	
+	if ( !defined($self->id) && defined($self->name) )
+	{
+		my $count = $self->schema->resultset("Vendor")->search({ vendor_name => $self->name })->count;
+		if ( $count > 0 )
+		{
+			Logger->warn("Vendor already exists");
+			return;
+		}
+	}
+	
+	my $data = $self->to_hashref(\%map);
+		
+	try {
+		Logger->debug("Updating vendor");
+		my $vendor = $self->schema->resultset("Vendor")->update_or_create( $data );
+		if ( ! $vendor->in_storage ) {
+			$vendor->insert;
+		}
+		
+		return('Vendor saved');
+	} catch {
+		Return("Failed to save ");
+		Logger->warn("Failed to save vendor ". $_);
+	};
+}
+
+sub populate
+{
+	my($self, $params) = @_;
+	
+	foreach my $attr (keys %{$params})
+	{
+		next if ( $attr =~ /^$/ || !$map{$attr} );
+		Logger->debug("Populate $attr to ". $params->{$attr});
+		$self->$attr($params->{$attr});
+	} 
+}
+
 
 1;

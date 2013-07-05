@@ -29,40 +29,40 @@
  *
 %]
 <form id="vendorForm">
-<table>
+<table class="cmdbTable">
 <tr>
-	<td>Name</td>
-	<td><input class="cmdbText" id="name" type="text" value="[% vendor.vendor_name %]" name="name" /></td>
+	<th align="left">Name</th>
+	<td><input class="cmdbText" id="name" type="text" value="[% vendor.name %]" name="name" /></td>
 </tr>
 <tr>
-	<td>Sales phone</td>
-	<td><input class="cmdbText" type="text" value="[% vendor.vendor_phone %]" name="salestel" /></td>
+	<th align="left">Sales phone</th>
+	<td><input class="cmdbText" type="text" value="[% vendor.phone %]" name="phone" /></td>
 </tr>
 <tr>
-	<td>Support phone</td>
-	<td><input type="text" class="cmdbText" value="[% vendor.vendor_support_phone %]" name="supporttel" /></td>
+	<th align="left">Support phone</th>
+	<td><input type="text" class="cmdbText" value="[% vendor.support_phone %]" name="support_phone" /></td>
 </tr>
 <tr>
-	<td>Support e-mail</td>
-	<td><input type="email" id="email" class="cmdbText" value="[% vendor.vendor_support_email %]" name="supportmail" /></td>
+	<th align="left">Support e-mail</th>
+	<td><input type="email" id="email" class="cmdbText" value="[% vendor.support_email %]" name="support_email" /></td>
 </tr>
 <tr>
-	<td>Support website</td>
-	<td><input type="url" id="web" class="cmdbText" value="[% vendor.vendor_support_www %]" name="supportweb" /></td>
+	<th align="left">Support website</th>
+	<td><input type="url" id="web" class="cmdbText" value="[% vendor.support_www %]" name="support_www" /></td>
 </tr>
 <tr>
-	<td>IETF Enterprise number</td>
-	<td><inout type="text" class="cmdbText" value="[% vendor.vendor_enterprises %]" name="enterprise" /></td>
+	<th align="left">IETF Enterprise number</th>
+	<td><input type="text" class="cmdbText" value="[% vendor.enterprises %]" name="enterprises" /></td>
 </tr>
 <tr valign="top">
-		<td>Details</td>
+		<th align="left">Details</th>
 		
 </tr>
 <tr>
-	<td colspan="2"><textarea rows="8" cols="80" name="details">[% vendor.vendor_details %]</textarea></td>
+	<td colspan="2"><textarea rows="8" cols="80" name="details">[% vendor.details %]</textarea></td>
 </tr>
 </table>
-<input type="hidden" name="id" value="[% vendor.vendor_id %]" />
+<input type="hidden" name="id" value="[% vendor.id %]" />
 
 <br>
 <button type="submit" id="saveVendor" class="cmdbButton" >save</button>&nbsp;
