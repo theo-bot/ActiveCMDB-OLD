@@ -40,7 +40,9 @@ package ActiveCMDB::Object::Contract;
  use Try::Tiny;
  use Logger;
  use Data::Dumper;
+ use ActiveCMDB::Object::Vendor;
  
+ with 'ActiveCMDB::Object::Methods';
 =cut
 
 use Moose;
@@ -49,6 +51,7 @@ use warnings;
 use Try::Tiny;
 use Logger;
 use Data::Dumper;
+use ActiveCMDB::Object::Vendor;
 
 =head1 ACCESSORS
 
@@ -151,6 +154,8 @@ has 'vendor_name' => (
 	default	=> ''	
 );
 
+with 'ActiveCMDB::Object::Methods';
+
 =head1 VARIABLES
 
 =head2 %map
@@ -216,5 +221,60 @@ sub get_data
 		Logger->warn("contract id not set or zero. " . $self->id);
 	}
 	
+}
+
+sub populate
+{
+	my($self, $params) = @_;
+	
+	foreach my $attr (keys %{$params})
+	{
+		next if ( $attr =~ /^id$/ || !$map{$attr} );
+		Logger->debug("Populate $attr to ". $params->{$attr});
+		$self->$attr($params->{$attr});
+	} 
+}
+
+sub save
+{
+	my($self) = @_;
+	my $data = undef;
+	
+	$data = $self->to_hashref(\%map);
+	
+	try {
+		my $rs = $self->schema->resultset("Contract")->update_or_create( $data );
+		if ( ! $rs->in_storage ) {
+			$rs->insert;
+		}
+	} catch {
+		Logger->warn("Failed to save contract: " . $_ );
+	};
+}
+
+#sub vendor_name
+#{
+#	my ($self) = @_;
+	
+#	my $vendor = ActiveCMDB::Object::Vendor->new( id => $self->vendor_id );
+#	$vendor->find();
+	
+#	return $vendor->name;
+#}
+
+sub service_start
+{
+	my($self) = @_;
+	my($start,undef) = split(/;/, $self->service_hours);
+	
+	return sprintf("%02d:%02d", int( $start / 60 ), int( $start % 60 ));
+}
+
+sub service_end
+{
+	my($self) = @_;
+	my(undef,$end) = split(/;/, $self->service_hours);
+	
+	return sprintf("%02d:%02d", int( $end / 60 ), int( $end % 60 ));
 }
 1;

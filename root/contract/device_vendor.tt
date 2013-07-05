@@ -1,0 +1,6 @@
+<table class="cmdbTable">
+<tr>
+	<th align="left">Name</th>
+	<td>:[% vendor.name %]</td>
+</tr>
+</table>

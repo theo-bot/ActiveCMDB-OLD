@@ -104,11 +104,24 @@
 		<script src="/static/js/activecmdb.process.js"></script>
 		[% CASE "contract" %]
 		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
-		<link rel="stylesheet" href="/static/css//css/jslider.plastic.css" />
+		<link rel="stylesheet" href="/static/css/jslider.css" />
+		<link rel="stylesheet" href="/static/css/jslider.plastic.css" />
 		<script src="/static/js/i18n/grid.locale-en.js"></script>
 		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.contract.js"></script>
-		<script src="/statiic/js/jquery.slider-min.js"></script>
+		<script src="/static/js/jshashtable-2.1_src.js"></script>
+		<script src="/static/js/jquery.numberformatter-1.2.3.js"></script>
+		<script src="/static/js/tmpl.js"></script>
+		<script src="/static/js/draggable-0.1.js"></script>
+		<script src="/static/js/jquery.dependClass-0.1.js"></script>
+		<script src="/static/js/jquery.slider.js"></script>
+		<style type="text/css" media="screen">
+			.layout { padding: 0px;  }
+	 		.layout-slider { margin-bottom: 60px; width: 50%; }
+	 		.layout-slider-settings { font-size: 12px; padding-bottom: 10px; }
+	 		.layout-slider-settings pre { font-family: Courier; }
+			td, th { overflow: visible; }
+		</style>
 		[% CASE "distrib" %]
 		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
 		<style>

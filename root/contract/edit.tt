@@ -1,4 +1,4 @@
-[% WRAPPER wrapper.tt extra="distrib" %]
+[% WRAPPER wrapper.tt extra="contract" %]
 [%#
  *
  * 	Script:	root/contract/edit.tt
@@ -40,17 +40,64 @@
 </tr>
 <tr>
 	<th align="left">Vendor</th>
-	<td colspan="3">:<select name="vendor_id" class="cmdbText">[% FOREACH vendor IN  vendors %]<option value="[% vendor.key %]" [% IF contract.vendor_id == vendor.key %]selected[% END %] >[% vendor.value %]</option>[% END %]</select>
+	<td colspan="3">:<select name="vendor_id" class="cmdbList">[% FOREACH vendor IN  vendors %]<option value="[% vendor.key %]" [% IF contract.vendor_id == vendor.key %]selected[% END %] >[% vendor.value %]</option>[% END %]</select>
+</tr>
+
+<tr>
+	<th align="left">Internal contact</th>
+	<td colspan="3">:<input type="text" class="cmdbText" value="[% contract.internal_contact %]" /></td>
+</tr>
+<tr>
+	<th align="left">Internal phone</th>
+	<td colspan="3">:<input type="text" class="cmdbText" value="[% contract.internal_phone %]" /></td>
 </tr>
 <tr>
 	<th align="left">Valid from</th>
-	<td>:<input type="text" class="cmdbText" size="9" value="[% contract.start_date %]"></td>
-	<th align="left">&nbsp;Until</th>
-	<td>:<input type="text" class="cmdbText" size="9" value="[% contract.end_date %]"></td>
+	<td>:<input type="text" class="cmdbText" size="9" name="start_date" id="start_date" value="[% contract.start_date %]"></td>
 </tr>
 <tr>
-	<th>Service hours</th>
+	<th align="left">&nbsp;Until</th>
+	<td>:<input type="text" class="cmdbText" size="9" name="end_date" id="end_date" value="[% contract.end_date %]"></td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<th align="left" valign="top">Service hours</th>
+<td colspan="6">
+<div class="layout">
+	<div class="layout-slider">
+		<span style="display: inline-block; width: 400px; padding: 0px 0px 0px 0px;"><input id="service_hours" type="slider" name="service_hours" width="300" value="[% contract.service_hours %]" /></span>
+	</div>
+</div>
+</td>
+</tr>
+<tr>
+<th align="left" valign="top">Details</th>
+<td colspan="6"><textarea class="cmdbText" name="details" cols="80" rows="14">[% contract.details %]</textarea>
 </tr>
 </table>
+<script type="text/javascript" charset="utf-8">
+ 		jQuery("#service_hours").slider(
+ 				{ 
+ 					skin: "plastic", 
+ 					from: 0, 
+ 					to: 1440, 
+ 					step: 15, 
+ 					dimension: "", 
+ 					scale: ['0:00','2:00','4:00','6:00','8:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00','24:00'], 
+ 					limits: false, 
+ 					calculate: function( value ){
+	        										var hours = Math.floor( value / 60 );
+    	    										var mins = ( value - hours*60 );
+        											return (hours < 10 ? "0"+hours : hours) + ":" + ( mins == 0 ? "00" : mins );
+      												}
+      				}
+ 				);
+</script>
+<input type="hidden" name="id" value="[% contract.id %]" />
+<br/>
+<button type="submit" id="saveRule" class="cmdbButton" >save</button>&nbsp;
+<button id="deleteRule" class="cmdbButton">delete</button><p id="response">
 </form>
 [% END %]

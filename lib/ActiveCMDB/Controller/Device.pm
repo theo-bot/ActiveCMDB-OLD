@@ -1,22 +1,23 @@
 package ActiveCMDB::Controller::Device;
-
-=begin nd
-
-    Script: ActiveCMDB::Controller::Device.pm
+=head1 MODULE - ActiveCMDB::Controller::Device
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
-    ActiveCMDB::Controller::Device object
+    Catalyst ActiveCMDB Device Cotroller
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,13 +29,29 @@ package ActiveCMDB::Controller::Device;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
-
 =cut
 
+=head1 IMPORTS
 
+ use Moose;
+ use namespace::autoclean;
+ use DateTime;
+ use Data::Dumper;
+ use POSIX;
+ use ActiveCMDB::Common::Conversion;
+ use ActiveCMDB::Common::Device;
+ use ActiveCMDB::Common::Location;
+ use ActiveCMDB::Common::Constants;
+ use ActiveCMDB::Common::Vendor;
+ use ActiveCMDB::Object::Device;
+ use ActiveCMDB::Object::IpType;
+ use ActiveCMDB::Object::Vendor;
+ use ActiveCMDB::Object::ifEntry;
+ use ActiveCMDB::Object::entPhysicalEntry;
+ use ActiveCMDB::Object::Location;
+ use ActiveCMDB::Object::Contract;
+ 
+=cut
 #
 # Include required modules 
 #
@@ -47,12 +64,14 @@ use ActiveCMDB::Common::Conversion;
 use ActiveCMDB::Common::Device;
 use ActiveCMDB::Common::Location;
 use ActiveCMDB::Common::Constants;
+use ActiveCMDB::Common::Vendor;
 use ActiveCMDB::Object::Device;
 use ActiveCMDB::Object::IpType;
 use ActiveCMDB::Object::Vendor;
 use ActiveCMDB::Object::ifEntry;
 use ActiveCMDB::Object::entPhysicalEntry;
 use ActiveCMDB::Object::Location;
+use ActiveCMDB::Object::Contract;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -603,7 +622,6 @@ sub devconfig :Local {
 	
 	$ref = ref $c->request->params->{id};
 	
-	
 	if ( $ref eq 'ARRAY' )
 	{
 		$id = $c->request->params->{id}[0];
@@ -622,5 +640,41 @@ sub devconfig :Local {
 	
 	$c->stash->{template} = 'device/device_configdata.tt';
 }
+
+sub contract :Local {
+	my($self, $c) = @_;
+	my($ref, $id, $device, $contract, $vendor);
+	
+	$ref = ref $c->request->params->{id};
+	
+	if ( $ref eq 'ARRAY' )
+	{
+		$id = $c->request->params->{id}[0];
+	} else {
+		$id = $c->request->params->{id};
+	}
+	
+	if ( $id > 0 )
+	{
+		$device = ActiveCMDB::Object::Device->new(device_id => $id );
+		$device->get_data();
+		
+		$contract = ActiveCMDB::Object::Contract->new(id => $device->contract_id);
+		$contract->get_data();
+		
+		$vendor = ActiveCMDB::Object::Vendor->new(id => $contract->vendor_id);
+		$vendor->get_data();
+	}
+	my %vendors = cmdb_get_vendors();
+	
+	$c->log->debug("URL:" . $vendor->support_www);
+	
+	$c->stash->{vendors} = \%vendors;
+	$c->stash->{device}   = $device;
+	$c->stash->{contract} = $contract;
+	$c->stash->{vendor}   = $vendor;
+	$c->stash->{template} = 'device/device_contract.tt';
+	
+} 
 
 1;

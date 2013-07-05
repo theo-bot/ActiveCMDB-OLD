@@ -34,12 +34,14 @@ package ActiveCMDB::Controller::Contract;
 
 use Moose;
 use namespace::autoclean;
+use Switch;
 use DateTime;
 use POSIX;
 use DateTime;
 use DateTime::Format::Strptime;
 use Data::Dumper;
 use ActiveCMDB::Object::Contract;
+use ActiveCMDB::Object::Vendor;
 use ActiveCMDB::Common::Vendor;
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -75,7 +77,7 @@ sub api :Local {
 
 sub list :Local {
 	my($self, $c) = @_;
-	my($rs, $json);
+	my($rs, $json, $search);
 	my @rows = ();
 	
 	my $rows	= $c->request->params->{rows} || 10;
@@ -83,9 +85,29 @@ sub list :Local {
 	my $order	= $c->request->params->{sidx} || 'contract_number';
 	my $asc		= '-' . $c->request->params->{sord};
 	
+	#
+	# Create search filter
+	#
+	if ( $c->request->params->{_search} eq 'true' )
+	{
+		my $searchOper   = $c->request->params->{searchOper};
+		my $searchField  = $c->request->params->{searchField};
+		my $searchString = $c->request->params->{searchString};
+		
+		switch ( $searchOper ) {
+			case 'cn'		{ $search = { $searchField => { like => '%'.$searchString.'%' } } }
+			case 'eq'		{ $search = { $searchField => $searchString } }
+			case 'ne'		{ $search = { $searchField => { '!=' => $searchString } } }
+			case 'bw'		{ $search = { $searchField => { like => $searchString.'%' } } }
+			else 			{ $search = { } }
+		}
+	} else {
+		$search = { };
+	}
+	$c->log->debug(Dumper($search));
+	
 	$rs = $c->model("CMDBv1::Contract")->search(
-				{
-				},
+				$search,
 				{
 					rows		=> $rows,
 					page		=> $page,
@@ -142,7 +164,55 @@ sub edit :Local {
 	$c->stash->{template} = 'contract/edit.tt';
 }
 
+sub add :Local {
+	my($self, $c) = @_;
+	
+	my $contract = ActiveCMDB::Object::Contract->new();
+	
+	$contract->service_hours('540;1020');
+	my %vendors = cmdb_get_vendors();
+	
+	$c->stash->{contract} = $contract;
+	$c->stash->{vendors} = \%vendors;
+	$c->stash->{template} = 'contract/edit.tt';
+}
 
+sub save :Local {
+	my($self, $c) = @_;
+	
+	if ( defined($c->request->params->{id}) )
+	{
+		$c->log->info("Saving contract data");
+		my $id = int($c->request->params->{id});
+		my $contract = ActiveCMDB::Object::Contract->new( id => $id );
+		$contract->populate($c->request->params);
+		$contract->save();
+		
+	} else {
+		$c->log->warn("Unable to save contract id not found.");
+	}
+	
+	$c->response->body('Done');
+	$c->response->status(200);
+}
+
+sub vendor_data :Local {
+	my($self, $c) = @_;
+	my($vendor);
+	
+	if ( defined($c->request->params->{vendor_id}) )
+	{
+		my $id = int($c->request->params->{vendor_id});
+		$vendor = ActiveCMDB::Object::Vendor->new( id => $id );
+		$vendor->find();
+		
+	} else {
+		$c->log->warn("Unable to find vendor.");
+	}
+	
+	$c->stash->{vendor}  = $vendor;
+	$c->stash->{template} = 'contract/device_vendor.tt';
+}
 
 __PACKAGE__->meta->make_immutable;
 

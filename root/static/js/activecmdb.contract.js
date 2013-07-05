@@ -64,6 +64,7 @@ $(document).ready(function(){
 		rowList:[10,20,30], 
 		pager: '#contractPager', 
 		sortname: 'contract_id', 
+		hidegrid: false,
 		viewrecords: true, 
 		sortorder: "asc", 
 		editurl: "/contract/api", 
@@ -77,49 +78,47 @@ $(document).ready(function(){
 				initialHeight:650,
 				href:'/contract/edit?id=' + id,
 				onClosed:function(){ 
-					$("#epTable").trigger("reloadGrid");
+					$("#contractTable").trigger("reloadGrid");
 				} 
 			});
 		},
 		
 	});
 	
-	jQuery("#contractTable").jqGrid('navGrid','#contractPager', 
-			{ view:true }, //options 
-			{
-				height:280,
-				reloadAfterSubmit:false,
-				onInitializeForm: function() { 
-					var dtFormat = $('#dateFormat').val();
-					$('#start_date').datepicker({
-						changeYear: true,
-						dateFormat: dtFormat 
-					});
-					$('#end_date').datepicker({
-						changeYear: true,
-						dateFormat: dtFormat
-					});
+	jQuery("#contractTable").jqGrid('navGrid',"#contractPager",
+			{	view:false, 
+				edit:false, 
+				add:true, 
+				save:false, 
+				del:false, 
+				addfunc: function() { 
+					$.colorbox({iframe:true,width:740,height:650,initialWidth:640,initialHeight:650,href:'/contract/add' });
 				},
-				onClose: function() { $('.hasDatepicker').datepicker("hide"); }
-			}, // edit options 
-			{
-				height:280,
-				reloadAfterSubmit:false,
-				onInitializeForm: function() { 
-					var dtFormat = $('#dateFormat').val();
-					$('#start_date').datepicker({
-						changeYear: true,
-						dateFormat: dtFormat
+				editfunc: function() {
+					$.colorbox({
+						iframe:true,
+						width:740,
+						height:650,
+						initialWidth:640,
+						initialHeight:650,
+						href:'/endpoint/edit',
+						onClosed:function(){ 
+							$("#contractTable").trigger("reloadGrid");
+							alert('CBOX Closed');
+						} 
 					});
-					$('#end_date').datepicker({
-						changeYear: true,
-						dateFormat: dtFormat
-					});
-				},
-				onClose: function() { $('.hasDatepicker').datepicker("hide"); }
-			}, // add options 
-			{reloadAfterSubmit:false}, // del options 
-			{} // search options 
-	);
+				}
+			},
+			{height:350,reloadAfterSubmit:true, jqModal:false, closeOnEscape:true},
+			{height:350,reloadAfterSubmit:true,jqModal:false, closeOnEscape:true,bottominfo:"Fields marked with (*) are required", closeAfterAdd: true},
+			{reloadAfterSubmit:false,jqModal:false, closeOnEscape:true},
+			{closeOnEscape:true},
+			{height:350,jqModal:false,closeOnEscape:true}
+	); 
+	
+	jQuery("#contractTable").jqGrid('inlineNav',"#contractPager", {edit: false, add:false, cancel:false, save:false});
+	
+	$("#start_date").datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
+	$("#end_date").datepicker({ dateFormat: "yy-mm-dd", changeMonth: true, changeYear: true });
 });
 

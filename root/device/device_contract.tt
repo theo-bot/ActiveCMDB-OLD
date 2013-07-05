@@ -1,0 +1,77 @@
+[% WRAPPER wrapper.tt extra="contract" %]
+[%#
+ *
+ * 	Script:	root/device/device_contract.tt
+ * 	___________________________________________________________
+ *
+ * 	Copyright (C) 2011-2015 Theo Bot
+ *
+ * 	http://www.activecmdb.org
+ *
+ * 	Topic: Purpose
+ *
+ * 	Template to view/edit device contract data
+ *
+ * 	About: License
+ *
+ * 	This program is free software; you can redistribute it and/or
+ * 	modify it under the terms of the GNU General Public License
+ * 	as published by the Free Software Foundation; either version 2
+ * 	of the License, or (at your option) any later version.
+ *
+ * 	This program is distributed in the hope that it will be useful,
+ * 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * 	GNU General Public License for more details.
+ *
+%]
+<div class="cmdbTabDiv" >
+<form>
+<b>Contract details</b><br><br>
+<input type="hidden" id="device_id" value="[% device.device_id %]" />
+<input type="hidden" id="vendor_id" name="vendor_id" value="[% contract.vendor_id %]" />
+<table class="cmdbTable1">
+<tr>
+	<th align="left">Contract</th>
+	<td>:[% contract.number %]</td>
+</tr>
+<tr>
+	<th align="left">Vendor</th>
+	<td>:[% contract.vendor_name %]</td>
+</tr>
+<tr>
+	<th align="left">Description</th>
+	<td>:[% contract.descr %]</td>
+</tr>
+<tr>
+	<th align="left">From</th>
+	<td>:[% contract.start_date %]</td>
+</tr>
+<tr>
+	<th align="left">Until</th>
+	<td>:[% contract.end_date %]</td>
+</tr>
+<tr>
+	<th align="left">Service hours</th>
+	<td>:[% contract.service_start %]&nbsp;-&nbsp;[% contract.service_end %]</td>
+</tr>
+</table>
+<table class="cmdbTable2">
+<tr>
+	<th align="left">Support Phone</th>
+	<td>:[% vendor.support_phone %]</td>
+</tr>
+<tr>
+	<th align="left">Website</th>
+	<td>:[% IF vendor.support_www.length > 0 %]<a style="color: black" href="[% vendor.support_www %]" target="_blank">[% vendor.support_www.replace('http://', '') %]</a>[% END %]</td>
+</tr>
+<tr>
+	<th align="left">E-Mail</th>
+	<td>:[% IF vendor.support_email.length > 0 %]<a style="color: black" href="mailto:[% vendor.support_email %]">[% vendor.support_email %]</a>[% END %]</td>
+</tr>
+</table>
+<textarea cols="80" rows="6">[% contract.details %]</textarea>
+</form>
+</div>
+
+[% END %]

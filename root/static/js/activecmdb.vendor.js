@@ -75,19 +75,3 @@ $(document).ready(function(){
 });
 
 
-function viewVendor(vendor_id)
-{
-	alert('Hallo');
-	$.colorbox(
-			{
-				iframe:true,
-				width:680,
-				height:450,
-				initialWidth:640,
-				initialHeight:400,
-				href:'/vendor/view?vendor=' + vendor_id, 
-					onClosed:function(){ location.reload(true); }
-			}
-	);
-	
-}

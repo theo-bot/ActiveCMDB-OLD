@@ -1,22 +1,23 @@
 package ActiveCMDB::Object::Vendor;
-
-=begin nd
-
-    Script: ActiveCMDB::Object::Vendor.pm
+=head1 MODULE - ActiveCMDB::Object::Vendor
     ___________________________________________________________________________
 
+=head1 VERSION
+
     Version 1.0
+
+=head1 COPYRIGHT
 
     Copyright (C) 2011-2015 Theo Bot
 
     http://www.activecmdb.org
 
 
-    Topic: Purpose
+=head1 DESCRIPTION
 
     Vendor object class definition
 
-    About: License
+=head1 LICENSE
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -28,21 +29,34 @@ package ActiveCMDB::Object::Vendor;
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    Topic: Release information
-
-    $Rev$
-
-	
 =cut
 
-#########################################################################
-# Initialize  modules
+
+=head1 IMPORTS
+
+ use Moose;
+ use Moose::Util::TypeConstraints;
+ use Try::Tiny;
+ use Logger;
+=cut
+
 use Moose;
 use Moose::Util::TypeConstraints;
 use Try::Tiny;
 use Logger;
 
-has 'id'			=> (is => 'ro',	isa => 'Str');
+=head1 ATTRIBUTES
+
+=head2 id
+
+INTEGER, Unique id for vendor
+=cut
+has 'id'			=> (is => 'ro',	isa => 'Int');
+
+=head2 name
+
+STRING, Vendor name
+=cut
 has 'name'			=> (is => 'rw', isa => 'Str');
 has 'phone'			=> (is => 'rw', isa => 'Str');
 has 'support_phone'	=> (is => 'rw', isa => 'Str');
@@ -69,6 +83,13 @@ sub find
 		}
 	}
 	
+}
+
+sub get_data
+{
+	my($self) = @_;
+	
+	return $self->find();
 }
 
 1;

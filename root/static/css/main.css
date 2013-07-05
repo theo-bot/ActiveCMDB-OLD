@@ -287,6 +287,22 @@ table.cmdbTable {
 	border-spacing: 0px;
 }
 
+table.cmdbTable1 {
+	border: 0px;
+	padding: 3px;
+	border-spacing: 0px;
+	float: left;
+	width:45%
+}
+
+table.cmdbTable2 {
+	border: 0px;
+	padding: 3px;
+	border-spacing: 0px;
+	float: right;
+	width: 45%	 
+}
+
 table.cmdbTableFixed {
 	table-layout: fixed;
 	margin-left: 2em;
@@ -297,7 +313,8 @@ table.cmdbTableFixed {
 }
 
 a.cmdbLink {
-	text-decoration: none;
+	/* text-decoration: none; */
+	color: #ff0000;
 }
 
 .ui-autocomplete-loading { 

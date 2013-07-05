@@ -73,6 +73,7 @@ has 'tftpset'		=> (is => 'rw', isa => 'Str', default => 'DEFAULT');
 has 'discotime'		=> (is => 'rw', isa => 'Int');
 has 'configtime'	=> (is => 'rw', isa => 'Int');
 has 'status'		=> (is => 'rw', isa => 'Int');
+has 'contract_id'	=> (is => 'rw', isa => 'Int', default => 0);
 
 # Security attributes
 has 'snmp_ro'		=> (is => 'rw', isa => 'Str');

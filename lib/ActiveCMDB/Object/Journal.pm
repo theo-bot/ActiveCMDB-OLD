@@ -52,7 +52,11 @@ has 'prio'			=> ( is => 'rw', isa => 'Int|Undef' );
 has 'data'			=> ( is => 'rw', isa => 'Str|Undef' );
 
 # Schema
-has 'schema'		=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}) } );
+has 'schema'		=> (
+	is		=> 'rw', 
+	isa		=> 'Object', 
+	default => sub { ActiveCMDB::Model::CMDBv1->instance() } 
+);
 
 my %mapper = (
 	id			=> 'journal_id',
