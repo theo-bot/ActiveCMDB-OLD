@@ -65,7 +65,11 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_nullable => 0 },
   "domain_name",
   { data_type => "varchar", is_nullable => 1, size => 128 },
+  "resolvers",
+  { data_type => "text", is_nullable => 1 },
   "active",
+  { data_type => "tinyint", is_nullable => 1 },
+  "auto_update",
   { data_type => "tinyint", is_nullable => 1 },
 );
 
