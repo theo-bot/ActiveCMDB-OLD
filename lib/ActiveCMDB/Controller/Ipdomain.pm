@@ -44,15 +44,27 @@ use namespace::autoclean;
 use POSIX;
 use Data::Dumper;
 use NetAddr::IP;
+use DateTime;
+use DateTime::Format::Strptime;
+use ActiveCMDB::Object::Ipdomain;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-sub index :Private {
+my $config = ActiveCMDB::ConfigFactory->instance();
+$config->load('cmdb');
+my $strp = DateTime::Format::Strptime->new(
+	pattern => $config->section('cmdb::default::date_format')
+);
+
+sub list_domains :Local {
     my ( $self, $c ) = @_;
-
+	my($rs, $json, $search);
+	my @rows = ();
+	
 	my @domains = ();
-
-    my $rs =	$c->model('CMDBv1::IpDomain')->search(
+	my $rows	= $c->request->params->{rows} || 10;
+	
+    $rs =	$c->model('CMDBv1::IpDomain')->search(
     								{},
     								{
     									join	 => 'ip_domain_networks',
@@ -62,13 +74,51 @@ sub index :Private {
     								}
     							);
     
-    while ( my $row = $rs->next )
-    {
-    	push(@domains, { domain_id => $row->domain_id, name => $row->domain_name, tally => $row->get_column('tally') });
-    }
+     
+    $json->{records} = $rs->count;
+	if ( $json->{records} > 0 ) {
+		$json->{total} = ceil($json->{records} / $rows );
+	} else {
+		$json->{total} = 0;
+	} 
     
-    $c->stash->{domains} = [ @domains ];
-    $c->stash->{template} = 'domain/list.tt';
+    while ( my $row = $rs->next )
+	{
+		push(@rows, { id => $row->domain_id, cell=> [
+														$row->domain_name,
+														$row->get_column('tally')
+														
+													]
+					}
+			);
+	}
+	
+	$json->{rows} = [ @rows ];
+	$c->stash->{json} = $json;
+	$c->log->debug(Dumper($json));
+	$c->forward( $c->view('JSON') );    
+}
+
+sub index :Private {
+	my($self, $c) = @_;
+	my $format = $config->section('cmdb::default::date_format');
+	$format =~ s/\%Y/yy/;
+	$format =~ s/\%m/mm/;
+	$format =~ s/\d%/dd/;
+	
+	$format =~ s/\%//g;
+	
+	$c->stash->{dateFormat} = $format;
+	
+	$c->stash->{template} = 'domain/list.tt';
+}
+
+sub api :Local {
+	my($self, $c) = @_;
+	
+	if ( defined($c->request->params->{oper}) ) {
+		$c->forward('/ipdomain/' . $c->request->params->{oper});
+	}
 }
 
 sub view :Local {
@@ -76,12 +126,21 @@ sub view :Local {
 	my($domain_id, $rs, $row);
 	my @networks = ();
 	
-	$domain_id = $c->request->params->{domain_id} || undef;
+	$domain_id = $c->request->params->{domain_id};
+	$c->log->debug(Dumper($c->request->params));
+	
 	
 	if ( defined($domain_id) )
 	{
-		$c->stash->{domain} = $c->model('CMDBv1::IpDomain')->find({ domain_id => $domain_id });
+		 my $domain = $c->model('CMDBv1::IpDomain')->find({ domain_id => $domain_id });
 		
+		if ( defined($domain) )
+		{
+			$c->log->info("Domain record found");
+			$c->stash->{domain} = $domain;
+		} else {
+			$c->log->warn("Domain record not found.");
+		}
 		$rs = $c->model('CMDBv1::IpDomainNetwork')->search(
 					{
 						domain_id => $domain_id
@@ -97,6 +156,8 @@ sub view :Local {
 		}
 		$c->stash->{networks} = [ @networks ];
 		
+	} else {
+		$c->log->warn("Domain id undefined.");
 	}
 	
 	$c->stash->{template} = 'domain/view.tt';
@@ -269,6 +330,22 @@ sub del :Local {
 	}
 	$c->response->status(200);
 	$c->response->body('');
+}
+
+sub update_domain :Local {
+	my($self, $c) = @_;
+	
+	my $domain_id = $c->request->params->{domain_id};
+	my $field     = $c->request->params->{field};
+	my $value	  = $c->request->params->{value};
+	my $domain = ActiveCMDB::Object::Ipdomain->new(domain_id => $domain_id);
+	$domain->get_data();
+	
+	$domain->$field($value);
+	$domain->save();
+	$c->response->status(200);
+	
+	
 }
 
 =head1 AUTHOR

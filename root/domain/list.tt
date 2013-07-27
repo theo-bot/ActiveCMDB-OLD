@@ -29,19 +29,10 @@
  *
 %]
 <br>
-<center>
-<table class="cmdbTable" width="98%">
-<tr align="left" >
-	<th>Domain name</th>
-	<th>Networks</th>
-</tr>
-[% FOREACH domain IN domains %]
-<tr class="cmdbRow" onClick="window.location = '/ipdomain/view?domain_id=[% domain.domain_id %]';">
-	<td>[% domain.name %]</td>
-	<td>[% domain.tally %]</td>
-</tr>
-[% END %]
-</table>
-</center>
+
+<input type="hidden" id="dateFormat" value="[% dateFormat %]" /> 
+<table id="domainTable"></table>
+<div id="domainPager"></div>
+
 
 [% END %]

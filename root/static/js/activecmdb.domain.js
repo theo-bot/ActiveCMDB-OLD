@@ -40,7 +40,7 @@ $(document).ready(function(){
 		          {name:'ip_mask',index:'ip_mask', width:80,editable:true, search:false, required:false}, 
 		          {name:'ip_masklen',index:'ip_masklen', width:70, align:"right",editable:true, search:false}, 
 		          {name:'active',index:'active', width:50, align:"right",editable:true,edittype:"checkbox", value:"1", offval:"0", formatter:"checkbox", search:false}, 
-		          {name:'snmp_ro',index:'snmp_ro', width:80,hidden:false,align:"right",editable:true,editrules: { edithidden: true }}, 
+		          {name:'snmp_ro',index:'snmp_ro', width:80,hidden:true,align:"right",editable:true,editrules: { edithidden: true }}, 
 		          {name:'snmp_rw',index:'snmp_rw', width:80,hidden:true, sortable:false,editable:true,editrules: { edithidden: true }},
 		          {name:'telnet_user',index:'telnet_user',width:80, sortable:false,editable:true, search:false},
 		          {name:'telnet_pwd',index:'telnet_pwd',width:80,hidden:true, sortable:false, editable:true, search:false,editrules: { edithidden: true }},
@@ -60,13 +60,113 @@ $(document).ready(function(){
 	}); 
 
 	jQuery("#netTable").jqGrid('navGrid',"#netPager",
-			{view:true},
-			{height:350,reloadAfterSubmit:false, jqModal:false, closeOnEscape:true, bottominfo:"Fields marked with (*) are required"},
-			{height:350,reloadAfterSubmit:true,jqModal:false, closeOnEscape:true,bottominfo:"Fields marked with (*) are required", closeAfterAdd: true},
-			{reloadAfterSubmit:false,jqModal:false, closeOnEscape:true},
-			{closeOnEscape:true},
-			{height:350,jqModal:false,closeOnEscape:true}
+			{
+				view:true, 
+				edit:true
+			},
+			{
+				height:430,
+				reloadAfterSubmit:true, 
+				jqModal:false, 
+				closeOnEscape:true, 
+				bottominfo:"Fields marked with (*) are required"
+			},
+			{
+				height:430,
+				reloadAfterSubmit:true,
+				jqModal:false, 
+				closeOnEscape:true,
+				bottominfo:"Fields marked with (*) are required", 
+				closeAfterAdd: true
+			},
+			{
+				reloadAfterSubmit:false,
+				jqModal:false, 
+				closeOnEscape:true
+			},
+			{
+				closeOnEscape:true
+			},
+			{
+				height:350,
+				jqModal:false,
+				closeOnEscape:true
+			}
 	); 
-	jQuery("#netTable").jqGrid('inlineNav',"#netPager", {edit: false, add:false, cancel:false, save:false});
+	jQuery("#netTable").jqGrid('inlineNav',"#netPager", {edit: false, add:false, cancel:false, save:true});
 	
+	
+		
+	jQuery("#domainTable").jqGrid({ 
+		url:'/ipdomain/api?oper=list_domains', 
+		datatype: "json",
+		colNames:['Domain name','Networks'],
+		colModel: [
+		            {
+		            	name:'domain_name',
+		            	index:'domain_name',
+		            	width:256
+		            },
+			        {
+			           	name:'tally',
+			           	index:'tally',
+			           	width:196
+			        }     
+			          ],
+			rowNum:10, 
+			rowList:[10,20,30], 
+			pager: '#domainPager', 
+			sortname: 'contract_id', 
+			hidegrid: false,
+			viewrecords: true, 
+			sortorder: "asc", 
+			editurl: "/ipdomain/api", 
+			caption: "IP Domain Administration",
+			ondblClickRow: function(id) {
+				$.colorbox({
+					iframe:true,
+					width:740,
+					height:650,
+					initialWidth:640,
+					initialHeight:650,
+					href:'/ipdomain/view?domain_id=' + id,
+					onClosed:function(){ 
+						$("#domainTable").trigger("reloadGrid");
+					} 
+				});
+			},
+			
+		});
+		
+		jQuery("#domainTable").jqGrid('navGrid',"#domainPager",
+				{	view:false, 
+					edit:false, 
+					add:true, 
+					save:false, 
+					del:false
+				},
+				{height:350,reloadAfterSubmit:true, jqModal:false, closeOnEscape:true},
+				{height:350,reloadAfterSubmit:true,jqModal:false, closeOnEscape:true,bottominfo:"Fields marked with (*) are required", closeAfterAdd: true},
+				{reloadAfterSubmit:false,jqModal:false, closeOnEscape:true},
+				{closeOnEscape:true},
+				{height:350,jqModal:false,closeOnEscape:true}
+		); 
+		
+		jQuery("#domainTable").jqGrid('inlineNav',"#domainPager", {edit: false, add:false, cancel:false, save:false});
+	
+		
+		$('#domainForm').on('change', 'input', function(e) {
+			var newvalue = this.value;
+			var domain_id = $("#id").val();
+			if ( this.type == 'checkbox' && this.checked == true ) { newvalue = 1; }
+			if ( this.type == 'checkbox' && this.checked == false ) { newvalue = 0; }
+			newdata = { field: this.name, value: newvalue, oper: "update_domain", domain_id: domain_id };
+			$.ajax({
+				dataType: "json",
+				url: "/ipdomain/api",
+				data: newdata
+				
+			});
+		});
+		
 });
