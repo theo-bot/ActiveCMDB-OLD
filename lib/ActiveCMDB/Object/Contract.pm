@@ -267,4 +267,5 @@ sub service_end
 	
 	return sprintf("%02d:%02d", int( $end / 60 ), int( $end % 60 ));
 }
+
 1;
