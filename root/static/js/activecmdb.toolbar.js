@@ -117,7 +117,8 @@ function fetch_device(hostname)
 					'devsec': 'security',
 					'devmnt': 'maintenance',
 					'devjnl': 'journal',
-					'devcfg': 'devconfig'
+					'devcfg': 'devconfig',
+					'devcir': 'circuits'
 			};
 			for (tab in taburl)
 			{
