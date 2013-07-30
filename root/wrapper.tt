@@ -85,6 +85,10 @@
 		<link rel="stylesheet" href="/static/css/dtree.css" />
 		<script src="/static/js/dtree.js"></script>
 		<script src="/static/js/activecmdb.structure.js"></script>
+		[% CASE "circuits" %]
+		<link rel="stylesheet" href="/static/css/dtree.css" />
+		<script src="/static/js/dtree.js"></script>
+		<script src="/static/js/activecmdb.circuits.js"></script>
 		[% CASE "maintenance" %]
 		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
 		<script src="/static/js/i18n/grid.locale-en.js"></script>

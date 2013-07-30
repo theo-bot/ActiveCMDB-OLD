@@ -100,6 +100,13 @@ div.entityDetail {
 	visibility:hidden;
 }
 
+div.circuitDetail {
+	position:absolute;
+	top:60px;
+	left:300px;
+	visibility:hidden;
+}
+
 div.interfaceList {
 	font-size: 90%;
 	position:relative;

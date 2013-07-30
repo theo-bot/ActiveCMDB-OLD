@@ -1,0 +1,53 @@
+<html>
+<head>
+<link rel="stylesheet" href="/static/css/dtree.css" />
+<script src="/static/js/dtree.js"></script>
+<script src="/static/js/jquery.js"></script>
+<link rel="stylesheet" href="/static/css/main.css" />
+</head>
+<body>
+<div class="cmdbTabDiv">
+<div id="circuitDetail" class="circuitDetail" >
+<table>
+<tr>
+	<td width="120">Name</td>
+	<td>:</td>
+	<td id="circuitName"></td>
+</tr>
+<tr valign="top">
+	<td>Description</td>
+	<td>:</td>
+	<td id="circuitDesc"></td>
+</tr>
+</table>
+</div>
+
+<div id="cirtree"></div>
+<script type="text/javascript">
+<!--
+	[% tally = 128 %]
+	var view = '';
+	d = new dTree('d');
+	d.add(0,-1,'Circuits');
+	[% IF vlans.size > 0 %]
+	view = 'vlan';
+	d.add(1, 0, 'VLAN');  
+	[% FOREACH vlan IN vlans %][% tally = tally + 1 %]d.add([% tally %], 1,'[% vlan.value.name %]','javascript:xCircuitDetails([% device_id %],[% vlan.key %],view)','','','');
+	[% END %][% END %]
+	
+	[% IF vrf.size > 0 %]
+	d.add(2,0, 'VRF');
+	[% FOREACH vrf IN vrfs %][% tally = tally + 1 %]d.add([% tally %], 2, '[% vrf.vrfname %]','javascript:xCircuitDetails([% device_id %],0,view)','','','');
+	[% END %][% END %]
+	
+	d.closeAll();
+	document.getElementById('cirtree').innerHTML = d;
+	$('#cirtree a').each(function() {
+		$(this).attr('style', 'color:black');
+	});
+//-->
+</script>
+</div>
+
+</body>
+</html>

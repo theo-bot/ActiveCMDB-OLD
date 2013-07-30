@@ -43,6 +43,7 @@ package ActiveCMDB::Common::Device;
 =cut
 
 use Exporter;
+use Data::Dumper;
 use Logger;
 use ActiveCMDB::Model::CMDBv1;
 use Try::Tiny;
@@ -54,6 +55,7 @@ our @ISA = ('Exporter');
 our @EXPORT = qw(
 	cmdb_get_host_by_ip
 	cmdb_gethostByAddr
+	get_vlans_by_device
 );
 
 =head1 FUNCTIONS
@@ -184,4 +186,45 @@ sub cmdb_gethostByAddr
 	}
 	
 	return $device;
+}
+
+sub get_vlans_by_device
+{
+	my($device_id) = @_;
+	my $vlans = undef;
+	Logger->info("Fetching vlan data");
+	if ( defined($device_id) && $device_id > 0 )
+	{
+		my($schema,$rs,$row);
+		#
+		# Connect to database
+		#
+		$schema = ActiveCMDB::Model::CMDBv1->instance();
+	
+		$rs = $schema->resultset('IpDeviceVlan')->search(
+			{
+				device_id => $device_id
+			},
+			{
+				columns		=> [qw/vlan_id/],
+				distinct	=> 1
+			}
+		);
+		
+		if ( defined($rs) ) 
+		{
+			while ( $row = $rs->next )
+			{
+				$vlans->{$row->vlan_id}->{name} = 'VLan ' . $row->vlan_id;
+				$vlans->{$row->vlan_id}->{vlan_id} = $row->vlan_id;
+			}
+			Logger->debug(Dumper($vlans));
+		} else {
+			Logger->info("Vlan Resulset not defined");
+		}
+	} else {
+		Logger->warn("Device ID not set");
+	}
+	
+	return $vlans
 }

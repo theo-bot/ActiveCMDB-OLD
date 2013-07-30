@@ -677,4 +677,36 @@ sub contract :Local {
 	
 } 
 
+=head2 circuits
+
+Display device circuits
+
+=cut
+
+sub circuits :Local {
+	my($self, $c) = @_;
+	my($ref,$id);
+	
+	$ref = ref $c->request->params->{id};
+	
+	if ( $ref eq 'ARRAY' )
+	{
+		$id = $c->request->params->{id}[0];
+	} else {
+		$id = $c->request->params->{id};
+	}
+	
+	if ( $id > 0 ) 
+	{
+		$c->stash->{device_id} = $id;
+		$c->stash->{vlans} = get_vlans_by_device($id); 
+	} else {
+		$c->log->warn('Device_id not set');
+	}
+	
+	$c->log->debug(Dumper($c->stash->{vlans}));
+	
+	$c->stash->{template} = 'device/device_circuits.tt';
+}
+
 1;
