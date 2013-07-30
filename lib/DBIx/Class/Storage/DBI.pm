@@ -1392,21 +1392,24 @@ sub _connect {
     }
     else {
       require DBI;
+      # TB 2012/08/28, This is where the failover test is build in
+      #
+      
       if ( defined( $info[3]->{dbhost} ) )
       {
-         my $fmt = $info[0];
-         foreach my $dbhost ( split( /\,/, $info[3]->{dbhost} ) )
-         {
-            $info[0] = sprintf($fmt, $dbhost);
-            eval {
-                $dbh = DBI->connect(@info);
-            };
-             if ( $@ ) { next; }
-             last;
-         }
-          
+      	my $fmt = $info[0];
+      	foreach my $dbhost ( split( /\,/, $info[3]->{dbhost} ) )
+      	{
+      		$info[0] = sprintf($fmt, $dbhost);
+      		eval {
+      			#print "@info\n";
+      			$dbh = DBI->connect(@info);
+      		};
+      		if ( $@ ) { next; }
+      		last;
+      	}
       } else {
-         $dbh = DBI->connect(@info);
+		$dbh = DBI->connect(@info);      	
       }
     }
 
