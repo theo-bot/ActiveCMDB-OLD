@@ -203,13 +203,13 @@ __PACKAGE__->has_many(
 
 Type: might_have
 
-Related object: L<ActiveCMDB::Schema::Database::Result::IpDeviceVlan>
+Related object: L<ActiveCMDB::Schema::Database::Result::IpDeviceIntVlan>
 
 =cut
 
 __PACKAGE__->might_have(
   "ip_device_vlan",
-  "ActiveCMDB::Schema::Database::Result::IpDeviceVlan",
+  "ActiveCMDB::Schema::Database::Result::IpDeviceIntVlan",
   {
     "foreign.device_id" => "self.device_id",
     "foreign.ifindex"   => "self.ifindex",

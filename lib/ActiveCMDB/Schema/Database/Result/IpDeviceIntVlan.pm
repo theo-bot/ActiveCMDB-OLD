@@ -1,12 +1,12 @@
 use utf8;
-package ActiveCMDB::Schema::Database::Result::IpDeviceVlan;
+package ActiveCMDB::Schema::Database::Result::IpDeviceIntVlan;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
 
 =head1 NAME
 
-ActiveCMDB::Schema::Database::Result::IpDeviceVlan
+ActiveCMDB::Schema::Database::Result::IpDeviceIntVlan
 
 =cut
 

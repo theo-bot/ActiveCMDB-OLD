@@ -202,7 +202,7 @@ sub get_vlans_by_device
 		#
 		$schema = ActiveCMDB::Model::CMDBv1->instance();
 	
-		$rs = $schema->resultset('IpDeviceVlan')->search(
+		$rs = $schema->resultset('IpDeviceIntVlan')->search(
 			{
 				device_id => $device_id
 			},
