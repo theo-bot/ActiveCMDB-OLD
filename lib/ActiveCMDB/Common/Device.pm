@@ -56,6 +56,7 @@ our @EXPORT = qw(
 	cmdb_get_host_by_ip
 	cmdb_gethostByAddr
 	get_vlans_by_device
+	get_vrfs_by_device
 );
 
 =head1 FUNCTIONS
@@ -227,4 +228,45 @@ sub get_vlans_by_device
 	}
 	
 	return $vlans
+}
+
+sub get_vrfs_by_device
+{
+	my($device_id) = @_;
+	my $vrfs = undef;
+	Logger->info("Fetching vrf data");
+	if ( defined($device_id) && $device_id > 0 )
+	{
+		my($schema,$rs,$row);
+		#
+		# Connect to database
+		#
+		$schema = ActiveCMDB::Model::CMDBv1->instance();
+	
+		$rs = $schema->resultset('IpDeviceVrf')->search(
+			{
+				device_id => $device_id
+			},
+			{
+				columns		=> [qw/vrf_rd/],
+				distinct	=> 1
+			}
+		);
+		
+		if ( defined($rs) ) 
+		{
+			while ( $row = $rs->next )
+			{
+				$vrfs->{$row->vrf_rd}->{vrf_name} = $row->vrf_name;
+				$vrfs->{$row->vrf_rd}->{vrf_rd} = $row->vrf_rd;
+			}
+			Logger->debug(Dumper($vrfs));
+		} else {
+			Logger->info("VRF Resulset not defined");
+		}
+	} else {
+		Logger->warn("Device ID not set");
+	}
+	
+	return $vrfs
 }

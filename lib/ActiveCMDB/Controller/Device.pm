@@ -685,26 +685,26 @@ Display device circuits
 
 sub circuits :Local {
 	my($self, $c) = @_;
-	my($ref,$id);
+	my($ref,$device_id);
 	
 	$ref = ref $c->request->params->{id};
 	
 	if ( $ref eq 'ARRAY' )
 	{
-		$id = $c->request->params->{id}[0];
+		$device_id = $c->request->params->{id}[0];
 	} else {
-		$id = $c->request->params->{id};
+		$device_id = $c->request->params->{id};
 	}
 	
-	if ( $id > 0 ) 
+	if ( $device_id > 0 ) 
 	{
-		$c->stash->{device_id} = $id;
-		$c->stash->{vlans} = get_vlans_by_device($id); 
+		$c->stash->{device_id} = $device_id;
+		$c->stash->{vlans} = get_vlans_by_device($device_id); 
+		$c->stash->{vrfs}  = get_vrfs_by_device($device_id);
 	} else {
 		$c->log->warn('Device_id not set');
 	}
 	
-	$c->log->debug(Dumper($c->stash->{vlans}));
 	
 	$c->stash->{template} = 'device/device_circuits.tt';
 }
