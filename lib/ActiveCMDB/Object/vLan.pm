@@ -52,7 +52,7 @@ sub get_data
 	my($rs);
 	
 	try {
-		$rs = $self->schema->resultset("IpDeviceVlan")->find(
+		$rs = $self->schema->resultset("IpDeviceIntVlan")->find(
 				{
 					device_id	=> $self->device_id,
 					ifindex		=> $self->ifindex,
@@ -90,7 +90,7 @@ sub save
 	Logger->debug("Saving vlan data");
 	
 	try {
-		$rs = $self->schema->resultset("IpDeviceVlan")->update_or_create( $data );
+		$rs = $self->schema->resultset("IpDeviceIntVlan")->update_or_create( $data );
 		if ( defined($rs) ) {
 			if ( !$rs->in_storage ) {
 				$rs->insert;

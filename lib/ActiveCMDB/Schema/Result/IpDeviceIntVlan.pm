@@ -38,7 +38,7 @@ __PACKAGE__->load_components("InflateColumn::DateTime", "TimeStamp", "EncodedCol
 
 =cut
 
-__PACKAGE__->table("ip_device_vlan");
+__PACKAGE__->table("ip_device_int_vlan");
 
 =head1 ACCESSORS
 
