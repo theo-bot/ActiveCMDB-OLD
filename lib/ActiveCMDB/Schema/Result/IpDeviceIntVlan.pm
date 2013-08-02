@@ -6,7 +6,7 @@ package ActiveCMDB::Schema::Result::IpDeviceIntVlan;
 
 =head1 NAME
 
-ActiveCMDB::Schema::Result::IpDeviceVlan
+ActiveCMDB::Schema::Result::IpDeviceIntVlan
 
 =cut
 
