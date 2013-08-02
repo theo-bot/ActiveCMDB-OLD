@@ -1,5 +1,5 @@
 use utf8;
-package ActiveCMDB::Schema::Result::IpDeviceVlan;
+package ActiveCMDB::Schema::Result::IpDeviceIntVlan;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
