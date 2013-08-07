@@ -39,6 +39,7 @@ package ActiveCMDB::Object::Journal;
 #
 use Moose;
 use Try::Tiny;
+use Data::Dumper;
 use DateTime;
 use Logger;
 use ActiveCMDB::Model::CMDBv1;
@@ -134,7 +135,9 @@ sub save {
 	
 	
 	my $data = $self->to_hashref(\%mapper);
-	
+	my $dtf = $self->schema->storage->datetime_parser;
+	#Logger->debug(Dumper($data));
+	$data->{journal_date} = $dtf->format_datetime($data->{journal_date});
 	try {
 		my $rs = $self->schema->resultset("IpDeviceJournal")->update_or_create( $data );
 		if ( ! $rs->in_storage ) {
