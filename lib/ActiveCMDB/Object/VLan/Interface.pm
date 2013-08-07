@@ -1,8 +1,8 @@
-package ActiveCMDB::Object::vLan;
+package ActiveCMDB::Object::VLan::Interface;
 
 =begin nd
 
-    Script: ActiveCMDB::Object::vLan.pm
+    Script: ActiveCMDB::Object::VLan::Interface.pm
     ___________________________________________________________________________
 
     Version 1.0
