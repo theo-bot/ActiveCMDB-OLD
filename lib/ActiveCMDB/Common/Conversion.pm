@@ -49,6 +49,7 @@ our @EXPORT = qw(
 	cmdb_del_conversion
 	cmdb_list_byname
 	cmdb_name_set
+	cmdb_oid_set
 );
 #########################################################################
 # Routines
@@ -222,4 +223,32 @@ sub cmdb_name_set
 	}
 	
 	return %set;
+}
+
+sub cmdb_oid_set
+{
+	my($name) = @_;
+	my($schema,$rs);
+	my %set = ();
+	
+	$schema = ActiveCMDB::Model::CMDBv1->instance();
+	$rs = $schema->resultset('Snmpmib')->search(
+		{
+			oidname	=> $name,
+			value	=> { '!=' => undef}
+		},
+		{
+			columns => [ qw/value mibvalue/ ]
+		}
+	);
+	
+	if ( defined($rs) )
+	{
+		while ( my $row = $rs->next )
+		{
+			$set{ $row->{value} = $row->mibvalue };
+		}
+	}
+	
+	return %set
 }
