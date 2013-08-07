@@ -40,6 +40,7 @@ use ActiveCMDB::Model::CMDBv1;
 use ActiveCMDB::Schema;
 use Try::Tiny;
 use strict;
+use Data::Dumper;
 
 our @ISA = ('Exporter');
 
@@ -244,11 +245,16 @@ sub cmdb_oid_set
 	
 	if ( defined($rs) )
 	{
+		Logger->debug("Processing values for $name");
 		while ( my $row = $rs->next )
 		{
-			$set{ $row->{value} = $row->mibvalue };
+			Logger->debug("Adding value for " . $row->value);
+			my $x = $row->value;
+			$set{ $x } = $row->mibvalue ;
 		}
+	} else {
+		Logger->warn("Unknown resultset");
 	}
-	
+		
 	return %set
 }

@@ -87,7 +87,7 @@ sub save
 	#
 	# Saving vlan data
 	#
-	Logger->debug("Saving vlan data");
+	Logger->debug("Saving vlan interface data");
 	
 	try {
 		$rs = $self->schema->resultset("IpDeviceIntVlan")->update_or_create( $data );
