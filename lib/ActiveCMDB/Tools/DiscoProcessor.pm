@@ -58,6 +58,7 @@ use ActiveCMDB::Tools::Common;
 use ActiveCMDB::ConfigFactory;
 use ActiveCMDB::Common::Broker;
 use ActiveCMDB::Common::Constants;
+use ActiveCMDB::Common::Device;
 use ActiveCMDB::Model::CMDBv1;
 use Data::Dumper;
 use Carp qw(cluck);
@@ -225,62 +226,8 @@ sub process_device
 	{
 		
 		Logger->info("Processing order ".$msg->cid . " device_id ". $msg->payload->{device}->{device_id});
+		$self->interrogate_device($msg->payload->{device}->{device_id});
 		
-		#
-		# Create default device object
-		#
-		my $device = Class::Device->new(device_id => $msg->payload->{device}->{device_id});
-		#
-		# Get device discovery data
-		#
-		$device->get_data();
-		$t1 = time();
-		$t2 = undef;
-		
-		#
-		# Update process data
-		#
-		$self->process->status(PROC_BUSY);
-		$self->process->action("Processing device " . $device->attr->hostname );
-		$self->process->update($self->process->process_name);
-		
-		if ( defined($device->attr->mgtaddress()) ) {
-			if ( $device->ping() ) 
-			{
-				Logger->debug("Device is reachable");
-				my $oid = $device->get_oid_by_name('sysObjectID') || cluck($!);
-				$res = $device->snmp_get($oid);
-				#print "::> ", $device->attr->sysobjectid,"\n";
-				if ( defined($res->{$oid}) && $res ne $device->attr->sysobjectid )
-				{
-					Logger->info("Setting sysObjectID to $res->{$oid}");
-					$device->attr->sysObjectID($res);
-				}
-				my $device_class = $self->get_class_by_oid($device->attr->sysobjectid);
-				if ( $device_class ne 'Class::Device' ) {
-					Logger->debug("Switch device class to $device_class");
-					#
-					# Create device specific object
-					#
-					$device = $device_class->new(device_id => $device->device_id);
-					$device->get_data();
-				}
-				$self->discover($device);
-				$t2 = time();
-				$device->attr->journal({ prio => 5, user => $self->process->process_name(), text => 'Discovery finished', date => DateTime->now()  });
-			} else {
-				Logger->warn("Device unreachable");
-			}
-		} else {
-			#
-			# Device cannot be discovered due to missing address
-			#
-			Logger->warn("Missing network address");
-		}
-		if ( defined($t2) )
-		{
-			$device->set_disco($t2 - $t1);
-		}
 	
 		#
 		# Acknowledge the order to the sender
@@ -294,6 +241,68 @@ sub process_device
 		$self->broker->sendframe($message);
 	} else {
 		Logger->warn("No device_id found in payload");
+	}
+}
+
+sub interrogate_device
+{
+	my($self, $device_id) = @_;
+	my($t1,$t2);
+	#
+	# Create default device object
+	#
+	my $device = Class::Device->new(device_id => $device_id);
+	#
+	# Get device discovery data
+	#
+	$device->get_data();
+	$t1 = time();
+	$t2 = undef;
+		
+	#
+	# Update process data
+	#
+	$self->process->status(PROC_BUSY);
+	$self->process->action("Processing device " . $device->attr->hostname );
+	$self->process->update($self->process->process_name);
+		
+	if ( defined($device->attr->mgtaddress()) ) {
+		if ( $device->ping() ) 
+		{
+			Logger->debug("Device is reachable");
+			my $oid = $device->get_oid_by_name('sysObjectID') || cluck($!);
+			my $res = $device->snmp_get($oid);
+			#print "::> ", $device->attr->sysobjectid,"\n";
+			if ( defined($res->{$oid}) && $res ne $device->attr->sysobjectid )
+			{
+				Logger->info("Setting sysObjectID to $res->{$oid}");
+				$device->attr->sysObjectID($res);
+			}
+			my $device_class = $self->get_class_by_oid($device->attr->sysobjectid);
+			if ( $device_class ne 'Class::Device' ) {
+				Logger->debug("Switch device class to $device_class");
+				#
+				# Create device specific object
+				#
+				$device = $device_class->new(device_id => $device->device_id);
+				$device->get_data();
+			}
+			$self->discover($device);
+			$t2 = time();
+			$device->attr->journal({ prio => 5, user => $self->process->process_name(), text => 'Discovery finished', date => DateTime->now()  });
+		} else {
+			Logger->warn("Device unreachable");
+		}
+	} else {
+		#
+		# Device cannot be discovered due to missing address
+		#
+		Logger->warn("Missing network address");
+	}
+	
+	if ( defined($t2) )
+	{
+		$device->set_disco($t2 - $t1);
 	}
 }
 
@@ -378,6 +387,17 @@ sub discover
 	Logger->info("Discovery finished for " . $device->attr->hostname);
 	$device->DESTROY;
 	
+}
+
+sub discover_device
+{
+	my($self, $hostname) = @_;
+	my($device);
+	
+	$device = cmdb_get_host_by_name($hostname);
+	if ( defined($device) ) {
+		$self->interrogate_device($device->device_id);
+	}
 }
 
 =head2 handle_signals

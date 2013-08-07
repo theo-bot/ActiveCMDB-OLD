@@ -55,6 +55,7 @@ our @ISA = ('Exporter');
 our @EXPORT = qw(
 	cmdb_get_host_by_ip
 	cmdb_gethostByAddr
+	cmdb_get_host_by_name
 	get_vlans_by_device
 	get_vrfs_by_device
 );
@@ -178,6 +179,35 @@ sub cmdb_gethostByAddr
 			$hostname = $row->get_column("hostname");
 			$device_id = $row->get_column("device_id");
 		}
+	}
+	
+	if ( defined($device_id) )
+	{
+		$device = ActiveCMDB::Object::Device->new(device_id => $device_id );
+		$device->get_data();
+	}
+	
+	return $device;
+}
+
+sub cmdb_get_host_by_name
+{
+	my($hostname) = @_;
+	my ($device_id,$device,$schema,$rs,$row);
+	
+	$device_id = undef;
+	$device    = undef;
+	
+	#
+	# Connect to database
+	#
+	$schema = ActiveCMDB::Model::CMDBv1->instance();
+	
+	$rs =$schema->resultset("IpDevice")->search({ hostname => $hostname });
+	if ( $rs->count > 0 )
+	{
+		$row = $rs->next;
+		$device_id = $row->device_id;
 	}
 	
 	if ( defined($device_id) )

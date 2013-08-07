@@ -50,11 +50,16 @@ END {
 # Process arguments
 #
 our $instance;
-my $result = GetOptions ("instance=i" => \$instance);
-if ( !defined($instance) ) {
+our $device;
+my $result = GetOptions (
+	"instance=i"	=> \$instance,
+	"disco=s"		=> \$device
+	);
+if ( !defined($instance)) {
 	Logger->warn("No instance defined");
 	exit 1;
 }
+
 $ENV{INSTANCE} = $instance;
 
 $discovery = ActiveCMDB::Tools::DiscoProcessor->new({ instance => $instance });
@@ -62,8 +67,12 @@ $discovery = ActiveCMDB::Tools::DiscoProcessor->new({ instance => $instance });
 # Initialize myself
 #
 $discovery->init({ instance => $instance});
-$discovery->processor();
-
+if ( !defined($device) )
+{
+	$discovery->processor();
+} else {
+	$discovery->discover_device($device);
+}
 Logger->info("Exitting");
 exit;
 
