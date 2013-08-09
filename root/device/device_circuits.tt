@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="/static/css/dtree.css" />
 <script src="/static/js/dtree.js"></script>
 <script src="/static/js/jquery.js"></script>
+<script src="/static/js/activecmdb.circuits.js"></script>
 <link rel="stylesheet" href="/static/css/main.css" />
 </head>
 <body>
@@ -19,6 +20,21 @@
 	<td>:</td>
 	<td id="circuitDesc"></td>
 </tr>
+<tr>
+	<td>Units</td>
+	<td>:</td>
+	<td id="cicuitUnits"></td>
+</tr>
+<tr>
+	<td>Min. speed</td>
+	<td>:</td>
+	<td id="circuitLow"></td>
+</tr>
+<tr>
+	<td>Max. speed</td>
+	<td>:</td>
+	<td id="circuitHigh"></td>
+</tr>
 </table>
 </div>
 
@@ -30,14 +46,13 @@
 	d = new dTree('d');
 	d.add(0,-1,'Circuits');
 	[% IF vlans.size > 0 %]
-	view = 'vlan';
 	d.add(1, 0, 'VLAN');  
-	[% FOREACH vlan IN vlans %][% tally = tally + 1 %]d.add([% tally %], 1,'[% vlan.value.name %]','javascript:xCircuitDetails([% device_id %],[% vlan.key %],view)','','','');
+	[% FOREACH vlan IN vlans %][% tally = tally + 1 %]d.add([% tally %], 1,'[% vlan.value.name %]','javascript:xCircuitDetails([% device_id %],[% vlan.key %],0)','','','');
 	[% END %][% END %]
 	
 	[% IF vrf.size > 0 %]
 	d.add(2,0, 'VRF');
-	[% FOREACH vrf IN vrfs %][% tally = tally + 1 %]d.add([% tally %], 2, '[% vrf.vrfname %]','javascript:xCircuitDetails([% device_id %],0,view)','','','');
+	[% FOREACH vrf IN vrfs %][% tally = tally + 1 %]d.add([% tally %], 2, '[% vrf.vrfname %]','javascript:xCircuitDetails([% device_id %],0,1)','','','');
 	[% END %][% END %]
 	
 	d.closeAll();

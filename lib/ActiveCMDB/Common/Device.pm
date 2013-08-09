@@ -232,13 +232,13 @@ sub get_vlans_by_device
 		#
 		$schema = ActiveCMDB::Model::CMDBv1->instance();
 	
-		$rs = $schema->resultset('IpDeviceIntVlan')->search(
+		$rs = $schema->resultset('IpDeviceVlan')->search(
 			{
 				device_id => $device_id
 			},
 			{
 				columns		=> [qw/vlan_id/],
-				distinct	=> 1
+				order_by	=> { -asc => 'vlan_id' }
 			}
 		);
 		

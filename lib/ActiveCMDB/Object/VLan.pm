@@ -102,4 +102,32 @@ sub save {
 	}
 }
 
+sub interfaces {
+	my($self) = @_;
+	my @interfaces = ();
+	
+	my $rs = $self->schema->resultset("IpDeviceIntVlan")->search(
+		{
+			device_id	=> $self->device_id,
+			vlan_id		=> $self->vlan_id
+		},
+		{
+			columns		=> [ qw/ifindex/ ],
+			order_by	=> 'ifindex'
+		}
+	);
+	
+	if ( defined($rs) )
+	{
+		while( my $row = $rs->next )
+		{
+			my $int = ActiveCMDB::Object::ifEntry->new(device_id => $self->device_id, ifindex => $row->ifindex );
+			$int->get_data();
+			push(@interfaces, $int);
+		}
+	}
+	
+	return @interfaces;
+}
+
 1;
