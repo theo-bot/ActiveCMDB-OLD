@@ -133,6 +133,8 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 1, size => 8 },
   "snmpv3_proto2",
   { data_type => "varchar", is_nullable => 1, size => 8 },
+  "snmp_port",
+  { data_type => "integer", is_nullable => 0, default_value => 161 },
 );
 
 =head1 PRIMARY KEY

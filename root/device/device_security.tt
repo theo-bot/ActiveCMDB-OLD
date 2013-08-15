@@ -54,6 +54,10 @@
 		<label for="number2"><input type="radio" value="3" name="snmpv" id="number2" class="cmdbRadio" [% IF device.snmpv > 1 %]CHECKED[% END %] onchange="snmpSelect();"> 3</label>
 	</td>
 </tr>
+<tr valign="top">
+	<td>SNMP Port</td>
+	<td><input type="text" name="snmp_port" class="cmdbText" size="6" value="[% device.snmp_port %]" /></td>
+</tr>
 </table>
 <div id="snmpv1">
 <table>

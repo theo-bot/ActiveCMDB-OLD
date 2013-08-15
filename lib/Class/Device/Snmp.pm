@@ -130,11 +130,13 @@ sub snmp_connect
 	{
 		my($result);
 		my $mgtaddr = $self->attr->mgtaddress;
+		my $port    = $self->attr->snmp_port;
 		my $snmpv   = $self->attr->snmpv;
 		
 		Logger->debug("Connecting to $mgtaddr with snmp $snmpv community $community");
 		my($session, $error) = Net::SNMP->session(
 									-hostname	=> $mgtaddr,
+									-port		=> $port,
 									-version	=> $snmpv,
 									-community	=> $community,
 									-translate	=> [ -timeticks => 0x0 ]

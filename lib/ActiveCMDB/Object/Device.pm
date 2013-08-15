@@ -86,6 +86,7 @@ has 'snmpv3_pass1'	=> (is => 'rw', isa => 'Str');
 has 'snmpv3_pass2'	=> (is => 'rw', isa => 'Str');
 has 'snmpv3_proto1'	=> (is => 'rw', isa => 'Proto1', default => 'md5');
 has 'snmpv3_proto2'	=> (is => 'rw', isa => 'Proto2', default => 'aes');
+has 'snmp_port'		=> (is => 'rw', isa => 'Int', default => 161);
 
 # Schema
 has 'schema'		=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Model::CMDBv1->instance() } );
