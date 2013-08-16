@@ -69,8 +69,10 @@ $discovery = ActiveCMDB::Tools::DiscoProcessor->new({ instance => $instance });
 $discovery->init({ instance => $instance});
 if ( !defined($device) )
 {
+	Logger->init("Entering main processing loop");
 	$discovery->processor();
 } else {
+	Logger->info("Start discovering $device");
 	$discovery->discover_device($device);
 }
 Logger->info("Exitting");

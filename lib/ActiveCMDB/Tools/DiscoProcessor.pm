@@ -397,6 +397,8 @@ sub discover_device
 	$device = cmdb_get_host_by_name($hostname);
 	if ( defined($device) ) {
 		$self->interrogate_device($device->device_id);
+	} else {
+		Logger->warn("Device not found.");
 	}
 }
 

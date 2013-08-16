@@ -208,12 +208,15 @@ sub cmdb_get_host_by_name
 	{
 		$row = $rs->next;
 		$device_id = $row->device_id;
+		Logger->debug("Found device_id " . $row->device_id );
 	}
 	
 	if ( defined($device_id) )
 	{
 		$device = ActiveCMDB::Object::Device->new(device_id => $device_id );
 		$device->get_data();
+	} else {
+		Logger->warn("Device ID not set.");
 	}
 	
 	return $device;
