@@ -104,7 +104,7 @@ sub save
 			$rs->insert;
 		}
 	} catch {
-		Logger->warn("Failed to save arp entry");
+		Logger->warn("Failed to save arp entry :" . $_);
 	};
 	
 	
