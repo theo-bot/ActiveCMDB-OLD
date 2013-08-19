@@ -195,13 +195,21 @@ sub fetch_device :Local {
 			$json->{$attr} = $device->$attr();
 		}
 		
-		$type = ActiveCMDB::Object::IpType->new(sysobjectid => $device->sysobjectid);
-		$type->find();
-		$json->{descr} = $type->descr;
+		if ( defined($device->sysobjectid) ) {
+			$type = ActiveCMDB::Object::IpType->new(sysobjectid => $device->sysobjectid);
+			$type->find();
+			$json->{descr} = $type->descr;
+			$vendor = ActiveCMDB::Object::Vendor->new({ id => $type->vendor_id});
+			$vendor->find();
+			$json->{vendor} = $vendor->name;
+		} else {
+			$json->{vendor} = '';
+			$json->{descr} = '';
+		}
 		
-		$vendor = ActiveCMDB::Object::Vendor->new({ id => $type->vendor_id});
-		$vendor->find();
-		$json->{vendor} = $vendor->name;
+		
+		
+		
 		my $dt = DateTime->from_epoch( epoch => $device->disco);
 		$json->{disco} = $dt->ymd . ' ' . $dt->hms;
 		$json->{added} = sprintf("%s",$device->added);
@@ -212,7 +220,7 @@ sub fetch_device :Local {
 			$c->log->debug("Truncating description");
 			$json->{descr_tr} = substr($device->sysdescr(),0,57) . '...';
 		} else {
-			$json->{descr_tr} = $type->sysdescr();
+			if ( defined($type) ) { $json->{descr_tr} = $type->sysdescr(); }
 		}
 		$json->{sysdescr} = $device->sysdescr();
  		$json->{descr_tr} =~ s/\r//g;
@@ -222,6 +230,41 @@ sub fetch_device :Local {
 	
 	$c->stash->{json} = $json;
 	$c->forward( $c->view('JSON') );
+}
+
+sub save_device :Local {
+	my($self, $c) = @_;
+	my($device, $device_id);
+	
+	$device_id = int($c->request->params->{device_id});
+	
+	if ( $device_id > 0 )
+	{
+		$device = ActiveCMDB::Object::Device->new(device_id => $device_id );
+		$device->get_data();
+	} else {
+		$device = ActiveCMDB::Object::Device->new();
+	}
+	
+	foreach my $param (qw/hostname mgtaddress/)
+	{
+		if ( defined($c->request->params->{$param}) && $c->request->params->{$param} )
+		{
+			$device->$param($c->request->params->{$param});
+		} 
+	}
+	$device->status( $c->request->params->{status} );
+	
+	if ( defined($c->request->params->{isCritical}) && $c->request->params->{isCritical} == 1 )
+	{
+		$device->is_critical(1);
+	} else {
+		$device->is_critical(0);
+	}
+	
+	if ( defined($device->mgtaddress) ) {
+		$device->save();
+	}
 }
 
 sub interface :Local {
