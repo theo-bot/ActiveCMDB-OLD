@@ -1,0 +1,17 @@
+class "CiscoRouter" {
+	
+	super 'Cisco';
+	version '1.0';
+	enabled 1;
+	
+	interrogations {
+					vmVlan	  4;
+					mplsVpn   4;
+				};
+	
+	oidset [
+				'1.3.6.1.4.1.9.1.1041'
+			];
+			
+	networkType 0;
+};

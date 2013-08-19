@@ -21,9 +21,9 @@
 	<td id="circuitDesc"></td>
 </tr>
 <tr>
-	<td>Units</td>
-	<td>:</td>
-	<td id="cicuitUnits"></td>
+	<td valign="top">Units</td>
+	<td valign="top">:</td>
+	<td id="cicuitUnits" width="320"></td>
 </tr>
 <tr>
 	<td>Min. speed</td>
@@ -43,20 +43,20 @@
 <!--
 	[% tally = 128 %]
 	var view = '';
-	d = new dTree('d');
-	d.add(0,-1,'Circuits');
+	d1 = new dTree('d1');
+	d1.add(0,-1,'Circuits');
 	[% IF vlans.size > 0 %]
-	d.add(1, 0, 'VLAN');  
-	[% FOREACH vlan IN vlans %][% tally = tally + 1 %]d.add([% tally %], 1,'[% vlan.value.name %]','javascript:xCircuitDetails([% device_id %],[% vlan.key %],0)','','','');
+	d1.add(1, 0, 'VLAN');  
+	[% FOREACH vlan IN vlans %][% tally = tally + 1 %]d1.add([% tally %], 1,'[% vlan.value.name %]','javascript:xCircuitDetails([% device_id %],[% vlan.key %],0)','','','');
 	[% END %][% END %]
 	
-	[% IF vrf.size > 0 %]
-	d.add(2,0, 'VRF');
-	[% FOREACH vrf IN vrfs %][% tally = tally + 1 %]d.add([% tally %], 2, '[% vrf.vrfname %]','javascript:xCircuitDetails([% device_id %],0,1)','','','');
+	[% IF vrfs.size > 0 %]
+	d1.add(2,0, 'VRF');
+	[% FOREACH vrf IN vrfs %][% tally = tally + 1 %]d1.add([% tally %], 2, '[% vrf.value.vrf_name %]','javascript:xCircuitDetails([% device_id %],\'[% vrf.value.vrf_rd %]\',1)','','','');
 	[% END %][% END %]
 	
-	d.closeAll();
-	document.getElementById('cirtree').innerHTML = d;
+	d1.closeAll();
+	document.getElementById('cirtree').innerHTML = d1;
 	$('#cirtree a').each(function() {
 		$(this).attr('style', 'color:black');
 	});

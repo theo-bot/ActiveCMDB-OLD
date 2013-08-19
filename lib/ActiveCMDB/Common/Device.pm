@@ -281,7 +281,7 @@ sub get_vrfs_by_device
 				device_id => $device_id
 			},
 			{
-				columns		=> [qw/vrf_rd/],
+				columns		=> [qw/vrf_rd vrf_name/],
 				distinct	=> 1
 			}
 		);

@@ -72,7 +72,8 @@ use ActiveCMDB::Object::ifEntry;
 use ActiveCMDB::Object::entPhysicalEntry;
 use ActiveCMDB::Object::Location;
 use ActiveCMDB::Object::Contract;
-use ActiveCMDB::Object::VLan;
+use ActiveCMDB::Object::Circuit::VLan;
+use ActiveCMDB::Object::Circuit::MplsVpn;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -766,7 +767,7 @@ sub fetch_circuit :Local {
 	#$c->log->debug("Fetcing data for $device_id :: $index");
 	if ( $type == 0 )
 	{
-		$circuit = ActiveCMDB::Object::VLan->new(device_id => $device_id, vlan_id => $circuit_id);
+		$circuit = ActiveCMDB::Object::Circuit::VLan->new(device_id => $device_id, vlan_id => $circuit_id);
 		$circuit->get_data();
 		
 		$json->{circuitName} = 'Vlan ' . $circuit_id;
@@ -790,8 +791,32 @@ sub fetch_circuit :Local {
 		}
 		$json->{cicuitUnits} = join(',', @interfaces);
 	}
-	
-	
+	if ( $type == 1 )
+	{
+		$circuit = ActiveCMDB::Object::Circuit::MplsVpn->new(device_id => $device_id, rd => $circuit_id);
+		$circuit->get_data();
+		
+		$json->{circuitName} = $circuit->rd;
+		$json->{circuitDesc} = $circuit->name;
+		$json->{circuitLow}  = 0;
+		$json->{circuitHigh} = 0;
+		my @interfaces = ();
+		
+		foreach my $int ($circuit->interfaces())
+		{
+			if ( $int->ifspeed < $json->{Low} || $json->{Low} == 0 )
+			{
+				$json->{Low} = $int->ifspeed;
+				$json->{circuitLow} = $int->ifspeedstr();
+			}
+			if ( $int->ifspeed > $json->{High}) {
+				$json->{High} = $int->ifspeed;
+				$json->{circuitHigh} = $int->ifspeedstr();
+			}
+			push(@interfaces, $int->ifname() );
+		}
+		$json->{cicuitUnits} = join(',', @interfaces);
+	}
 	
 	$c->stash->{json} = $json;
 	$c->forward( $c->view('JSON') );

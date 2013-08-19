@@ -1,5 +1,5 @@
 use utf8;
-package ActiveCMDB::Schema::Result::IpDeviceVrf;
+package ActiveCMDB::Schema::Result::IpDeviceIntVrf;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
@@ -38,7 +38,7 @@ __PACKAGE__->load_components("InflateColumn::DateTime", "TimeStamp", "EncodedCol
 
 =cut
 
-__PACKAGE__->table("ip_device_vrf");
+__PACKAGE__->table("ip_device_int_vrf");
 
 =head1 ACCESSORS
 
@@ -48,18 +48,17 @@ __PACKAGE__->table("ip_device_vrf");
   is_foreign_key: 1
   is_nullable: 0
 
+=head2 ifindex
+
+  data_type: 'integer'
+  is_foreign_key: 1
+  is_nullable: 0
 
 =head2 vrf_rd
 
   data_type: 'varchar'
   is_nullable: 0
   size: 45
-
-=head2 vrf_name
-
-  data_type: 'varchar'
-  is_nullable: 0
-  size: 256
 
 =head2 disco
 
@@ -71,12 +70,10 @@ __PACKAGE__->table("ip_device_vrf");
 __PACKAGE__->add_columns(
   "device_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  "ifIndex",
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "vrf_rd",
   { data_type => "varchar", is_nullable => 0, size => 45 },
-  "vrf_name",
-  { data_type => "varchar", is_nullable => 0, size => 256 },
-  "vrf_status",
-  { data_type => "integer", is_nullable => 0 },
   "disco",
   { data_type => "integer", is_nullable => 1  },
 );
@@ -95,7 +92,7 @@ __PACKAGE__->add_columns(
 
 =cut
 
-__PACKAGE__->set_primary_key("device_id", "vrf_rd");
+__PACKAGE__->set_primary_key("device_id", "ifIndex", "vrf_rd");
 
 =head1 RELATIONS
 
@@ -110,12 +107,17 @@ Related object: L<ActiveCMDB::Schema::Result::IpDeviceInt>
 __PACKAGE__->belongs_to(
   "ip_device_int",
   "ActiveCMDB::Schema::Result::IpDeviceInt",
-  { device_id => "device_id" },
+  { device_id => "device_id", ifindex => "ifindex" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
 
-
+__PACKAGE__->belongs_to(
+  "ip_device_vrf",
+  "ActiveCMDB::Schema::Result::IpDeviceVrf",
+  { device_id => "device_id", ifindex => "vrf_rd" },
+  { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
+);
 
 # Created by DBIx::Class::Schema::Loader v0.07025 @ 2012-10-30 14:31:29
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:sxuNiVtTZ+3389Uou7zrzA
