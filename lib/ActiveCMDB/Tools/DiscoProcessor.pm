@@ -272,11 +272,12 @@ sub interrogate_device
 			Logger->debug("Device is reachable");
 			my $oid = $device->get_oid_by_name('sysObjectID') || cluck($!);
 			my $res = $device->snmp_get($oid);
+			Logger->debug(Dumper($res));
 			#print "::> ", $device->attr->sysobjectid,"\n";
-			if ( defined($res->{$oid}) && $res ne $device->attr->sysobjectid )
+			if ( defined($res) && $res ne $device->attr->sysobjectid )
 			{
 				Logger->info("Setting sysObjectID to $res->{$oid}");
-				$device->attr->sysObjectID($res);
+				$device->attr->sysobjectid($res);
 			}
 			my $device_class = $self->get_class_by_oid($device->attr->sysobjectid);
 			if ( $device_class ne 'Class::Device' ) {
