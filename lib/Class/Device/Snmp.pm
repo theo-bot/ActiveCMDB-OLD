@@ -37,6 +37,7 @@ package Class::Device::Snmp;
 
 use Moose::Role;
 use Net::SNMP;
+use Data::Dumper;
 use ActiveCMDB::Common::Constants;
 
 sub snmp_get
@@ -52,7 +53,9 @@ sub snmp_get
 		Logger->debug("Requesting oid $oid");
 		$result = $self->comms->get_request($oid);
 		if ( defined($result) ) {
-			Logger->debug("Request complete");
+			Logger->debug(Dumper($result));
+			Logger->debug("Request ($oid) complete :" . $result->{$oid});
+			#if ( $oid =~ /1\.3\.6.\.1\.3/ ) { exit; }
 			return $result->{$oid};
 		} else {
 			Logger->warn("Request failed");
