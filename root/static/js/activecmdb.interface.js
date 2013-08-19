@@ -42,6 +42,7 @@ function xInterfaceDetails(device_id,ifindex)
 			$( "#ifSpeed").text(data.ifspeed);
 			$( "#ifType" ).text(data.iftype);
 			$( "#ifPhysAddress").text(data.ifphysaddress);
+			$( '#ifNetworks').text(data.networks);
 			document.getElementById('ifDetail').style.visibility = 'visible';
 		}
 	});

@@ -86,6 +86,11 @@
 	<td>:</td>
 	<td id="ifPhysAddress"></td>
 </tr>
+<tr>
+	<td class="cmdb_int">networks</td>
+	<td>:</td>
+	<td id="ifNetworks"></td>
+</tr>
 </table>
 
 

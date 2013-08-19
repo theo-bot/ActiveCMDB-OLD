@@ -46,6 +46,7 @@ use Exporter;
 use Data::Dumper;
 use Logger;
 use ActiveCMDB::Model::CMDBv1;
+use ActiveCMDB::Object::ipAdEntry;
 use Try::Tiny;
 use strict;
 use Socket;
@@ -58,6 +59,7 @@ our @EXPORT = qw(
 	cmdb_get_host_by_name
 	get_vlans_by_device
 	get_vrfs_by_device
+	get_networks_by_interface
 );
 
 =head1 FUNCTIONS
@@ -303,4 +305,41 @@ sub get_vrfs_by_device
 	}
 	
 	return $vrfs
+}
+
+sub get_networks_by_interface
+{
+	my($device_id, $ifindex) = @_;
+	my @nets = ();
+	
+	if ( defined($device_id) && defined($ifindex) )
+	{
+		my($schema,$rs,$row);
+		#
+		# Connect to database
+		#
+		$schema = ActiveCMDB::Model::CMDBv1->instance();
+		
+		$rs = $schema->resultset("IpDeviceNet")->search(
+			{
+				device_id		=> $device_id,
+				ipadentifindex	=> $ifindex
+			}, 
+			{
+				columns			=> 'ipadentaddr'
+			}
+		);
+		
+		if ( defined($rs) )
+		{
+			while( $row = $rs->next )
+			{
+				my $net = ActiveCMDB::Object::ipAdEntry->new(device_id => $device_id, ipadentaddr => $row->ipadentaddr );
+				$net->get_data();
+				push(@nets, $net);
+			}
+		}
+	}
+	
+	return @nets
 }

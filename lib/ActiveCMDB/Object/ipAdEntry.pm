@@ -74,7 +74,9 @@ sub get_data
 		{
 			my $attr = $key->name;
 			next if ($attr =~ /schema/ );
-			$self->$attr($rs->$attr);
+			if ( $rs->can($attr) && $self->meta->get_attribute( $attr )->get_write_method() ) {
+				$self->$attr($rs->$attr);
+			}
 		}
 	}
 	

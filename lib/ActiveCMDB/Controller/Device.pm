@@ -332,6 +332,16 @@ sub fetch_interface :Local {
 		$json->{iftype} = "";
 	}
 	$json->{ifspeed} = $int->ifspeedstr();
+	
+	my $item = 0;
+	$json->{networks} = '';
+	foreach my $net (get_networks_by_interface($device_id, $ifindex))
+	{
+		if ( $item > 0 ) { $json->{networks} .= "\n"; }
+		$json->{networks} .= $net->ipadentaddr . '/' . $net->ipadentprefix;
+		$item++;
+	}
+	
 	$c->stash->{json} = $json;
 	$c->forward( $c->view('JSON') );
 }
