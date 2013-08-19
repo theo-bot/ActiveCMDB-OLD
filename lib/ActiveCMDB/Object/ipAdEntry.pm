@@ -50,7 +50,12 @@ has 'ipadentprefix'		=> (is => 'rw', isa => 'Int');
 has 'iptype'				=> (is => 'rw', isa => 'IpType', default => 0);
 has 'disco'				=> (is => 'rw', isa => 'Int');
 
-has 'schema'			=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}) } );
+# Schema
+has 'schema'		=> (
+	is		=> 'rw', 
+	isa		=> 'Object', 
+	default => sub { ActiveCMDB::Model::CMDBv1->instance() } 
+);
 
 sub get_data
 {
