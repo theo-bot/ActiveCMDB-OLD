@@ -40,6 +40,7 @@ package ActiveCMDB::Object::Device;
 use Moose;
 use Moose::Util::TypeConstraints;
 use Try::Tiny;
+use Data::Dumper;
 use DateTime;
 use Logger;
 use ActiveCMDB::Common::Constants;
@@ -56,10 +57,10 @@ enum 'Proto2'  => ('des', 'aes');
 #
 # Define attributes
 #
-has 'device_id'		=> (is => 'ro', isa => 'Int');
+has 'device_id'		=> (is => 'rw', isa => 'Int');
 has 'hostname'		=> (is => 'rw',	isa => 'Str');
 has 'mgtaddress'	=> (is => 'rw', isa => 'Str');
-has 'sysobjectid'	=> (is => 'rw',	isa => 'Str');
+has 'sysobjectid'	=> (is => 'rw',	isa => 'Maybe[Str]');
 has 'disco'			=> (is => 'rw', isa => 'Str');
 has 'sysuptime'		=> (is => 'rw', isa => 'Int');
 has 'sysdescr'		=> (is => 'rw', isa => 'Str');
@@ -170,6 +171,15 @@ sub save {
 	my($rs, $data, $attr);
 	
 	#
+	# Verify if the hostname was set and if it is a new device
+	#
+	if ( (defined($self->device_id) || $self->device_id == 0) && !defined($self->hostname) ) {
+		my $h = sprintf("NEW%08d", int(rand(99999999)));
+		$self->hostname($h);
+		$self->added( DateTime->now() );
+	}
+	
+	#
 	# Save ip_device table data, which is in IpDevice
 	#
 	@colums = $self->schema->source("IpDevice")->columns;
@@ -187,6 +197,14 @@ sub save {
 		if ( ! $rs->in_storage ) {
 			$rs->insert;
 		}
+		if ( ! defined($self->device_id) || $self->device_id == 0 ) {
+			
+			Logger->debug("Found row " . $rs->device_id);
+			if ( $rs->device_id ) {
+				$self->device_id($rs->device_id);
+			}
+			
+ 		}
 	
 		# Next save the security attributes to IpDeviceSec 
 		@colums = $self->schema->source("IpDeviceSec")->columns;
@@ -202,6 +220,7 @@ sub save {
 		if ( ! $rs->in_storage ) {
 			$rs->insert;
 		}
+		
 		
 		return true;
 		
