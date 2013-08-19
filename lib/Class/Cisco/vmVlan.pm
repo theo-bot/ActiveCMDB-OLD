@@ -154,7 +154,7 @@ sub save_vmVlan
 		#
 		foreach $vlan_id (keys %{$data->{vlan}})
 		{
-			$vlan = ActiveCMDB::Object::VLan->new(device_id => $self->attr->device_id, vlan_id => $vlan_id);
+			$vlan = ActiveCMDB::Object::Circuit::VLan->new(device_id => $self->attr->device_id, vlan_id => $vlan_id);
 			$vlan->get_data();
 			$vlan->name( $data->{vlan}->{$vlan_id}->{name} );
 			$vlan->status( $data->{vlan}->{$vlan_id}->{state} );
