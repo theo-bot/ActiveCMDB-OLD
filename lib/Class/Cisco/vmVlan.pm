@@ -39,8 +39,8 @@ use Try::Tiny;
 use Logger;
 use ActiveCMDB::Common::Constants;
 use ActiveCMDB::Common::Conversion;
-use ActiveCMDB::Object::VLan;
-use ActiveCMDB::Object::VLan::Interface;
+use ActiveCMDB::Object::Circuit::VLan;
+use ActiveCMDB::Object::Circuit::VLan::Interface;
 use ActiveCMDB::Object::ifEntry;
 use Data::Dumper;
 
@@ -48,7 +48,6 @@ my %vars = (
 				'vlanTrunkPortDynamicStatus'	=> 1,
 				'vmVlan'						=> 1,
 			);
-
 
 =item discover_vmvlan
 
