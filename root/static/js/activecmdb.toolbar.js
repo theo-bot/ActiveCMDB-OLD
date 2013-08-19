@@ -52,6 +52,9 @@ toolbar.attachEvent("onClick",function(id){
 		case "fetchDevice":
 			fetch_device( $("#hostname").val() );
 			break;
+		case "newDevice":
+			new_device();
+			break;
 		case "searchDevice":
 			$( "#searchWin").dialog( "open" );
 			break;
@@ -86,6 +89,41 @@ function fetchconfig_device(hostname)
 		data: 'hostname=' + hostname,
 		datatype: 'json'
 	});
+}
+
+function new_device()
+{
+	var empty = '';
+	$("#device_id").val(empty);
+	$("#hostname").val(empty);
+	$("#mgtaddress").val(empty);
+	$("#devtype").text(empty)
+	$("#vendor").text(empty);
+	$("#disco").text(empty);
+	$("#added").text(empty);
+	$("#sysdescr").text(empty);
+	$("#isCritical").attr('checked', false);
+	var taburl = {
+			'devint': 'interface',
+			'devent': 'structure',
+			'devcon': 'connections',
+			'devloc': 'site',
+			'devctr': 'contract',
+			'devsec': 'security',
+			'devmnt': 'maintenance',
+			'devjnl': 'journal',
+			'devcfg': 'devconfig',
+			'devcir': 'circuits'
+	};
+	for (tab in taburl)
+	{
+		/* alert(tab + ' => ' + taburl[tab]); */
+		var t = '#' + tab;
+		var u = '/device/' + taburl[tab] + '?id=0';
+		$( t ).attr('href', u);
+	}
+	$("#tabs").tabs({active: 0});
+	$("#mgtaddress").focus();
 }
 
 function fetch_device(hostname)
@@ -138,6 +176,13 @@ function save_device()
 	
 	var data = $("#deviceForm").serialize();
 	
-	
+	$.post(
+			'/device/save_device',
+			data,
+			function(data) {
+				$('#response').html(data).show().delay(5000).hide('slow');
+			},
+			'html'
+		);
 	
 }
