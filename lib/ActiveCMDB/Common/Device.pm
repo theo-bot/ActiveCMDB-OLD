@@ -288,6 +288,7 @@ sub get_vrfs_by_device
 		
 		if ( defined($rs) ) 
 		{
+			Logger->info("Found " . $rs->count . " vpns for device");
 			while ( $row = $rs->next )
 			{
 				$vrfs->{$row->vrf_rd}->{vrf_name} = $row->vrf_name;
