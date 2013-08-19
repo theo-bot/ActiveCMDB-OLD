@@ -1,6 +1,6 @@
-package ActiveCMDB::Object::VLan;
+package ActiveCMDB::Object::Circuit::VLan;
 
-=head1 MODULE - ActiveCMDB::Object::VLan.pm
+=head1 MODULE - ActiveCMDB::Object::Circuit::VLan.pm
     ___________________________________________________________________________
 
 =head1 VERSION
@@ -79,7 +79,9 @@ sub get_data
 			foreach my $key (keys %mapper)
 			{
 				my $attr = $mapper{$key};
-				if ( $row->can($attr) ) { $self->$key($row->$attr) }
+				if ( $self->meta->get_attribute( $key )->get_write_method() ) {
+					if ( $row->can($attr) ) { $self->$key($row->$attr) }
+				}
 			}
 		}
 	}
@@ -99,7 +101,7 @@ sub save {
 		}
 	} catch {
 		Logger->warn("Failed to save vlan: " . $_ );
-	}
+	};
 }
 
 sub interfaces {
