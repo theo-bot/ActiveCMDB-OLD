@@ -365,6 +365,24 @@ sub configs {
 	return @cfgdata;
 }
 
+sub delete
+{
+	my($self) = @_;
+	
+	if ( defined($self->device_id) && $self->device_id > 0 )
+	{
+		my $row = $self->schema->resultset("IpDevice")->find(
+				{
+					device_id	=> $self->device_id
+				}
+		);
+		
+		if ( defined($row) && $row->device_id == $self->device_id )
+		{
+			$row->delete();
+		}
+	}
+}
 __PACKAGE__->meta->make_immutable;
 
 1;
