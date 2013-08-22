@@ -832,4 +832,40 @@ sub fetch_circuit :Local {
 	$c->forward( $c->view('JSON') );
 }
 
+sub delete_device :Local {
+	my($self, $c) = @_;
+	
+	my $device_id  = $c->request->params->{device_id};
+	my $device = ActiveCMDB::Object::Device->new(device_id => $device_id);
+	$device->get_data();
+	# The device should not be deleted from the database, rather is should be
+	# marked for deletion and the distribution server should be signalled
+	#
+	$c->log->info("Setting device status to 3");
+	$device->status(3);
+	$device->save();
+	
+	my $p = { 
+		device => {  
+			device_id  => $device_id,
+			hostname   => $device->hostname,
+			mgtaddress => $device->mgtaddress
+		},
+		user => $c->user->get('username')
+		
+	};
+	my $broker = ActiveCMDB::Common::Broker->new( $config->section('cmdb::broker') );
+	$broker->init({ process => 'web'.$$ , subscribe => false });
+	my $message = ActiveCMDB::Object::Message->new();
+	$message->from('web'.$$ );
+	$message->subject('DeleteDevice');
+	$message->to($config->section("cmdb::process::object::exchange"));
+	$message->payload($p);
+	$c->log->debug("Sending message to " . $message->to );
+	$broker->sendframe($message,{ priority => PRIO_HIGH } );
+	
+	$c->response->body("Failed to update device parameters");
+	$c->response->status(200);
+}
+
 1;

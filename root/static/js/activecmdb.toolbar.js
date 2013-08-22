@@ -67,6 +67,9 @@ toolbar.attachEvent("onClick",function(id){
 		case "saveDevice":
 			save_device();
 			break;
+		case "delDevice":
+			delete_device();
+			break;
 		default:
 			alert("Unknown action :" + id);
 	}
@@ -146,6 +149,9 @@ function fetch_device(hostname)
 			} else {
 				$("#isCritical").attr('checked', false);
 			}
+			
+			$("option[value='3']").attr('selected','selected');
+			
 			var taburl = {
 					'devint': 'interface',
 					'devent': 'structure',
@@ -172,7 +178,7 @@ function fetch_device(hostname)
 
 function save_device()
 {
-	var check = $
+	/* var check = $ */
 	
 	var data = $("#deviceForm").serialize();
 	
@@ -185,4 +191,18 @@ function save_device()
 			'html'
 		);
 	
+}
+
+function delete_device()
+{
+	var data = $("#deviceForm").serialize();
+	
+	$.post(
+			'/device/delete_device',
+			data,
+			function(data) {
+				$("#response").html(data).show().deleay(5000).hide('slow');
+			},
+			'html'
+	);
 }

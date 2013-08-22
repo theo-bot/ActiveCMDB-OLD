@@ -170,6 +170,7 @@ sub save {
 	my @colums = ();
 	my($rs, $data, $attr);
 	
+	Logger->debug("Saving device_id" . $self->device_id );
 	#
 	# Verify if the hostname was set and if it is a new device
 	#
@@ -193,6 +194,7 @@ sub save {
 	}
 	
 	try {
+		Logger->debug(Dumper($data));
 		$rs = $self->schema->resultset("IpDevice")->update_or_create( $data );
 		if ( ! $rs->in_storage ) {
 			$rs->insert;
@@ -379,6 +381,7 @@ sub delete
 		
 		if ( defined($row) && $row->device_id == $self->device_id )
 		{
+			Logger->info("Delete device " . $row->hostname);
 			$row->delete();
 		}
 	}
