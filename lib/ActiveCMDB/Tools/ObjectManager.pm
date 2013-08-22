@@ -54,6 +54,7 @@ use ActiveCMDB::Schema;
 use ActiveCMDB::Object::Maintenance;
 use ActiveCMDB::Object::Process;
 use ActiveCMDB::Object::Device;
+use ActiveCMDB::Object::User;
 use ActiveCMDB::Common::Crypto;
 use ActiveCMDB::Object::Endpoint;
 
@@ -183,7 +184,14 @@ sub manage {
 		if ( $msg ) {
 			switch ( $msg->subject )
 			{
-				case 'ProcessDevice'			{ $self->process_device($msg->payload) }
+				case 'ProcessDevice'			{ 
+												  $self->process_device({	device_id	=> $msg->payload->{device}->{device_id},
+												  							dest		=> [ split(/\,/, $self->config->section("cmdb::process::object::follow_up")) ],
+												  							priority	=> PRIO_NORMAL
+												  					
+												  						}) 
+											    }
+				case 'DeleteDevice'				{ $self->delete_device($msg)  }
 				case 'AckProcessDevice'			{ $self->ack_order($msg) }
 				case 'Shutdown'					{ $self->running(PROC_SHUTDOWN) }
 				case 'DiscoverDevice'			{ 
@@ -323,8 +331,9 @@ sub process_devices
 		my $device = ActiveCMDB::Object::Device->new( device_id => $row->device_id  );
 		$device->get_data();
 		$self->process_device({
-					device	=> $device,
-					dest	=> [ split(/\,/, $self->config->section("cmdb::process::object::follow_up")) ]
+					device		=> $device,
+					dest		=> [ split(/\,/, $self->config->section("cmdb::process::object::follow_up")) ],
+					priority	=> PRIO_NORMAL
 				});
 	}
 	Logger->info("Done fetching");
@@ -368,14 +377,18 @@ sub ack_order
 sub process_device
 {
 	my($self, $args) = @_;
-	my($message, $p);
+	my($message, $p, $device);
 	
+	Logger->debug(Dumper($args));
 	$message = ActiveCMDB::Object::Message->new();
 	$message->from($self->process->name);
 	$message->reply_to($self->config->section("cmdb::broker::prefix") . $self->process->process_name );
 	$message->subject('ProcessDevice');
 	
-	$self->store_object('device', $args->{device});
+	$device = ActiveCMDB::Object::Device->new(device_id => $args->{device_id});
+	$device->get_data();
+	
+	$self->store_object('device', $device);
 	$self->store_object('message', $message);
 	
 	
@@ -384,12 +397,15 @@ sub process_device
 		Logger->debug("Sending message to $dest");
 		my $ep = ActiveCMDB::Object::Endpoint->new( name => $dest );
 		$ep->get_data();
+		if ( defined($ep->dest_in) ) {
+			$dest = $ep->dest_in;
+		}
 		
 		$p = undef;
-		$p->{device}->{device_id } = $args->{device}->{device_id};
+		$p->{device}->{device_id} = $args->{device_id};
 		
 		$message->payload( $p );
-		$message->to( $ep->dest_in() );
+		$message->to( $dest );
 		$message->cid($self->uuid());
 		$self->broker->sendframe($message, $args);
 		$self->create_order($message, $dest);
@@ -397,7 +413,50 @@ sub process_device
 	
 }
 
+=item delete_device
 
+=cut
+
+sub delete_device
+{
+	my($self, $msg) = @_;
+	
+	if ( defined($msg->payload->{user}) )
+	{
+		Logger->info("User " . $msg->payload->{user} . " requested to delete " . $msg->payload->{device}->{hostname} );
+		my $user = ActiveCMDB::Object::User->new(username => $msg->payload->{user});
+		$user->get_data();
+		
+		my $device = ActiveCMDB::Object::Device->new(device_id => $msg->payload->{device}->{device_id});
+		$device->get_data();
+			
+		if ( $user->has_role('deviceAdmin') )
+		{
+			if ( $device->status == 3 )
+			{
+				my $ep = ActiveCMDB::Object::Endpoint->new( name => 'cmdbDistrib' );
+				$ep->get_data();
+	
+				my $p = $msg->payload;
+				my $message = ActiveCMDB::Object::Message->new();
+				$message->from($self->process->name);
+				$message->subject($msg->subject);
+				$message->payload($p);
+				$message->to( $ep->dest_in() );
+				$self->broker->sendframe($message);
+			
+				# Now we delete the device
+				$device->delete();
+			} else {
+				Logger->warn("Attempt to delete device with invalid status (!=3)");
+			}
+		} else {
+			Logger->warn("Unprivileged user attempted to delete device " . $msg->payload->{hostname});
+		}
+	} else {
+		Logger->warn("Attempt to delete device without user");
+	}
+}
 
 sub create_order
 {
