@@ -27,20 +27,54 @@
  *
  */
 
-function xCircuitDetails(device_id,circuit, type)
+function xCircuitDetails(type, device_id,circuit, ifindex)
 {
 	$.ajax({
 		url: '/device/fetch_circuit',
-		data: 'device_id=' + device_id + '&circuit=' + circuit + '&type=' + type,
+		data: 'device_id=' + device_id + '&circuit=' + circuit + '&type=' + type + '&ifindex=' + ifindex,
 		datatype: 'json',
 		success: function(data) {
+			showCircuitDetails(type, data);
+		}
+	});
+}
+
+function showCircuitDetails(type, data)
+{
+	switch(type)
+	{
+		case 0: 
+			$( "#dName").text("Name");
+			$( "#dMinSpeed" ).text("Min. speed");
+			$( "#dMaxSpeed" ).text("Max. speed");
 			$( "#circuitName" ).text(data.circuitName);
 			$( "#circuitDesc" ).text(data.circuitDesc);
 			$( "#cicuitUnits" ).text(data.cicuitUnits);
 			$( "#circuitLow" ).text(data.circuitLow);
 			$( "#circuitHigh").text(data.circuitHigh);
-			
-			document.getElementById('circuitDetail').style.visibility = 'visible';
-		}
-	});
+			break;
+		case 1:
+			$( "#dName").text("Name");
+			$( "#dMinSpeed" ).text("Min. speed");
+			$( "#dMaxSpeed" ).text("Max. speed");
+			$( "#circuitName" ).text(data.circuitName);
+			$( "#circuitDesc" ).text(data.circuitDesc);
+			$( "#cicuitUnits" ).text(data.cicuitUnits);
+			$( "#circuitLow" ).text(data.circuitLow);
+			$( "#circuitHigh").text(data.circuitHigh);
+			break;
+		case 2:
+			$( "#dName").text("DLCI");
+			$( "#dMinSpeed" ).text("CIR");
+			$( "#dMaxSpeed" ).text("Burst rate");
+			$( "#circuitName" ).text(data.circuitName);
+			$( "#circuitDesc" ).text(data.circuitDesc);
+			$( "#cicuitUnits" ).text(data.cicuitUnits);
+			$( "#circuitLow" ).text(data.circuitLow);
+			$( "#circuitHigh").text(data.circuitHigh);
+			break;
+		default:
+			alert("Unknown type exception");
+	}
+	document.getElementById('circuitDetail').style.visibility = 'visible';
 }

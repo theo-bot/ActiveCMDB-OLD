@@ -60,6 +60,7 @@ our @EXPORT = qw(
 	get_vlans_by_device
 	get_vrfs_by_device
 	get_networks_by_interface
+	get_dlci_by_device
 );
 
 =head1 FUNCTIONS
@@ -305,6 +306,45 @@ sub get_vrfs_by_device
 	}
 	
 	return $vrfs
+}
+
+sub get_dlci_by_device
+{
+	my($device_id) = @_;
+	my $circuits = undef;
+	if ( defined($device_id) && $device_id > 0 )
+	{
+		my($schema,$rs,$row);
+		#
+		# Connect to database
+		#
+		$schema = ActiveCMDB::Model::CMDBv1->instance();
+		
+		$rs = $schema->resultset("IpDeviceIntDlci")->search(
+				{
+					device_id => $device_id
+				},
+				{
+					order_by	=> 'dlci'
+				}
+		);
+		
+		if ( defined($rs) )
+		{
+			Logger->info("Found " . $rs->count . " frame-relay circuits for device");
+			while ( $row = $rs->next )
+			{
+				$circuits->{$row->dlci.'-'.$row->ifIndex}->{dlci} = $row->dlci;
+				$circuits->{$row->dlci.'-'.$row->ifIndex}->{ifindex} = $row->ifIndex;
+			}
+		} else {
+			Logger->info("No frame-relay circuits configured for device");
+		}
+	} else {
+		Logger->warn("Device ID not set");
+	}
+	
+	return $circuits;
 }
 
 sub get_networks_by_interface

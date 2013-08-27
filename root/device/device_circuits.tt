@@ -11,7 +11,7 @@
 <div id="circuitDetail" class="circuitDetail" >
 <table>
 <tr>
-	<td width="120">Name</td>
+	<td id="dName" width="120">Name</td>
 	<td>:</td>
 	<td id="circuitName"></td>
 </tr>
@@ -26,19 +26,19 @@
 	<td id="cicuitUnits" width="320"></td>
 </tr>
 <tr>
-	<td>Min. speed</td>
+	<td id="dMinSpeed">Min. speed</td>
 	<td>:</td>
 	<td id="circuitLow"></td>
 </tr>
 <tr>
-	<td>Max. speed</td>
+	<td id="dMaxSpeed">Max. speed</td>
 	<td>:</td>
 	<td id="circuitHigh"></td>
 </tr>
 </table>
 </div>
 
-<div id="cirtree"></div>
+<div id="cirtree" class="cirTree"></div>
 <script type="text/javascript">
 <!--
 	[% tally = 128 %]
@@ -47,12 +47,17 @@
 	d1.add(0,-1,'Circuits');
 	[% IF vlans.size > 0 %]
 	d1.add(1, 0, 'VLAN');  
-	[% FOREACH vlan IN vlans %][% tally = tally + 1 %]d1.add([% tally %], 1,'[% vlan.value.name %]','javascript:xCircuitDetails([% device_id %],[% vlan.key %],0)','','','');
+	[% FOREACH vlan IN vlans %][% tally = tally + 1 %]d1.add([% tally %], 1,'[% vlan.value.name %]','javascript:xCircuitDetails(0,[% device_id %],[% vlan.key %])','','','');
 	[% END %][% END %]
 	
 	[% IF vrfs.size > 0 %]
 	d1.add(2,0, 'VRF');
-	[% FOREACH vrf IN vrfs %][% tally = tally + 1 %]d1.add([% tally %], 2, '[% vrf.value.vrf_name %]','javascript:xCircuitDetails([% device_id %],\'[% vrf.value.vrf_rd %]\',1)','','','');
+	[% FOREACH vrf IN vrfs %][% tally = tally + 1 %]d1.add([% tally %], 2, '[% vrf.value.vrf_name %]','javascript:xCircuitDetails(1,[% device_id %],\'[% vrf.value.vrf_rd %]\')','','','');
+	[% END %][% END %]
+	
+	[% IF frdlci.size > 0 %]
+	d1.add(3,0, 'Frame-Relay');
+	[% FOREACH dlci IN frdlci %][% tally = tally + 1 %]d1.add([% tally %], 3, '[% dlci.value.dlci %]','javascript:xCircuitDetails(2,[% device_id %],\'[% dlci.value.dlci %]\',[% dlci.value.ifindex %])','','','');
 	[% END %][% END %]
 	
 	d1.closeAll();

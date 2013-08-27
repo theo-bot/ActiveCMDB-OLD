@@ -38,6 +38,7 @@ use Methods;
 use Moose;
 
 with 'Class::Device::mplsVpn';
+with 'Class::Cisco::FrameRelay';
 
 extends 'Class::Cisco';
 

@@ -74,6 +74,7 @@ use ActiveCMDB::Object::Location;
 use ActiveCMDB::Object::Contract;
 use ActiveCMDB::Object::Circuit::VLan;
 use ActiveCMDB::Object::Circuit::MplsVpn;
+use ActiveCMDB::Object::Circuit::FrDlci;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -754,8 +755,9 @@ sub circuits :Local {
 	if ( $device_id > 0 ) 
 	{
 		$c->stash->{device_id} = $device_id;
-		$c->stash->{vlans} = get_vlans_by_device($device_id); 
-		$c->stash->{vrfs}  = get_vrfs_by_device($device_id);
+		$c->stash->{vlans}  = get_vlans_by_device($device_id) ; 
+		$c->stash->{vrfs}   = get_vrfs_by_device($device_id) ;
+		$c->stash->{frdlci} = get_dlci_by_device($device_id);
 	} else {
 		$c->log->warn('Device_id not set');
 	}
@@ -767,10 +769,11 @@ sub circuits :Local {
 sub fetch_circuit :Local {
 	my($self,$c) = @_;
 	
-	my($device_id,$index,$json, $circuit_id, $type,$circuit);
+	my($device_id,$index,$json, $circuit_id, $type,$circuit, $ifindex);
 	
 	$device_id  = $c->request->params->{device_id};
 	$circuit_id = $c->request->params->{circuit};
+	$ifindex    = $c->request->params->{ifindex};
 	$type       = $c->request->params->{type};
 	$json		= undef;
 	
@@ -828,9 +831,26 @@ sub fetch_circuit :Local {
 		$json->{cicuitUnits} = join(',', @interfaces);
 	}
 	
+	if ( $type == 2 )
+	{
+		$circuit = ActiveCMDB::Object::Circuit::FrDlci->new(device_id => $device_id, ifindex => $ifindex, dlci=> $circuit_id);
+		$circuit->get_data();
+		
+		$json->{circuitName} = $circuit->dlci;
+		$json->{circuitDesc} = $circuit->type;
+		$json->{circuitLow}  = $circuit->dlcistr;
+		$json->{circuitHigh} = $circuit->burst;
+		my @interfaces = ();
+		my $int = ActiveCMDB::Object::ifEntry->new(device_id => $device_id, ifindex => $ifindex);
+		$int->get_data();
+		push(@interfaces, $int->ifname());
+		$json->{cicuitUnits} = join(',', @interfaces);
+	}
+	
 	$c->stash->{json} = $json;
 	$c->forward( $c->view('JSON') );
 }
+
 
 sub delete_device :Local {
 	my($self, $c) = @_;
