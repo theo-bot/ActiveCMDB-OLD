@@ -281,6 +281,7 @@ div.cmdbTabDiv
 	font-size: 84%;
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 	max-height: 245px;
+	min-height: 145px;
 	height: expression( this.scrollHeight > 244 ? "245px" : "auto" );
 	overflow-x: hidden;
 	overflow-y: scroll;
@@ -359,4 +360,8 @@ select.searchSelect {
 
 td, th {
 	overflow: hidden;
+}
+
+div.cirTree {
+	heigth: 120px;
 }
