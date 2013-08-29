@@ -44,7 +44,16 @@ has 'device_id'		=> (is => 'ro', isa => 'Int');
 has 'atifindex'		=> (is => 'rw',	isa => 'Int');
 has 'atphysaddress'	=> (is => 'rw', isa => 'Str');
 has 'atnetaddress'	=> (is => 'rw', isa => 'Str');
-has 'disco'			=> (is => 'rw', isa => 'Int');
+has 'disco'			=> (is => 'rw', isa => 'Maybe[Int]');
+
+my %mapper = (
+	device_id		=> 'device_id',
+	atifindex		=> 'atifindex',
+	atphysaddress	=> 'atphysaddress',
+	atnetaddress	=> 'atnetaddress',
+	disco			=> 'atnetaddress'
+);
+
 # Schema
 has 'schema'		=> (
 	is		=> 'rw', 
@@ -110,8 +119,6 @@ sub save
 	} catch {
 		Logger->warn("Failed to save arp entry :" . $_);
 	};
-	
-	
 }
 
 __PACKAGE__->meta->make_immutable;

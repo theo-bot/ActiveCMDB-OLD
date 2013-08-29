@@ -43,26 +43,31 @@ use ActiveCMDB::Object::atEntry;
 use Logger;
 use Data::Dumper;
 
-my(%atEntry);
 
-%atEntry = (
+my %atEntry = (
 				'atIfIndex'		=> 'atifindex',
 				'atPhysAddress'	=> 'atphysaddress',
-				'atNetAddress'	=> 'atnetaddress'
+				'atNetAddress'	=> 'netaddress'
 			);
 			
+my %ipNetToMediaEntry = (
+				'ipNetToMediaIfIndex'		=> 'atifindex',
+				'ipNetToMediaPhysAddress'	=> 'atphysaddress',
+				'ipNetToMediaNetAddress'	=> 'atnetaddress'
+			);
+
 sub discover_arp
 {
 	my($self, $data) = @_;
 	
-	my($oid, $res, $snmp_oid, $arp_data, $object);
+	my($oid, $res, $snmp_oid, $arp_data, $object, $valid);
 	
 	$arp_data = undef;
 	
 	foreach $object (keys %atEntry)
 	{
 		$snmp_oid = $self->get_oid_by_name($object);
-		my $method = $atEntry{$object};
+		
 		$res = $self->snmp_table($snmp_oid);
 		if ( defined($res) )
 		{
@@ -71,20 +76,58 @@ sub discover_arp
 				my($key, $value);
 				
 				$key = _oidkey($snmp_oid, $oid);
-				if ( ! defined($arp_data->{$key}) )
-				{
-					$arp_data->{$key} = ActiveCMDB::Object::atEntry->new(device_id => $self->attr->device_id);
-				}
+								
 				$value = uc($res->{$oid});
 				$value =~ s/^0X//;
-				$arp_data->{$key}->$method($value);
+				$value =~ s/\s+//g;
+				$arp_data->{$key}->{$atEntry{$object}} = $value;
 				
-				$arp_data->{$key}->disco($data->{system}->disco);
+				$arp_data->{$key}->{disco} = $data->{system}->disco;
 				
 			}
+		} else {
+			Logger->warn("Failed to fetch $object");
 		}
 	}
 	
+	
+	foreach $object (keys %ipNetToMediaEntry)
+	{
+		Logger->debug("Requesting object $object");
+		$snmp_oid = $self->get_oid_by_name($object);
+		
+		$res = $self->snmp_table($snmp_oid);
+		if ( defined($res) )
+		{
+			foreach $oid (keys %{$res})
+			{
+				my($key, $value);
+				
+				$key = _oidkey($snmp_oid, $oid);
+								
+				
+				if ( $object eq 'ipNetToMediaPhysAddress'  && defined($res->{$oid}) && length($res->{$oid}) <= 8 )
+				{
+					my $v = '';
+					foreach my $a (unpack("C*", $res->{$oid} )) { $v .= uc(sprintf("%02x", $a)); }
+					$value = $v;
+				} else {
+					$value = uc($res->{$oid});
+					$value =~ s/^0X//;
+					$value =~ s/\s+//g;
+				} 
+				
+				my $o = $ipNetToMediaEntry{$object};
+				$arp_data->{$key}->{$o} = $value;
+				
+				$arp_data->{$key}->{disco} = $data->{system}->disco;
+			}
+		} else {
+			Logger->warn("Failed to fetch $object");
+		}
+	}
+	Logger->debug(Dumper($arp_data));
+		
 	return $arp_data;
 }
 
@@ -93,11 +136,30 @@ sub save_arp
 	my($self, $data) = @_;
 	my($transaction, $rs, $atEntry, $txnres, $result);
 	
+	
+	my @obect_types = values(%ipNetToMediaEntry);
+	
 	$transaction = sub {
 		
 		foreach my $key (keys %$data)
 		{
-			$data->{$key}->save();
+			my $valid = true;
+			foreach my $object (@obect_types)
+			{
+				if ( !defined($data->{$key}->{$object}) ) { $valid = false; }
+			}
+			if ( $valid ) {
+				$atEntry = ActiveCMDB::Object::atEntry->new( device_id => $self->device_id );
+				foreach my $object (@obect_types)
+				{
+					$atEntry->$object($data->{$key}->{$object});
+				}
+				$atEntry->disco($data->{$key}->{disco});
+				$atEntry->save();
+			} else {
+				Logger->warn("Unable to save arp entry, incomplete data");
+				Logger->debug(Dumper($data->{$key}));
+			}
 		}
 	};
 	

@@ -452,7 +452,8 @@ sub connections :Local {
 					{
 						join		=> 'interface',
 						'+select'	=> ['interface.ifname'],
-						'+as'		=> ['ifname']
+						'+as'		=> ['ifname'],
+						order_by	=> 'ifIndex'
 					}
 	);
 	
