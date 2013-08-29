@@ -117,7 +117,7 @@ div.interfaceList {
 div.interfaceDetail {
 	font-size: 90%;
 	position:absolute;
-	top:90px;
+	top:60px;
 	left:400px;
 	visibility:hidden;
 }
