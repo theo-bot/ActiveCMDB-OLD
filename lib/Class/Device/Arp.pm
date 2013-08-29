@@ -166,6 +166,7 @@ sub save_arp
 	try
 	{
 		$result = $self->attr->schema->txn_do($transaction);
+		$self->clean_table("IpDeviceAt", $self->attr->disco);
 	} catch {
 		Logger->error("Transaction failed" . $_);
 	};
