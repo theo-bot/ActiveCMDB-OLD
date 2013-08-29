@@ -101,5 +101,25 @@ sub set_disco {
 	}
 }
 
+sub clean_table {
+	my($self, $dsource, $disco) = @_;
+	
+	if ( defined($dsource) && defined($disco) && $disco > 0 )
+	{
+		my $rs = $self->attr->schema->resultset($dsource)->search(
+			{
+				device_id 	=> $self->attr->device_id,
+				disco		=> { '<' => $disco }
+			}
+		);
+		
+		if ( defined($rs) )
+		{
+			while( my $row = $rs->next ) { $row->delete(); }
+		}
+	}
+	
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
