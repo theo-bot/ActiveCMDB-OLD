@@ -176,18 +176,15 @@ $(document).ready(function(){
 		           	{
 		           		name:'ep_dest_in',
 		           		index:'ep_dest_in',
-		           		width:64,
+		           		width:160,
 		           		editable:false,
-		           		align:"center"
 		           	},
 		           	{
 		           		name:'ep_dest_out',
 		           		index:'ep_dest_out', 
-		           		width:64, 
+		           		width:160, 
 		           		editable:false,
 		           		required:true,
-		           		align:"center",
-		       
 		           	}
 		          ],
 		rowNum:10, 
