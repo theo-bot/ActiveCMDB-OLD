@@ -229,4 +229,16 @@ $(document).ready(function(){
 	
 	jQuery("#usersTable").jqGrid('inlineNav',"#rolesPager", {edit: false, add:false, cancel:false, save:false});
 
+	$( '#updPasswd' ).click(function() {
+		var data = $( '#passwdForm' ).serialize();
+		
+		$.post('/users/passwd',
+				data,
+				function(data) {
+					$('#response').html(data).show().delay(5000).hide('slow');
+					$('input[name*="pass"]').val('');
+				},
+				'html'
+		);
+	});
 });
