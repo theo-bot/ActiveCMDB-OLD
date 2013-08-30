@@ -38,6 +38,9 @@ package ActiveCMDB::Controller::Users;
 use Moose;
 use namespace::autoclean;
 use Data::Dumper;
+use POSIX;
+use Switch;
+use Try::Tiny;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -51,24 +54,36 @@ sub index :Private {
 	if ( $c->check_user_roles('admin') )
 	{
 		$c->log->info("Listing all users");
-		$c->stash->{admin} = 1;
-		$c->stash->{users} = [ $c->model('CMDBv1::User')->all ];
+		$c->stash->{template} = 'users/user_container.tt';
+		
 	} else {
 		$c->log->info("Fetching current user");
-		$c->stash->{admin} = 0;
-		$c->stash->{users} = [ $c->model('CMDBv1::User')->find({ username => $c->user->username })   ];
+		$c->stash->{template} = 'users/user_password.tt';
 	}
 	
 	
-	$c->log->info("Found " . scalar(@{$c->stash->{users}}) . " objects");
-	$c->stash->{template} = 'users/list.tt';
+	#$c->log->info("Found " . scalar(@{$c->stash->{users}}) . " objects");
+	#$c->stash->{template} = 'users/list.tt';
+}
+
+sub api: Local {
+	my($self, $c) = @_;
+
+	if ( $c->check_user_roles('admin'))
+	{	
+		if ( defined($c->request->params->{oper}) ) {
+			$c->forward('/users/' . $c->request->params->{oper});
+		}
+	} else {
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
+	}
 }
 
 sub edit :Local {
 	my($self, $c) = @_;
 	my($user_id);
 	
-	$user_id = $c->request->params->{user_id} || 0;
+	$user_id = $c->request->params->{id} || 0;
 	
 	$c->stash->{user} = $c->model('CMDBv1::User')->find({ id => $user_id });
 	
@@ -241,6 +256,63 @@ sub passwd :Local {
 		$c->response->body('User not found');
 		$c->log->error("User $user not found");
 	}
+}
+
+sub list: Local {
+	my($self, $c) = @_;
+	my($rs,$json);
+	my @rows = ();
+	my $rows	= $c->request->params->{rows} || 10;
+	my $page	= $c->request->params->{page} || 1;
+	my $order	= $c->request->params->{sidx} || 'username';
+	my $asc		= '-' . $c->request->params->{sord};
+	my $search = undef;
+
+	if ( defined($c->request->params->{_search}) && $c->request->params->{_search} eq 'true' )
+	{
+		my $field  = $c->request->params->{searchField};
+		my $string = $c->request->params->{searchString};
+		
+		switch ( $c->request->params->{searchOper})
+		{
+			case "cn"	{ $search = { $field => { 'like' => '%'.$string.'%' } } }
+			case "eq"	{ $search = { $field => $string } }
+			case "ne"	{ $search = { $field => { '!=' => $string } } }
+		}
+	}
+	
+	
+	$rs = $c->model("CMDBv1::User")->search(
+				$search,
+				{
+					rows		=> $rows,
+					page		=> $page,
+					order_by	=> { $asc => $order },
+				}
+	);
+	
+	$json->{records} = $rs->count;
+	if ( $json->{records} > 0 ) {
+		$json->{total} = ceil($json->{records} / $c->request->params->{rows} );
+	} else {
+		$json->{total} = 0;
+	} 
+	
+	while ( my $row = $rs->next )
+	{
+		push(@rows, { id => $row->id, cell=> [
+														$row->username,
+														$row->first_name,
+														$row->last_name,
+														$row->active
+											]
+					}
+			);
+	}
+	
+	$json->{rows} = [ @rows ];
+	$c->stash->{json} = $json;
+	$c->forward( $c->view('JSON') );
 }
 
 =head1 AUTHOR

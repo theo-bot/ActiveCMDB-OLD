@@ -139,6 +139,16 @@
 		<script src="/static/js/i18n/grid.locale-en.js"></script>
 		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.distrib.js"></script>
+		[% CASE %]
+		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+		<style>
+			.ui-autocomplete-loading {
+				background: white url('/static/images/ui-anim_basic_16x16.gif') right center no-repeat;
+			}
+		</style>
+		<script src="/static/js/i18n/grid.locale-en.js"></script>
+		<script src="/static/js/jquery.jqGrid.min.js"></script>
+		<script src="/static/js/activecmdb.admin.js"></script>
 	[% END %]
 </head>
 <body>
