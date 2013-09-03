@@ -109,7 +109,7 @@ $(document).ready(function(){
 		rules: {
 			name: {
 				required: true,
-				minlength: 3
+				minlength: 2
 			},
 		},
 		messages: {
@@ -141,6 +141,115 @@ $(document).ready(function(){
 		
 		
 	});
+	
+	/*
+	 * 
+	 * Role management
+	 * 
+	 */
+	jQuery("#siteTable").jqGrid({ 
+		url:'/location/api?oper=list', 
+		datatype: "json",
+		colNames:['Name', 'Type', 'Contact', 'Phone'],
+		colModel: [
+		           	{
+		           		name:'name',
+		           		index:'name', 
+		           		width:192, 
+		           		editable:false, 
+		           		searchoptions: {sopt:['eq','ne','cn']},
+		           		required:true, 
+		           	}, 
+		           	{
+		           		name:'type',
+		           		index:'type',
+		           		width:128, 
+		           		searchoptions: {sopt:['eq','ne','cn']}, 
+		           		editable:false,
+		           		
+		           	},
+		           	{
+		           		name:'primary_contact',
+		           		index:'primary_contact',
+		           		width:192, 
+		           		searchoptions: {sopt:['eq','ne','cn']}, 
+		           		editable:false,
+		           		
+		           	},
+		           	{
+		           		name:'primary_phone',
+		           		index:'primary_phone',
+		           		width:128, 
+		           		searchoptions: {sopt:['eq','ne','cn']}, 
+		           		editable:false,
+		           		
+		           	},
+		          ],
+		rowNum:10, 
+		rowList:[10,20,30], 
+		pager: '#sitePager', 
+		sortname: 'name',
+		hidegrid: false,
+		viewrecords: true, 
+		sortorder: "asc", 
+		editurl: "/location/api", 
+		caption: "Site Management",
+		ondblClickRow: function(id) {
+			$.colorbox({
+				iframe:true,
+				width:820,
+				height:615,
+				initialWidth:820,
+				initialHeight:615,
+				href:'/location/edit?id=' + id,
+				onClosed:function(){ 
+					$("#siteTable").trigger("reloadGrid");
+				} 
+			});
+		}
+	});
+	
+	jQuery("#siteTable").jqGrid('navGrid',"#sitePager",
+			{	view:false, 
+				edit:false, 
+				add:true, 
+				save:false, 
+				del:false, 
+				addfunc: function() { 
+					$.colorbox({
+						iframe:true,
+						width:820,
+						height:615,
+						initialWidth:820,
+						initialHeight:615,
+						href:'/location/add',
+						onClosed:function(){
+							$("#siteTable").trigger("reloadGrid");
+						}
+					});
+				},
+				editfunc: function() {
+					$.colorbox({
+						iframe:true,
+						width:820,
+						height:615,
+						initialWidth:820,
+						initialHeight:615,
+						href:'/location/edit',
+						onClosed:function(){ 
+							$("#siteTable").trigger("reloadGrid");
+						} 
+					});
+				}
+			},
+			{height:350,reloadAfterSubmit:true, jqModal:false, closeOnEscape:true},
+			{height:350,reloadAfterSubmit:true,jqModal:false, closeOnEscape:true,bottominfo:"Fields marked with (*) are required", closeAfterAdd: true},
+			{reloadAfterSubmit:false,jqModal:false, closeOnEscape:true},
+			{closeOnEscape:true},
+			{height:350,jqModal:false,closeOnEscape:true}
+	); 
+	
+	jQuery("#siteTable").jqGrid('inlineNav',"#sitePager", {edit: false, add:false, cancel:false, save:false});
 });
 
 $(function() {
@@ -307,13 +416,13 @@ function updateSiteForm(siteType)
 	} else {
 		$("#parent").show();
 	}
-	if ( siteType == 3 )
+	if ( siteType == 4 )
 	{
 		$("#building").show();
 	} else {
 		$("#building").hide();
 	}
-	if (siteType < 3 )
+	if (siteType < 4 )
 	{
 		$("#building-room").hide();
 	} else {

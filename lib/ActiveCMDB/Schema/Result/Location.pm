@@ -48,7 +48,7 @@ __PACKAGE__->table("location");
   is_auto_increment: 1
   is_nullable: 0
 
-=head2 type
+=head2 location_type
 
   data_type: 'integer'
   default_value: 0
@@ -137,7 +137,7 @@ __PACKAGE__->table("location");
 __PACKAGE__->add_columns(
   "location_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "type",
+  "location_type",
   { data_type => "integer", default_value => 0, is_nullable => 0 },
   "parent_id",
   { data_type => "integer", default_value => 0, is_nullable => 0 },

@@ -46,6 +46,9 @@ use Moose;
 use namespace::autoclean;
 use Try::Tiny;
 use Data::Dumper;
+use Switch;
+use POSIX;
+use Logger;
 use ActiveCMDB::ConfigFactory;
 use ActiveCMDB::Common::Conversion;
 use ActiveCMDB::Common::Location;
@@ -55,25 +58,71 @@ BEGIN { extends 'Catalyst::Controller'; }
 
 sub index :Private {
     my ( $self, $c ) = @_;
-	my @sitetypes = ();
+    
+	$c->stash->{template} = 'location/site_container.tt';
+}
 
+sub api: Local {
+	my($self, $c) = @_;
+
+	if ( $c->check_user_roles('admin'))
+	{	
+		if ( defined($c->request->params->{oper}) ) {
+			$c->forward('/location/' . $c->request->params->{oper});
+		}
+	} else {
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
+	}
+}
+
+sub edit: Local
+{
+	my($self, $c) = @_;
+	my @sitetypes = ();
 	my $config = ActiveCMDB::ConfigFactory->instance();
 	$config->load('cmdb');
 	
 	my $sitetypes = $config->section('cmdb::location::types');
-	
-	$c->log->debug(Dumper($sitetypes));
 	foreach my $key (sort keys %$sitetypes)
 	{
 		push(@sitetypes, { id => $key, name => $sitetypes->{$key}} );
 	}
-
+	
 	$c->stash->{types} = [ @sitetypes ];
 	$c->stash->{classifs} = [ cmdb_list_byname('siteClass') ];
-
-    $c->stash->{template} = 'location/view.tt';
+	
+	my $id = int($c->request->params->{id});
+	
+	if ( $id ) {
+		my $site = ActiveCMDB::Object::Location->new(location_id => $id);
+		$site->get_data();
+		$c->stash->{site} = $site;
+		my @parents = get_site_parents($site->location_type);
+		$c->stash->{parents} = [ @parents ];
+		
+	}
+	
+	
+	$c->stash->{template} = 'location/view.tt';
 }
 
+sub add :Local {
+	my($self,$c) = @_;
+	my @sitetypes = ();
+	my $config = ActiveCMDB::ConfigFactory->instance();
+	$config->load('cmdb');
+	
+	my $sitetypes = $config->section('cmdb::location::types');
+	foreach my $key (sort keys %$sitetypes)
+	{
+		push(@sitetypes, { id => $key, name => $sitetypes->{$key}} );
+	}
+	
+	$c->stash->{types} = [ @sitetypes ];
+	$c->stash->{classifs} = [ cmdb_list_byname('siteClass') ];
+	
+	$c->stash->{template} = 'location/view.tt';
+}
 
 sub find_by_name :Local {
 	my($self,$c) = @_;
@@ -203,12 +252,22 @@ sub save :Local {
 	my($self,$c) = @_;
 	my($site, $rs);
 	
-	$site = ActiveCMDB::Object::Location->new(location_id => $c->request->params->{location_id} || undef);
+	if ( defined($c->request->params->{location_id}) && int($c->request->params->{location_id}) > 0 )
+	{
+		$site = ActiveCMDB::Object::Location->new(location_id => $c->request->params->{location_id});
+		$site->get_data();
+	} else {
+		$site = ActiveCMDB::Object::Location->new();
+	}
+	
 	foreach my $key ($site->meta->get_all_attributes)
 	{
 		my $attr = $key->name;
-		next if ( /location_id|schema/ );
-		$site->$attr($c->request->params->{$attr});
+		next if ( $attr =~ /location_id|schema/ );
+		if ( defined($c->request->params->{$attr}) ) {
+			Logger->debug("Populating $attr");
+			$site->$attr($c->request->params->{$attr});
+		}
 	}
 	
 	
@@ -227,10 +286,73 @@ sub save :Local {
 	{
 		$c->response->body("Saved site information");
 	} else {
-		$c->log->error("Failed to save site: " . $_);
+		
 		$c->response->body("Failed to save site information");
 	}
 	
+}
+
+
+sub list: Local {
+	my($self, $c) = @_;
+	my($rs,$json);
+	my @rows = ();
+	my $rows	= $c->request->params->{rows} || 10;
+	my $page	= $c->request->params->{page} || 1;
+	my $order	= $c->request->params->{sidx} || 'username';
+	my $asc		= '-' . $c->request->params->{sord};
+	my $search = undef;
+
+	if ( defined($c->request->params->{_search}) && $c->request->params->{_search} eq 'true' )
+	{
+		my $field  = $c->request->params->{searchField};
+		my $string = $c->request->params->{searchString};
+		
+		switch ( $c->request->params->{searchOper})
+		{
+			case "cn"	{ $search = { $field => { 'like' => '%'.$string.'%' } } }
+			case "eq"	{ $search = { $field => $string } }
+			case "ne"	{ $search = { $field => { '!=' => $string } } }
+		}
+	}
+	
+	
+	$rs = $c->model("CMDBv1::Location")->search(
+				$search,
+				{
+					rows		=> $rows,
+					page		=> $page,
+					order_by	=> { $asc => $order },
+				}
+	);
+	
+	$json->{records} = $rs->count;
+	if ( $json->{records} > 0 ) {
+		$json->{total} = ceil($json->{records} / $c->request->params->{rows} );
+	} else {
+		$json->{total} = 0;
+	} 
+	
+	my $config = ActiveCMDB::ConfigFactory->instance();
+	$config->load('cmdb');
+	
+	my $sitetypes = $config->section('cmdb::location::types');
+	
+	while ( my $row = $rs->next )
+	{
+		push(@rows, { id => $row->location_id, cell=> [
+														$row->name,
+														$sitetypes->{$row->location_type},
+														$row->primary_contact,
+														$row->primary_phone
+											]
+					}
+			);
+	}
+	
+	$json->{rows} = [ @rows ];
+	$c->stash->{json} = $json;
+	$c->forward( $c->view('JSON') );
 }
 
 =head1 AUTHOR

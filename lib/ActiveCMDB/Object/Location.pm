@@ -50,8 +50,8 @@ with 'ActiveCMDB::Object::Methods';
 #
 # Define attributes
 #
-has 'location_id'		=> (is => 'ro', isa => 'Int');
-has 'ltype'				=> (is => 'rw', isa => 'Int', default => 0);
+has 'location_id'		=> (is => 'rw', isa => 'Int', default => 0);
+has 'location_type'		=> (is => 'rw', isa => 'Int', default => 0);
 has 'parent_id'			=> (is => 'rw', isa => 'Int', default => 0);
 has 'name'				=> (is => 'rw', isa => 'Str');
 has 'lattitude'			=> (is => 'rw', isa => 'Str|Undef' );
@@ -68,7 +68,7 @@ has 'zipcode'			=> (is => 'rw', isa => 'Str|Undef');
 
 
 # Schema
-has 'schema'		=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}) } );
+has 'schema'		=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Model::CMDBv1->instance() } );
 
 sub get_data
 {
@@ -86,7 +86,7 @@ sub get_data
 				
 				next if ( $attr =~ /schema|location_id/ );
 				my $dattr = $attr;
-				$dattr =~ s/^ltype$/type/;
+				
 				
 				$self->$attr($row->$dattr);
 			}
@@ -130,7 +130,7 @@ sub place
 	
 	if ( $self->parent_id > 0 ) {
 		my $row = $self->schema->resultset("Location")->find( { location_id => $self->parent_id } );
-		if ( defined($row) && $row->type == 2 )
+		if ( defined($row) && $row->location_type == 2 )
 		{
 			$place = $row->name;
 		} 
@@ -164,13 +164,14 @@ sub save
 	}
 	
 	try {
-		$rs = $self->schema->resultset("IpDevice")->update_or_create( $data );
+		$rs = $self->schema->resultset("Location")->update_or_create( $data );
 		if ( ! $rs->in_storage ) {
 			$rs->insert;
 		}
 		
 		return true;
 	} catch {
+		Logger->error("Failed to save site: " . $_);
 		return false;
 	}
 	

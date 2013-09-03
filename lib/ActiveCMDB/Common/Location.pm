@@ -52,6 +52,7 @@ our @ISA = ('Exporter');
 
 our @EXPORT = qw(
 	cmdb_get_sites
+	get_site_parents
 );
 
 =head1 FUNCTIONS
@@ -84,4 +85,30 @@ sub cmdb_get_sites
 	}
 	#Logger->debug(Dumper(@sites));
 	return @sites;
+}
+
+sub get_site_parents
+{
+	my($type_id) = @_;
+	my @parents = ();
+	my($rs, $schema, $row);
+	$schema = ActiveCMDB::Model::CMDBv1->instance();
+	$rs = $schema->resultset("Location")->search(
+			{
+				location_type => { '<' =>  $type_id }
+			},
+			{
+				order_by	=> ['location_type', 'name' ]
+			}
+	);
+	
+	if ( defined($rs) )
+	{
+		while ( $row = $rs->next )
+		{
+			push(@parents, { location_id => $row->location_id, name => $row->name });
+		}
+	}
+	
+	return @parents;
 }

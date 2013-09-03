@@ -35,14 +35,14 @@
 <table id="tblsite" border="0" padding="3">
 <tr align="left">
 	<td width="100">Name</td>
-	<td><input type="text" name="name" id="name" value="[% site.name %]" />&nbsp;<input type="button" class="cmdbButton" value="fetch" id="fetchSite" /></td>
+	<td><input type="text" name="name" id="name" value="[% site.name %]" /></td>
 </tr>
 <tr>
 	<td>Type</td>
 	<td>
 		<select name="type" id="type" class="cmdbList">
 		[% FOREACH type IN types %]
-			<option value="[% type.id %]" [% IF type.id == site.type %]selected[% END %]>[% type.name %]</option>
+			<option value="[% type.id %]" [% IF type.id == site.location_type %]selected[% END %]>[% type.name %]</option>
 		[% END %]
 		</select> 
 	</td>
@@ -52,7 +52,7 @@
 	<td>
 		<select name="parent_id" id="parent_id" class="cmdbList">
 			[% FOREACH parent IN parents %]
-			<option value="[% parent.location_id %]" [% IF parent.location_id == site.location_id %]selected[% END %]>[% parent.name %]</option>
+			<option value="[% parent.location_id %]" [% IF parent.location_id == site.parent_id %]selected[% END %]>[% parent.name %]</option>
 			[% END %]
 		</select>
 	</td>
@@ -125,4 +125,7 @@
 
 
 </form>
+<script type="text/javascript">
+	updateSiteForm(document.getElementById("type").value);
+</script>
 [% END %]
