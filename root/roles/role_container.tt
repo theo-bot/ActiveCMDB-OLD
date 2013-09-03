@@ -1,7 +1,7 @@
-[% WRAPPER wrapper.tt extra="roles" %]
+[% WRAPPER wrapper.tt extra="role" %]
 [%#
  *
- * 	Script:	root/process/container.tt
+ * 	Script:	root/roles/role_container.tt
  * 	___________________________________________________________
  *
  * 	Copyright (C) 2011-2015 Theo Bot
@@ -10,7 +10,7 @@
  *
  * 	Topic: Purpose
  *
- * 	Template to display process list
+ * 	Template to display roles list
  *
  * 	About: License
  *
@@ -28,7 +28,6 @@
  *
  *
 %]
-
 <br>
 <table id="rolesTable"></table>
 <div id="rolesPager"></div>

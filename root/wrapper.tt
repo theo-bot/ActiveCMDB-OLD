@@ -43,29 +43,28 @@
 	<link rel="stylesheet" href="/static/css/jquery-ui.css" />
 	<link rel="stylesheet" href="/static/css/colorbox.css" />
 	<link rel="stylesheet" href="/static/css/dualListBox.css" />
+	<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
 	<script src="/static/js/jquery.js"></script>
 	<script src="/static/js/jquery-ui.js"></script>
 	<script src="/static/js/jquery.hoverIntent.minified.js"></script>
 	<script src="/static/js/jquery.colorbox-min.js"></script>
 	<script src="/static/js/jquery.dualListBox-1.3.min.js"></script>
 	<script src="/static/js/jquery.validate.min.js"></script>
+	<script src="/static/js/i18n/grid.locale-en.js"></script>
+	<script src="/static/js/jquery.jqGrid.min.js"></script>
 	[% END %]
 	<script src="/static/js/activecmdb.js"></script>
 	[% SWITCH extra %]
 		[% CASE "location" %]
-		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
-		<script src="/static/js/i18n/grid.locale-en.js"></script>
-		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.location.js"></script>
 		[% CASE "vendor" %]
-		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
-		<script src="/static/js/i18n/grid.locale-en.js"></script>
-		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.vendor.js"></script>
 		[% CASE "user" %]
 		<script src="/static/js/activecmdb.user.js"></script>
 		[% CASE "role" %]
-		<script src="/static/js/activecmdb.role.js"></script>
+		<script src="/static/js/activecmdb.admin.js"></script>
+		[% CASE "users" %]
+		<script src="/static/js/activecmdb.admin.js"></script>
 		[% CASE "device" %]
 		<script src="/static/js/activecmdb.device.js"></script>
 		<link rel="stylesheet" type="text/css" href="/static/css/dhtmlxtoolbar_dhx_web.css" />
@@ -73,14 +72,8 @@
 		<script src="/static/js/dhtmlxtoolbar.js" ></script>
 		<script src="/static/js/activecmdb.device.js"></script>
 		[% CASE "domain" %]
-		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
-		<script src="/static/js/i18n/grid.locale-en.js"></script>
-		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.domain.js"></script>
 		[% CASE "iptype" %]
-		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
-		<script src="/static/js/i18n/grid.locale-en.js"></script>
-		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.iptype.js"></script>
 		[% CASE "interface" %]
 		<script src="/static/js/activecmdb.interface.js"></script>
@@ -93,9 +86,6 @@
 		<script src="/static/js/dtree.js"></script>
 		<script src="/static/js/activecmdb.circuits.js"></script>
 		[% CASE "maintenance" %]
-		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
-		<script src="/static/js/i18n/grid.locale-en.js"></script>
-		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/jquery.timepicker.js"></script>
 		<script src="/static/js/activecmdb.maintenance.js"></script>
 		[% CASE "devicemaint" %]
@@ -103,21 +93,12 @@
 		[% CASE "devicesec" %]
 		<script src="/static/js/activecmdb.devsec.js"></script>
 		[% CASE "devicejnl" %]
-		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
-		<script src="/static/js/i18n/grid.locale-en.js"></script>
-		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.devjnl.js"></script>
 		[% CASE "process" %]
-		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
-		<script src="/static/js/i18n/grid.locale-en.js"></script>
-		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.process.js"></script>
 		[% CASE "contract" %]
-		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
 		<link rel="stylesheet" href="/static/css/jslider.css" />
 		<link rel="stylesheet" href="/static/css/jslider.plastic.css" />
-		<script src="/static/js/i18n/grid.locale-en.js"></script>
-		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.contract.js"></script>
 		<script src="/static/js/jshashtable-2.1_src.js"></script>
 		<script src="/static/js/jquery.numberformatter-1.2.3.js"></script>
@@ -139,8 +120,6 @@
 				background: white url('/static/images/ui-anim_basic_16x16.gif') right center no-repeat;
 			}
 		</style>
-		<script src="/static/js/i18n/grid.locale-en.js"></script>
-		<script src="/static/js/jquery.jqGrid.min.js"></script>
 		<script src="/static/js/activecmdb.distrib.js"></script>
 	[% END %]
 </head>
