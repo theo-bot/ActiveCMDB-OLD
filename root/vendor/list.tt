@@ -28,11 +28,10 @@
  *
  *
 %]
-<center>
+
 <br>
 <input type="hidden" id="dateFormat" value="[% dateFormat %]" /> 
 <table id="vendorTable"></table>
 <div id="vendorPager"></div>
-</center>
 <br/>
 [% END %]
