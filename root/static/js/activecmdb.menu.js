@@ -33,7 +33,7 @@ var data = [
         label: '<img src="/static/images/menu/world.png" /> ActiveCMDB',
         children: [
             { 
-            	label: '<img src="/static/images/menu/bricks.png" /> Devices',
+            	label: '<img src="/static/images/menu/bricks.png" /> Devices', url: '/device',
             	children: [
             	            { label: '<img src="/static/images/menu/computer.png" /> Assets', url: '/device' },
             	            { label: '<img src="/static/images/menu/dns.png" /> Domains', url: '/ipdomain' },
@@ -71,7 +71,8 @@ $(function() {
 	
 	$( '#cmdbMenu' ).tree({
 		data: data,
-		autoEscape: false
+		autoEscape: false,
+		autoOpen: 0
 	});
 	
 	$( '#cmdbMenu').bind( 'tree.click' ,
