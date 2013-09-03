@@ -93,10 +93,11 @@ process:
   
 location:
     types:
-      0: Country
-      1: State
-      2: Place
-      3: Site
-      4: Building
-      5: Room
-      6: Rack
+      0: Region
+      1: Country
+      2: State
+      3: Place
+      4: Site
+      5: Building
+      6: Room
+      7: Rack
