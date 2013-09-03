@@ -385,8 +385,14 @@ sub process_device
 	$message->reply_to($self->config->section("cmdb::broker::prefix") . $self->process->process_name );
 	$message->subject('ProcessDevice');
 	
-	$device = ActiveCMDB::Object::Device->new(device_id => $args->{device_id});
-	$device->get_data();
+	if ( defined($args->{device}) )
+	{
+		$device = $args->{device}
+	} elsif ( defined($args->{device_id}) ) {
+	
+		$device = ActiveCMDB::Object::Device->new(device_id => $args->{device_id});
+		$device->get_data();
+	}
 	
 	$self->store_object('device', $device);
 	$self->store_object('message', $message);
