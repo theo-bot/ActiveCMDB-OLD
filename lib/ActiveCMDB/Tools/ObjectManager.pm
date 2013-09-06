@@ -117,6 +117,11 @@ has 'poll_store' => (
 		}
 	);
 
+has 'server_id' => (
+		is		=> 'rw',
+		isa		=> 'Int',
+		default	=> 0
+);
 	
 with 'ActiveCMDB::Tools::Common';
 
@@ -140,6 +145,7 @@ sub init {
 	$self->process->update($self->process->process_name());
 	$self->process->disconnect();
 	$self->schema_age(0);
+	$self->server_id( $self->config->section('cmdb::default::server_id') );
 	#
 	# Connecting to database
 	#
@@ -414,7 +420,7 @@ sub process_device
 		$message->to( $dest );
 		$message->cid($self->uuid());
 		$self->broker->sendframe($message, $args);
-		$self->create_order($message, $dest);
+		$self->create_order($message, $dest, $device);
 	}
 	
 }
@@ -466,15 +472,18 @@ sub delete_device
 
 sub create_order
 {
-	my($self, $message, $dest) = @_;
-	$self->schema->resultset('DeviceOrder')->create(
+	my($self, $message, $dest, $device) = @_;
+	if ( defined($device) && defined($device->device_id) )
+	{
+		$self->schema->resultset('DeviceOrder')->create(
 						{
 							cid			=> $message->cid(),
-							device_id	=> $message->payload->{device}->{device_id},
+							device_id	=> $device->device_id,
 							ts			=> time(),
 							dest		=> $dest
 						}
 					);
+	}
 }
 
 sub handle_signals
@@ -716,12 +725,27 @@ sub process_challenge
 	if ( defined($data) )
 	{
 		my $request = $self->json->decode($data);
+		Logger->debug(Dumper($request));
 		if ( defined( $request->{id} ) )
 		{
-			if ( $self->fetch_poll($request->{id}) < $request->{server_id} )
+			my $current = $self->fetch_poll($request->{id});
+			if ( defined($current) && $current > 0 )
 			{
+				if ( $current > $request->{server_id} )
+				{
+					Logger->info("[1309061336] Storing poll result " . $request->{server_id} );
+					$self->store_poll( $request->{id} =>  $request->{server_id} );
+				} else {
+					Logger->info("[1309061337] Current poll ($current) reply was higher than " . $request->{server_id});
+				}
+			} else {
+				Logger->info("[1309061335] Storing poll result " . $request->{server_id});
 				$self->store_poll( $request->{id} =>  $request->{server_id} );
-			} 
+			}
+			
+			
+		} else {
+			Logger->warn("[1309060816] Challenge response did not contain server id");
 		}
 	}
 	
@@ -735,10 +759,10 @@ sub score_challenge
 		my $winner = int( $self->fetch_poll( $self->challenge ) );
 		if ( $winner == $self->config->section("cmdb::default::server_id") )
 		{
-			Logger->info("The server is now MASTER");
+			Logger->info("[1309061403] The server is now MASTER");
 			$self->master(1);
 		} else {
-			Logger->info("Another server ($winner) is now master" );
+			Logger->info("[1309060940] The server is now STANDBY" );
 			$self->master(0);
 		}
 		$self->delete_poll( $self->challenge );
