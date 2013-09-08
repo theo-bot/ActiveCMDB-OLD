@@ -709,7 +709,7 @@ sub reply_challenge
 		
 			$message->payload($data);
 			$self->broker->sendframe($message, undef);
-			Logger->debug(Dumper($request));
+			
 		} else {
 			Logger->warn("Unable to decode payload");
 		}
@@ -725,7 +725,6 @@ sub process_challenge
 	if ( defined($data) )
 	{
 		my $request = $self->json->decode($data);
-		Logger->debug(Dumper($request));
 		if ( defined( $request->{id} ) )
 		{
 			my $current = $self->fetch_poll($request->{id});
