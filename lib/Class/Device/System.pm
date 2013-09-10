@@ -2,7 +2,7 @@ package Class::Device::System;
 
 =begin nd
 
-    Script: CMDB::Device::System.pm
+    Script: Class::Device::System.pm
     ___________________________________________________________________________
 
     Version 1.0
@@ -76,8 +76,6 @@ sub discover_system
 sub save_system
 {
 	my($self, $data) = @_;
-	my($rs, $method, $ts);
-	
 	
 	$self->attr->save();
 }
