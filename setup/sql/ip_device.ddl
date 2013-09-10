@@ -19,6 +19,8 @@ CREATE TABLE ip_device (
   tftpSet varchar(32) DEFAULT 'DEFAULT',
   discotime int(11) NOT NULL DEFAULT '0',
   configtime int(11) NOT NULL DEFAULT '0',
+  os_type varchar(32) DEFAULT NULL,
+  os_version varchar(16) DEFAULT NULL,
   PRIMARY KEY (device_id),
   UNIQUE KEY mgtaddres (mgtaddress),
   KEY disco (disco,device_id,status),
