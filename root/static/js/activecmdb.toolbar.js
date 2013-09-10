@@ -105,6 +105,8 @@ function new_device()
 	$("#disco").text(empty);
 	$("#added").text(empty);
 	$("#sysdescr").text(empty);
+	$("#os").text(empty);
+	$("#status").val(0);
 	$("#isCritical").attr('checked', false);
 	var taburl = {
 			'devint': 'interface',
