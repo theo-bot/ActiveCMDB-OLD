@@ -60,7 +60,7 @@
 	</tr>
 	<tr>
 		<td>Status</td>
-		<td><select name="status">[% statusOptions %]</select></td>
+		<td><select id="status" name="status">[% statusOptions %]</select></td>
 	</tr>
 </table>
 </div>

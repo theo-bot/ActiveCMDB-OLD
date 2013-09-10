@@ -192,7 +192,7 @@ sub fetch_device :Local {
 	if ( defined($device_id) ) {
 		$device = ActiveCMDB::Object::Device->new(device_id =>$device_id);
 		$device->find();
-		foreach my $attr (qw/device_id mgtaddress device_id/) 
+		foreach my $attr (qw/device_id mgtaddress device_id status/) 
 		{
 			$json->{$attr} = $device->$attr();
 		}

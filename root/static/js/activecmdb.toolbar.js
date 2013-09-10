@@ -36,7 +36,7 @@ var toolbar = new dhtmlXToolbarObject("toolbarObj", "dhx_web");
 toolbar.setIconsPath("/static/images/toolbar/");
 toolbar.setIconSize(16);
 toolbar.addButton("newDevice",1,"","new.gif","new_dis.gif");
-toolbar.addButton("fetchDevice",2,"","computer_go.png","")
+toolbar.addButton("fetchDevice",2,"","computer_go.png","");
 toolbar.addButton("searchDevice",3,"","magnifier.png","");
 toolbar.addButton("saveDevice", 4,"", "save.gif", "save_dis.gif");
 toolbar.addSeparator("sepOne",5);
@@ -151,7 +151,7 @@ function fetch_device(hostname)
 				$("#isCritical").attr('checked', false);
 			}
 			
-			$("option[value='3']").attr('selected','selected');
+			$("#status").val(data.status);
 			
 			var taburl = {
 					'devint': 'interface',
