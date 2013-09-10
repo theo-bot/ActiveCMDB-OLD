@@ -146,6 +146,20 @@ __PACKAGE__->table("ip_device");
   is_nullable: 1
   size: 32
 
+=head2 os_type
+
+  data_type: 'varchar'
+  default_value: 'DEFAULT'
+  is_nullable: 1
+  size: 32
+  
+=head2 os_version
+
+  data_type: 'varchar'
+  default_value: 'DEFAULT'
+  is_nullable: 1
+  size: 16
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -205,7 +219,21 @@ __PACKAGE__->add_columns(
   	data_type => "integer",
   	default_value => 0,
   	is_nullable => 0
-  }
+  },
+  "os_type",
+  {
+    data_type => "varchar",
+    default_value => "DEFAULT",
+    is_nullable => 1,
+    size => 32,
+  },
+  "os_version",
+  {
+    data_type => "varchar",
+    default_value => "DEFAULT",
+    is_nullable => 1,
+    size => 16,
+  },
 );
 
 =head1 PRIMARY KEY

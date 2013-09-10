@@ -5,6 +5,7 @@ class "Cisco" {
 	enabled 1;
 	
 	interrogations {
+					osversion	2;
 					ifmib	3;
 					entity	3;
 				};

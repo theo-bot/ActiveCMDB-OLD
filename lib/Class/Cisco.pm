@@ -47,6 +47,7 @@ extends 'Class::Device';
 # 
 # Discovery mixins
 #
+with 'Class::Cisco::OsVersion';
 with 'Class::Cisco::vmVlan';
 
 #

@@ -144,6 +144,7 @@ function fetch_device(hostname)
 			$("#added").text(data.added);
 			$("#sysdescr").text(data.descr_tr);
 			$("#sysdescr").attr("title", data.sysdescr);
+			$("#os").text(data.os);
 			if ( data.critical == 1 ) {
 				$("#isCritical").attr('checked', true);
 			} else {

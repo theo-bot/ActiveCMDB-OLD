@@ -97,6 +97,11 @@
 	<td id="sysdescr" title=""></td>
 </tr>
 <tr>
+	<td>OS</td>
+	<td>:</td>
+	<td id="os"></td>
+</tr>
+<tr>
 	<td>Critical</td>
 	<td>:</td>
 	<td><input type="checkbox" id="isCritical" name="isCritical" value="1" default="0" /></td>

@@ -228,6 +228,16 @@ sub fetch_device :Local {
  		$json->{descr_tr} =~ s/\r//g;
  		$json->{descr_tr} =~ s/\n//g;
  		$json->{critical} = $device->is_critical;
+ 		if ( defined($device->os_type) )
+ 		{
+ 			$json->{os} = $device->os_type;
+ 			if ( defined($device->os_version) && $device->os_version ) 
+ 			{
+ 				$json->{os} .= ' (' . $device->os_version . ')';
+ 			}
+ 		} else {
+ 			$json->{os} = '';
+ 		}
 	}
 	
 	$c->stash->{json} = $json;
