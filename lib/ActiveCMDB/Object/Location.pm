@@ -109,7 +109,7 @@ sub site_parent
 		{
 			my $tsite = $parent;
 			$p = $tsite->name;
-			while ( $tsite->type > 0 )
+			while ( $tsite->location_type > 0 )
 			{
 				my $parent_id = $tsite->parent_id;
 				$tsite = $self->schema->resultset('Location')->find({ location_id => $parent_id });
