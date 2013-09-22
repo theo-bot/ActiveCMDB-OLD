@@ -77,7 +77,7 @@ has 'status'		=> (is => 'rw', isa => 'Int');
 has 'contract_id'	=> (is => 'rw', isa => 'Int', default => 0);
 has 'os_type'		=> (is => 'rw', isa => 'Str', default => '');
 has 'os_version'	=> (is => 'rw', isa => 'Str', default => '');
-
+has 'domain_id'		=> (is => 'rw', isa => 'Maybe[Int]');
 # Security attributes
 has 'snmp_ro'		=> (is => 'rw', isa => 'Str');
 has 'snmp_rw'		=> (is => 'rw', isa => 'Str');

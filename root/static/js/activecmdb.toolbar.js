@@ -108,6 +108,8 @@ function new_device()
 	$("#os").text(empty);
 	$("#status").val(0);
 	$("#isCritical").attr('checked', false);
+	$("#ipDomain").val('');
+
 	var taburl = {
 			'devint': 'interface',
 			'devent': 'structure',
@@ -154,6 +156,7 @@ function fetch_device(hostname)
 			}
 			
 			$("#status").val(data.status);
+			$("#ipDomain").val(data.ipdomain);
 			
 			var taburl = {
 					'devint': 'interface',

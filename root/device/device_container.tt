@@ -62,6 +62,10 @@
 		<td>Status</td>
 		<td><select id="status" name="status">[% statusOptions %]</select></td>
 	</tr>
+	<tr>
+	<td>Domain</td>
+	<td><select id="ipDomain" name="domain_id">[% FOREACH domain IN ipdomains %]<option value="[% domain.domain_id %]">[% domain.domain_name %]</option>[% END %]</select></td>
+</tr>
 </table>
 </div>
 <br>
@@ -106,6 +110,7 @@
 	<td>:</td>
 	<td><input type="checkbox" id="isCritical" name="isCritical" value="1" default="0" /></td>
 </tr>
+
 </table>
 </div>
 

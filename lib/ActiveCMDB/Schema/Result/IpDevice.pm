@@ -164,9 +164,16 @@ __PACKAGE__->table("ip_device");
 
 __PACKAGE__->add_columns(
   "device_id",
-  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
+  { 
+  	data_type 		  => "integer", 
+  	is_auto_increment => 1, 
+  	is_nullable 	  => 0 },
   "hostname",
-  { data_type => "varchar", is_nullable => 1, size => 128 },
+  { 
+  	data_type   => "varchar", 
+  	is_nullable => 1, 
+  	size        => 128 
+  },
   "mgtaddress",
   { data_type => "varchar", is_nullable => 1, size => 128 },
   "sysobjectid",
@@ -181,14 +188,33 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_nullable => 1 },
   "location_id",
   { data_type => "integer", is_nullable => 1 },
+  "domain_id",
+  {
+  	data_type	=> "integer",
+  	is_nullable	=> 1
+  },
   "category",
-  { data_type => "integer", is_nullable => 1 },
+  { 
+  	data_type => "integer", 
+  	is_nullable => 1 
+  },
   "sysuptime",
-  { data_type => "bigint", is_nullable => 1 },
+  { 
+  	data_type => "bigint", 
+  	is_nullable => 1 
+  },
   "sysdescr",
-  { data_type => "varchar", is_nullable => 1, size => 512 },
+  { 
+  	data_type => "varchar", 
+  	is_nullable => 1, 
+  	size => 512 
+  },
   "external_id",
-  { data_type => "varchar", is_nullable => 1, size => 128 },
+  { 
+  	data_type => "varchar", 
+  	is_nullable => 1, 
+  	size => 128 
+  },
   "added",
   {
     data_type => "timestamp",
@@ -196,11 +222,23 @@ __PACKAGE__->add_columns(
     is_nullable => 1,
   },
   "is_critical",
-  { data_type => "tinyint", default_value => 0, is_nullable => 1 },
+  { 
+  	data_type => "tinyint", 
+  	default_value => 0, 
+  	is_nullable => 1 
+  },
   "is_ssh",
-  { data_type => "tinyint", default_value => 0, is_nullable => 1 },
+  { 
+  	data_type => "tinyint", 
+  	default_value => 0, 
+  	is_nullable => 1 
+  },
   "is_telnet",
-  { data_type => "tinyint", default_value => 0, is_nullable => 1 },
+  { 
+  	data_type => "tinyint", 
+  	default_value => 0, 
+  	is_nullable => 1 
+  },
   "tftpset",
   {
     data_type => "varchar",

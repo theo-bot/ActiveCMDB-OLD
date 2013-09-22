@@ -65,6 +65,7 @@ use ActiveCMDB::Common::Device;
 use ActiveCMDB::Common::Location;
 use ActiveCMDB::Common::Constants;
 use ActiveCMDB::Common::Vendor;
+use ActiveCMDB::Common::IpDomain;
 use ActiveCMDB::Object::Device;
 use ActiveCMDB::Object::IpType;
 use ActiveCMDB::Object::Vendor;
@@ -92,6 +93,8 @@ sub index :Private {
 		$state .= sprintf("<option value='%d'>%s</option>", $s->{key}, $s->{value});
 	}
 	
+	my @domains = cmdb_get_domains();
+	$c->stash->{ipdomains} = [ @domains ];
 	
 	$c->stash->{statusOptions} = $state;
 	$c->stash->{template} = 'device/device_container.tt';
@@ -228,6 +231,7 @@ sub fetch_device :Local {
  		$json->{descr_tr} =~ s/\r//g;
  		$json->{descr_tr} =~ s/\n//g;
  		$json->{critical} = $device->is_critical;
+ 		$json->{ipdomain} = $device->domain_id;
  		if ( defined($device->os_type) )
  		{
  			$json->{os} = $device->os_type;
@@ -258,7 +262,7 @@ sub save_device :Local {
 		$device = ActiveCMDB::Object::Device->new();
 	}
 	
-	foreach my $param (qw/hostname mgtaddress/)
+	foreach my $param (qw/hostname mgtaddress domain_id/)
 	{
 		if ( defined($c->request->params->{$param}) && $c->request->params->{$param} )
 		{
