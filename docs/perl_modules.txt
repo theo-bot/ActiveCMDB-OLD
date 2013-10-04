@@ -25,6 +25,8 @@ JSON::XS
 Log::Log4perl
 MIME::Base64
 Moose
+MooseX::DeclareX
+MooseX::DeclareX::Privacy
 MooseX::Privacy
 MooseX:Singleton
 namespace::autoclean
