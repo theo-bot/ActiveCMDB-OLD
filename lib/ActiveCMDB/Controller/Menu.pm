@@ -39,6 +39,7 @@ package ActiveCMDB::Controller::Menu;
 
 use Moose;
 use namespace::autoclean;
+use ActiveCMDB::Common::Menu;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -59,6 +60,16 @@ sub empty :Local {
 	$c->response->status(200);
 	$c->response->body('');
 }
+
+sub menu_items :Local {
+	my($self, $c) = @_;
+	my $topitem = 'ActiveCMDB';
+	my $menu = undef;
+	push(@{$menu}, CreateMenuItem($topitem));
+	$c->stash->{json} = $menu;
+	$c->forward( $c->view('JSON') );
+}
+
 =head1 AUTHOR
 
 Theo Bot
