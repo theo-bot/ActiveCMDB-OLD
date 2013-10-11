@@ -62,7 +62,7 @@ sub to_hashref
 		{
 			$attr = $key->name;
 			next if ( $attr =~ /schema/ );
-			$data->{$attr} = $self->$attr();
+			$data->{$attr} = $self->$attr;
 		}
 	}
 	
