@@ -1,0 +1,83 @@
+[% WRAPPER wrapper.tt extra="import" %]
+[%#
+ *
+ * 	Script:	root/import/edit.tt
+ * 	___________________________________________________________
+ *
+ * 	Copyright (C) 2011-2015 Theo Bot
+ *
+ * 	http://www.activecmdb.org
+ *
+ * 	Topic: Purpose
+ *
+ * 	Template to  import jobs
+ *
+ * 	About: License
+ *
+ * 	This program is free software; you can redistribute it and/or
+ * 	modify it under the terms of the GNU General Public License
+ * 	as published by the Free Software Foundation; either version 2
+ * 	of the License, or (at your option) any later version.
+ *
+ * 	This program is distributed in the hope that it will be useful,
+ * 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * 	GNU General Public License for more details.
+ *
+ *  Topic: Version Control
+ *
+ *
+%]
+
+<form method="post" id="importEditForm" enctype="multipart/form-data">
+
+<table>
+	<tr>
+		<th>Filename</th>
+		<td>:</td>
+		<td>[% import.filename %]</td>
+	</tr>
+	<tr>
+		<th>Username</th>
+		<td>:</td>
+		<td>[% import.username %]</td>
+	</tr>
+	<tr>
+		<th>Uploaded</th>
+		<td>:</td>
+		<td>[% import.upload %]</td>
+	</tr>
+	<tr>
+		<th>Entries</th>
+		<td>:</td>
+		<td>[% import.tally %]</td>
+	</tr>
+	<tr>
+		<th>ID</th>
+		<td>:</td>
+		<td>[% import.id %]</td>
+	</tr>
+	<tr>
+		<th>Status</th>
+		<td>:</td>
+		<td>[% import.state %]</td>
+	</tr>
+	<tr>
+		<th>Objects</th>
+		<td>:</td>
+		<td><select id="impObjType" name="object_type" class="cmdbList">[% FOREACH objType IN objTypes %]<option value="[% objType.key %]" [% IF import.object_type == objType %]selected[% END %]>[% objType.key %]</option>[% END %]</select></td>
+	</tr>
+</table>
+<br><br>
+
+<p id="response"></p>
+<div class="bottomLeft">
+	<input type="button" id="impUpdate" value="Update" class="cmdbButton" />
+	<input type="button" id="impStart" value="Start import" class="cmdbButton" />
+</div>
+<div class="bottomRight">
+	<input type="button" id="impDisc" value="Discard" class="cmdbButton" />
+</div>
+<input type="hidden" name="id" id="importID" value="[% import.id %]" />	
+</form>
+[% END %]

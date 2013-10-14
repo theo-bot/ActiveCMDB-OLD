@@ -9,7 +9,7 @@ default:
    
 
 database:
-  dbhost: 192.168.178.20
+  dbhost: 192.168.1.20
   dbuser: activecmdb
   dbpass: 000000013ce6b012811c3f639a192d6a60a6a3300b1f2ec75cfe870c6901e3e2a8cbdf45f5647ccfc41f558b603cbe53c6069b229e72fb081614521821759db550ae422cac6af6893851cefa73e4925e044ab909360dd971a7139f2908d176a913343bb11e6fbe53a9159f0742c85f990dbd8a56a8043f985ef60840ffd97b070eec5971b99ab523782564fe053d6f68d0f3233a5b2f1729494696b9718fc7511056ae88f3fd5d498932f98a29e5c1a415c28a4a2e5c9251ebf90952bf4daf5caf178d316f1ca97fc6f511e86de605dcf98f6ba81986ff1d4b86e9c86b5a85d344cdfd48d51b58130a34d84ae027316ad092ab42aa8bcc1fc6b114e6bba95fdeca033cc9
   dbtype: mysql
@@ -17,7 +17,7 @@ database:
   pwencr: 1
   
 cloud:
-  host: http://192.168.178.20:8098
+  host: http://192.168.1.20:8098
   timeout: 950
 
 logging:
@@ -26,7 +26,7 @@ logging:
   
 broker:
   typeof: RabbitMQ
-  uri: tcp://192.168.178.20:5672
+  uri: tcp://192.168.1.20:5672
   user: activecmdb
   password: access
   pwencr: 0
@@ -88,6 +88,12 @@ process:
     expfile: $CMDB_HOME/conf/syslog.exp
     expmaxage: 60
     delay_forward: 120
+  worker:
+    queue: cmdb.worker
+    exchange: cmdb.worker-x
+    maxproc: 1
+    path: $CMDB_HOME/sbin/cmdb_core_worker.pl
+    managed: 1
     
     
   

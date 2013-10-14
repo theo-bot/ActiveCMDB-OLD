@@ -1,4 +1,4 @@
-package ActiveCMDB::Object::Number;
+package ActiveCMDB::Object::String;
 
 use 5.010;
 use namespace::autoclean;
@@ -7,7 +7,7 @@ use MooseX::DeclareX
 	plugins  => [qw(public private)],
 	types 	 => [ -Moose ]; 
 
-class ActiveCMDB::Object::Number
+class ActiveCMDB::Object::String
 {
 	has	'value'		=> (
 		is		=> 'rw',
@@ -16,15 +16,11 @@ class ActiveCMDB::Object::Number
 	
 	has 'required'	=> (
 		is		=> 'rw',
-		isa		=> 'Int'
+		isa		=> 'Int',
+		default	=> 0
 	);
 	
 	has 'verify'	=> (
-		is		=> 'rw',
-		isa		=> 'Maybe[Str]'
-	);
-	
-	has 'range'		=> (
 		is		=> 'rw',
 		isa		=> 'Maybe[Str]'
 	);
@@ -43,24 +39,15 @@ class ActiveCMDB::Object::Number
 		if ( $self->required && !defined($self->value) ) {
 			return (0,"Undefined value, while required");
 		}
-		if ( $self->value !~ /^\d+$/ ) {
-			return (0, "Value not decimal");	
-		}
+
 		if ( defined($self->enum) && defined($self->value) )
 		{
 			my $found = 0;
-			foreach ( split(/\,/, $self->enum) ) { if ( $self->value == $_ ) { $found = 1 } }
+			foreach ( split(/\,/, $self->enum) ) { if ( $self->value eq $_ ) { $found = 1 } }
 			if ( $found == 0 ) {
 				return (0, "Value not found in enum set");
 			}
 		} 
-		if ( defined($self->range) && defined($self->value) )
-		{
-			my($min,$max) = sort {$a <=> $b} split(/\,/, $self->range, 2);
-			if ( $self->value < $min || $self->value > $max ) {
-				return(0, "Value outside defined range");
-			}
-		}
 		
 		return 1;
 	}

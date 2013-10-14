@@ -1,0 +1,55 @@
+[% WRAPPER wrapper.tt extra="import" %]
+[%#
+ *
+ * 	Script:	root/import/edit.tt
+ * 	___________________________________________________________
+ *
+ * 	Copyright (C) 2011-2015 Theo Bot
+ *
+ * 	http://www.activecmdb.org
+ *
+ * 	Topic: Purpose
+ *
+ * 	Template to  import jobs
+ *
+ * 	About: License
+ *
+ * 	This program is free software; you can redistribute it and/or
+ * 	modify it under the terms of the GNU General Public License
+ * 	as published by the Free Software Foundation; either version 2
+ * 	of the License, or (at your option) any later version.
+ *
+ * 	This program is distributed in the hope that it will be useful,
+ * 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * 	GNU General Public License for more details.
+ *
+ *  Topic: Version Control
+ *
+ *
+%]
+
+<form method="post" id="importEditForm" enctype="multipart/form-data" action="/import/upload" >
+
+<div class="cmdbButton">
+<table>
+	<tr>
+		<th>Filename</th>
+		<td>:</td>
+		<td><input type="file" name="filename" class="cmdbButton"></td>
+	</tr>
+	<tr>
+		<th>Object types</th>
+		<td>:</td>
+		<td><select id="impObjType" name="object_type" class="cmdbList">[% FOREACH objType IN objTypes %]<option value="[% objType.key %]" [% IF import.object_type == objType %]selected[% END %]>[% objType.key %]</option>[% END %]</select></td>
+	</tr>
+</table>
+</div>
+<br><br>
+
+<div class="bottomLeft">
+	<input type="submit" value="upload" class="cmdbButton" />
+</div>
+
+</form>
+[% END %]

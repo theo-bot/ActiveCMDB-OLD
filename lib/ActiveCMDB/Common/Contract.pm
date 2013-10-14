@@ -1,5 +1,5 @@
-package ActiveCMDB::Common::IpDomain;
-=head1 MODULE - ActiveCMDB::Common::IpDomain
+package ActiveCMDB::Common::Contract;
+=head1 MODULE - ActiveCMDB::Common::Contract
     ___________________________________________________________________________
 
 =head1 VERSION
@@ -15,7 +15,7 @@ package ActiveCMDB::Common::IpDomain;
 
 =head1 DESCRIPTION
 
-    Common ipdomain functions
+    Common contract functions
 
 =head1 LICENSE
 
@@ -34,7 +34,9 @@ package ActiveCMDB::Common::IpDomain;
 =head1 IMPORTS
  use Exporter;
  use Logger;
- use ActiveCMDB::Model::Cloud;
+ use ActiveCMDB::Common::Constants;
+ use ActiveCMDB::Object::Contract;
+ use ActiveCMDB::Model::CMDBv1;
  use Try::Tiny;
  use strict;
  use Data::Dumper;
@@ -43,7 +45,7 @@ package ActiveCMDB::Common::IpDomain;
 use Exporter;
 use Logger;
 use ActiveCMDB::Common::Constants;
-use ActiveCMDB::Object::Ipdomain;
+use ActiveCMDB::Object::Contract;
 use ActiveCMDB::Model::CMDBv1;
 use Try::Tiny;
 use strict;
@@ -52,90 +54,63 @@ use Data::Dumper;
 our @ISA = ('Exporter');
 
 our @EXPORT = qw(
-	cmdb_get_domains
-	get_domain_by_name
-	check_domain_name
+	get_contract_by_number
+	check_contract_number
 );
 
-sub cmdb_get_domains
+sub get_contract_by_number
 {
-	my @domains = ();
-	my $schema = ActiveCMDB::Model::CMDBv1->instance();
-	push(@domains, { domain_name => 'Select domain'});
+	my($cn) = @_;
+	my $contract = undef;
 	
-	my $rs = $schema->resultset("IpDomain")->search(
-		{
-			active => 1
-		},
-		{
-			order_by	=> 'domain_name',
-			columns		=> [qw/domain_id domain_name/]
-		}
-	);
-	if ( defined($rs) )
-	{
-		while ( my $row = $rs->next )
-		{
-			push(@domains, { domain_id => $row->domain_id, domain_name => $row->domain_name });
-		}
-	}
-	
-	return @domains;
-}
-
-sub get_domain_by_name
-{
-	my($dn) = @_;
-	my $domain = undef;
-	
-	if ( defined($dn) )
+	if ( defined($cn) )
 	{
 		my $schema = ActiveCMDB::Model::CMDBv1->instance();
 		my $row = $schema->resultset("IpDomain")->find(
 			{
-				domain_name => $dn
+				contract_number => $cn
 			},
 			{
-				columns => qw/domain_id/
+				columns => qw/contract_id/
 			}
 		);
 		
 		if ( defined($row) )
 		{
-			$domain = ActiveCMDB::Object::Ipdomain->new(domain_id => $row->domain_id);
-			$domain->get_data();	
+			$contract = ActiveCMDB::Object::Ipdomain->new(id => $row->contract_id);
+			$contract->get_data();	
 		}
 	} else {
-		Logger->warn("Domain name not defined");
+		Logger->warn("Contract number not defined");
 	}
 	
-	return $domain;
+	return $contract;
 }
 
-sub check_domain_name
+sub check_contract_number
 {
-	my($dn) = @_;
-	my $domain = undef;
+	my($cn) = @_;
+	my $contract = undef;
 	
-	if ( defined($dn) )
+	if ( defined($cn) && $cn)
 	{
 		my $schema = ActiveCMDB::Model::CMDBv1->instance();
 		my $row = $schema->resultset("IpDomain")->find(
 			{
-				domain_name => $dn
+				contract_number => $cn
 			},
 			{
-				columns => qw/domain_id/
+				columns => qw/contract_id/
 			}
 		);
 		
 		if ( defined($row) )
 		{
-			$domain = $row->domain_id;
+			$contract = $row->contract_id;
 		}
 	} else {
-		Logger->warn("Domain name not defined");
+		Logger->warn("Contract number not defined");
 	}
 	
-	return $domain;
+	return $contract;
 }

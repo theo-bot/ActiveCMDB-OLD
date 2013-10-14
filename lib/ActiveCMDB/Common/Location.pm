@@ -43,7 +43,7 @@ package ActiveCMDB::Common::Location;
 use Exporter;
 use Logger;
 use ActiveCMDB::Model::CMDBv1;
-use ActiveCMDB::Schema;
+use ActiveCMDB::Object::Location;
 use Try::Tiny;
 use strict;
 use Data::Dumper;
@@ -53,6 +53,9 @@ our @ISA = ('Exporter');
 our @EXPORT = qw(
 	cmdb_get_sites
 	get_site_parents
+	get_site_by_name
+	get_siteid_by_name
+	get_siteid_by_name
 );
 
 =head1 FUNCTIONS
@@ -112,3 +115,62 @@ sub get_site_parents
 	
 	return @parents;
 }
+
+sub get_site_by_name
+{
+	my($sn) = @_;
+	my $site = undef;
+	
+	if ( defined($sn) )
+	{
+		my $schema = ActiveCMDB::Model::CMDBv1->instance();
+		my $row = $schema->resultset("Location")->find(
+			{
+				name => $sn
+			},
+			{
+				columns => qw/location_id/
+			}
+		);
+		
+		if ( defined($row) )
+		{
+			$site = ActiveCMDB::Object::Location->new(location_id => $row->location_id);
+			$site->get_data();	
+		}
+	} else {
+		Logger->warn("Site name not defined");
+	}
+	
+	return $site;
+}
+
+sub get_siteid_by_name
+{
+	my($sn) = @_;
+	my $site = undef;
+	
+	if ( defined($sn) )
+	{
+		my $schema = ActiveCMDB::Model::CMDBv1->instance();
+		my $row = $schema->resultset("Location")->find(
+			{
+				name => $sn
+			},
+			{
+				columns => qw/location_id/
+			}
+		);
+		
+		if ( defined($row) )
+		{
+			$site = $row->location_id;	
+		}
+	} else {
+		Logger->warn("Site name not defined");
+	}
+	
+	return $site;
+}
+
+1;

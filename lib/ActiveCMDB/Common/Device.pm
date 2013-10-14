@@ -46,6 +46,7 @@ use Exporter;
 use Data::Dumper;
 use Logger;
 use ActiveCMDB::Model::CMDBv1;
+use ActiveCMDB::Common::Constants;
 use ActiveCMDB::Object::ipAdEntry;
 use Try::Tiny;
 use strict;
@@ -54,7 +55,10 @@ use Socket;
 our @ISA = ('Exporter');
 
 our @EXPORT = qw(
+	verify_device_object
 	cmdb_get_host_by_ip
+	get_deviceid_by_ip
+	get_deviceid_by_hostname
 	cmdb_gethostByAddr
 	cmdb_get_host_by_name
 	get_vlans_by_device
@@ -383,3 +387,7 @@ sub get_networks_by_interface
 	
 	return @nets
 }
+
+
+
+

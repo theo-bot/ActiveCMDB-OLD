@@ -1,0 +1,126 @@
+{
+   "Fields" : {
+      "11" : {
+         "map" : "snmp_rw",
+         "required" : 0,
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "7" : {
+         "map" : "contract_id",
+         "required" : 0,
+         "verify" : "check_contract_number",
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "17" : {
+         "map" : "snmp_port",
+         "required" : 0,
+         "default" : 161,
+         "class" : "ActiveCMDB::Object::Number"
+      },
+      "2" : {
+         "map" : "external_id",
+         "required" : 0,
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "1" : {
+         "map" : "hostname",
+         "required" : 0,
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "18" : {
+         "map" : "telnet_user",
+         "required" : 0,
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "0" : {
+         "map" : "mgtaddress",
+         "required" : 1,
+         "class" : "ActiveCMDB::Object::NetAddress"
+      },
+      "16" : {
+         "map" : "snmpv3_proto2",
+         "required" : 0,
+         "enum" : "des,aes",
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "13" : {
+         "map" : "snmpv3_pass1",
+         "required" : 0,
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "6" : {
+         "map" : "tftpset",
+         "required" : 0,
+         "default" : "DEFAULT",
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "3" : {
+         "map" : "location_id",
+         "required" : 0,
+         "verify" : "get_siteid_by_name",
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "9" : {
+         "map" : "snmpv",
+         "required" : 0,
+         "range" : "0,2",
+         "default" : 0,
+         "class" : "ActiveCMDB::Object::Number"
+      },
+      "12" : {
+         "map" : "snmpv3_user",
+         "required" : 0,
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "14" : {
+         "map" : "snmpv3_pass2",
+         "required" : 0,
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "15" : {
+         "map" : "snmpv3_proto1",
+         "required" : 0,
+         "enum" : "sha,md5",
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "8" : {
+         "map" : "domain_id",
+         "required" : 0,
+         "verify" : "check_domain_name",
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "4" : {
+         "map" : "is_critical",
+         "required" : 0,
+         "range" : "0,1",
+         "default" : 0,
+         "class" : "ActiveCMDB::Object::Number"
+      },
+      "19" : {
+         "map" : "telnet_pwd",
+         "required" : 0,
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "10" : {
+         "map" : "snmp_ro",
+         "required" : 0,
+         "class" : "ActiveCMDB::Object::String"
+      },
+      "5" : {
+         "map" : "status",
+         "required" : 0,
+         "range" : "0,1",
+         "default" : 0,
+         "class" : "ActiveCMDB::Object::Number"
+      }
+   },
+   "ObjectClass" : "ActiveCMDB::Object::Device",
+   "PostProcess" : "verify_device_object",
+   "Library" : [
+      "ActiveCMDB::Common::Device",
+      "ActiveCMDB::Common::Location",
+      "ActiveCMDB::Common::Contract",
+      "ActiveCMDB::Common::IpDomain"
+   ]
+}
+

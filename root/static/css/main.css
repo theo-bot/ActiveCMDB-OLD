@@ -208,6 +208,18 @@ div.configData {
 	overflow:scroll;
 }
 
+div.bottomLeft {
+	position: absolute;
+	bottom: 5px;
+	left: 5px;	
+}
+
+div.bottomRight {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;	
+}
+
 input.cmdbText {
 	font: 1.1em 'trebuchet ms',helvetica,sans-serif;
 }
@@ -348,6 +360,10 @@ a.cmdbLink {
 	right: -350px;
 }
 
+#importProgress {
+	width: 300px;
+}
+
 select.searchSelect {
 	width: 90%;
 }
@@ -360,6 +376,7 @@ select.searchSelect {
 
 td, th {
 	overflow: hidden;
+	text-align: left;
 }
 
 div.cirTree {

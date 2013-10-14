@@ -1,0 +1,9 @@
+Install search indexes using the following commands:
+
+
+
+search-cmd install cmdbImport
+search-cmd solr cmdbImport cmdbImport.xml
+
+search-cmd install cmdbImportLines
+search-cmd solr cmdbImport cmdbImportLines.xml

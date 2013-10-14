@@ -1,0 +1,7 @@
+<add>
+  <doc>
+   <field name="id">DocID</field>
+   <field name="username">User name</field>
+   <field name="filename">Filename</field>
+  </doc>
+</add>

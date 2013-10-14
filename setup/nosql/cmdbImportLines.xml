@@ -1,0 +1,10 @@
+<add>
+  <doc>
+   <field name="id">DocID</field>
+   <field name="ln">Line number</field>
+   <field name="status">Status</field>
+   <field name="importId">Parent ID</field>
+   <field name="data">Raw data</field>
+   <field name="lineId">lineId</field>
+  </doc>
+</add>

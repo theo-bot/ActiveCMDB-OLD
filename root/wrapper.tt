@@ -121,6 +121,8 @@
 			}
 		</style>
 		<script src="/static/js/activecmdb.distrib.js"></script>
+		[% CASE "import" %]
+		<script src="/static/js/activecmdb.import.js"></script>
 	[% END %]
 </head>
 <body>

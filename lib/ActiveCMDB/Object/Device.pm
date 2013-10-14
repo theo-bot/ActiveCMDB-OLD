@@ -172,11 +172,13 @@ sub save {
 	my @colums = ();
 	my($rs, $data, $attr);
 	
-	Logger->debug("Saving device_id" . $self->device_id );
+	if ( defined($self->device_id) ) {
+		Logger->debug("Saving device_id" . $self->device_id );
+	}
 	#
 	# Verify if the hostname was set and if it is a new device
 	#
-	if ( (defined($self->device_id) || $self->device_id == 0) && !defined($self->hostname) ) {
+	if ( (defined($self->device_id) || $self->device_id == 0) && ( !defined($self->hostname) || length($self->hostname) == 0 ) ) {
 		my $h = sprintf("NEW%08d", int(rand(99999999)));
 		$self->hostname($h);
 		$self->added( DateTime->now() );
@@ -388,6 +390,101 @@ sub delete
 		}
 	}
 }
+
+=head2 get_deviceid_by_ip
+
+Find the device_id via an management ip address. 
+
+=cut
+
+sub get_deviceid_by_ip
+{
+	my($self) = @_;
+	
+	if ( defined($self->mgtaddress) )
+	{
+		my $row = $self->schema->resultset("IpDevice")->find(
+			{
+				mgtaddress => $self->mgtaddress
+			},
+			{
+				columns => qw/device_id/
+			}
+		);
+		if ( defined($row) ) {
+			return $row->device_id;
+		}
+	}
+	
+	return undef;
+}
+
+=head2 get_deviceid_by_hostname
+
+
+
+=cut
+
+sub get_deviceid_by_hostname
+{
+	my($self) = @_;
+	
+	if ( defined($self->hostname) )
+	{
+		
+		my $row = $self->schema->resultset("IpDevice")->find(
+			{
+				hostname => $self->hostname
+			},
+			{
+				columns => qw/device_id/
+			}
+		);
+		if ( defined($row) ) {
+			return $row->device_id;
+		}
+	}
+	
+	return undef;
+}
+
+=head2 verify_device_object
+
+Verify a device object to avoid data corruption and duplicates
+
+Arguments:
+ $device	- ActiveCMDB::Object::Device object	
+
+=cut
+
+sub verify_device_object
+{
+	my($self) = @_;
+	my($result, $reason);
+	$result = true;
+	
+	#
+	# If the device id is not present, try to find it via its management address
+	
+	if ( !defined($self->device_id) && defined($self->mgtaddress()) )
+	{
+		my $id = $self->get_deviceid_by_ip();
+		if ( defined($id) ) {
+			Logger->info("Assigned device_id ($id) via ipaddress");
+			$self->device_id($id);
+		}
+	}	
+	
+	if ( !defined($self->device_id) && defined($self->hostname) )
+	{
+		my $id = $self->get_deviceid_by_hostname($self->hostname);
+		if ( defined($id) ) {
+			Logger->info("Assigned device_id ($id) via hostname");
+			$self->device_id($id);
+		}
+	}
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
