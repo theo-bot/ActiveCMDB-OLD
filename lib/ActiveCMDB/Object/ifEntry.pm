@@ -55,16 +55,16 @@ has 'iftype'			=> ( is => 'rw', isa => 'Int' );
 has 'istrunk'			=> ( is => 'rw', isa => 'Int', default => 0);
 
 has 'disco'				=> ( is => 'rw', isa => 'Int' );
-has 'schema'			=> ( is => 'rw', isa => 'Object' );
-
+# Schema
+has 'schema'		=> (
+	is		=> 'rw', 
+	isa		=> 'Object', 
+	default => sub { ActiveCMDB::Model::CMDBv1->instance() } 
+);
 sub get_data
 {
 	my($self) = @_;
 	my($rs);
-	
-	if ( !defined($self->schema) ) { 
-		$self->schema(ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}));
-	}
 	
 	#
 	# Get basic data
@@ -100,10 +100,6 @@ sub save
 	my($data);
 	
 	$data = undef;
-	if ( !defined($self->schema) ) { 
-		$self->schema(ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}));
-	}
-	
 	
 	foreach my $key ( __PACKAGE__->meta->get_all_attributes )
 	{

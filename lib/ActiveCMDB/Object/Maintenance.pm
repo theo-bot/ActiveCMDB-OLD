@@ -54,7 +54,12 @@ has 'end_time'		=> (is => 'rw', isa => 'Int|Undef', writer => '_end_time', defau
 has 'm_repeat'		=> (is => 'rw', isa => 'Int', default => 0);
 has 'm_interval'		=> (is => 'rw', isa => 'Int', default => 0);
 
-has 'schema'		=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}) } );
+# Schema
+has 'schema'		=> (
+	is		=> 'rw', 
+	isa		=> 'Object', 
+	default => sub { ActiveCMDB::Model::CMDBv1->instance() } 
+);
 
 sub get_data
 {

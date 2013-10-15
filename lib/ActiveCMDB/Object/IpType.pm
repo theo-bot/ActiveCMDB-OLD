@@ -47,7 +47,11 @@ has 'descr'			=> (is => 'rw', isa => 'Str');
 has 'vendor_id'		=> (is => 'rw', isa => 'Int');
 
 # Schema
-has 'schema'		=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}) } );
+has 'schema'		=> (
+	is		=> 'rw', 
+	isa		=> 'Object', 
+	default => sub { ActiveCMDB::Model::CMDBv1->instance() } 
+);
 
 sub find
 {

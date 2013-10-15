@@ -191,11 +191,6 @@ sub init {
 	$self->json( JSON::XS->new->ascii->pretty->allow_nonref );
 	
 	#
-	# Connecting to database
-	#
-	$self->schema(ActiveCMDB::Model::CMDBv1->instance());
-	
-	#
 	# Connect to broker
 	#
 	$self->broker(ActiveCMDB::Common::Broker->new( $self->config->section('cmdb::broker') ));

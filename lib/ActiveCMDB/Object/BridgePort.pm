@@ -43,8 +43,12 @@ has 'device_id'		=> (is => 'ro', isa => 'Int');
 has 'ifindex'		=> (is => 'rw', isa => 'Int');
 has 'mac'			=> (is => 'rw', isa => 'Str');
 has 'disco'			=> (is => 'rw', isa => 'Int');
-has 'schema'		=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}) } );
-
+# Schema
+has 'schema'		=> (
+	is		=> 'rw', 
+	isa		=> 'Object', 
+	default => sub { ActiveCMDB::Model::CMDBv1->instance() } 
+);
 sub get_data
 {
 	my($self) = @_;

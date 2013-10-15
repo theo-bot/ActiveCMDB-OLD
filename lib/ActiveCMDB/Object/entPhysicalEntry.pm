@@ -52,17 +52,18 @@ has 'entphysicalserialnum'		=> (is => 'rw', isa => 'Str');
 has 'ifindex'					=> (is => 'rw', isa => 'Int');
 has 'disco'						=> (is => 'rw', isa => 'Int');
 
-has 'schema'					=> (is => 'rw', isa => 'Object');
+# Schema
+has 'schema'		=> (
+	is		=> 'rw', 
+	isa		=> 'Object', 
+	default => sub { ActiveCMDB::Model::CMDBv1->instance() } 
+);
 has 'icon'						=> (is => 'rw', isa => 'Any');
 
 sub get_data
 {
 	my($self) = @_;
 	my($rs);
-	
-	if ( !defined($self->schema) ) { 
-		$self->schema(ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}));
-	}
 	
 	#
 	# Get basic data
@@ -99,9 +100,6 @@ sub save
 	my($data);
 	
 	$data = undef;
-	if ( !defined($self->schema) ) { 
-		$self->schema(ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}));
-	}
 	
 	
 	foreach my $key ( __PACKAGE__->meta->get_all_attributes )

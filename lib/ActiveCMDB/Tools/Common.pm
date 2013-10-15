@@ -62,8 +62,12 @@ has 'config'		=> ( is => 'rw', isa => 'Object' );
 
 Database connection
 =cut
-has 'schema'		=> ( is => 'rw', isa => 'Object' );
-
+# Schema
+has 'schema'		=> (
+	is		=> 'rw', 
+	isa		=> 'Object', 
+	default => sub { ActiveCMDB::Model::CMDBv1->instance() } 
+);
 =head2 broker
 
 Connection to the default broker

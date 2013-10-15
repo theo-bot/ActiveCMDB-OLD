@@ -55,8 +55,12 @@ has 'config_type'		=> (is => 'rw', isa => 'Str');
 has 'config_name'		=> (is => 'rw', isa => 'Str');
 has 'config_data'		=> (is => 'rw', isa => 'Str');
 
-has 'schema'			=> => (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}) } );
-
+# Schema
+has 'schema'		=> (
+	is		=> 'rw', 
+	isa		=> 'Object', 
+	default => sub { ActiveCMDB::Model::CMDBv1->instance() } 
+);
 with 'ActiveCMDB::Object::Methods';
 
 my %map = (

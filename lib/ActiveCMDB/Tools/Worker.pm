@@ -122,11 +122,6 @@ sub init {
 	$self->process->update($self->process->process_name());
 		
 	#
-	# Connecting to database
-	#
-	$self->schema(ActiveCMDB::Model::CMDBv1->instance());
-	
-	#
 	# Connect to broker
 	#
 	$self->broker(ActiveCMDB::Common::Broker->new( $self->config->section('cmdb::broker') ));

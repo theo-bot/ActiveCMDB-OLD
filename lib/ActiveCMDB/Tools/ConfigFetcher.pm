@@ -107,11 +107,6 @@ sub init {
 	$self->class_loader();
 	
 	#
-	# Connecting to database
-	#
-	$self->schema(ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}));
-	
-	#
 	# Connect to broker
 	#
 	$self->broker(ActiveCMDB::Common::Broker->new( $self->config->section('cmdb::broker') ));

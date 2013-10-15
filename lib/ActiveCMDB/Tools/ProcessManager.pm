@@ -106,10 +106,6 @@ sub init {
 	$self->process->ppid(getppid());
 	$self->process->update($self->process->process_name());
 	$self->process->disconnect();
-	#
-	# Connecting to database
-	#
-	$self->schema(ActiveCMDB::Model::CMDBv1->instance());
 	
 	#
 	# Connect to broker

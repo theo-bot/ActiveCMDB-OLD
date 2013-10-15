@@ -146,10 +146,6 @@ sub init {
 	$self->process->disconnect();
 	$self->schema_age(0);
 	$self->server_id( $self->config->section('cmdb::default::server_id') );
-	#
-	# Connecting to database
-	#
-	$self->schema(ActiveCMDB::Schema->connect(ActiveCMDB::Model::CMDBv1->config()->{connect_info}));
 	
 	#
 	# Connect to broker
