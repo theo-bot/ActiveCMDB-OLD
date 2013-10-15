@@ -79,7 +79,9 @@ sub populate
 		foreach my $attr (keys %map)
 		{
 			my $m = $map{$attr};
-			$self->$attr($data->$m());
+			if ( defined($data->$m()) ) {
+				$self->$attr($data->$m());
+			}
 		}
 	}
 }

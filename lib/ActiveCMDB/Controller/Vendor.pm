@@ -214,6 +214,11 @@ sub save :Local {
 	if ( $c->check_user_roles('vendorAdmin') )
 	{
 		$vendor = ActiveCMDB::Object::Vendor->new();
+		
+		if ( defined($c->request->params->{id}) && $c->request->params->{id} eq "" ) {
+			$c->request->params->{id} = undef;
+		}
+		
 		$vendor->populate($c->request->params);
 		my $res = $vendor->save();
 		$c->response->body($res);

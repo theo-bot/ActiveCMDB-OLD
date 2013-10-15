@@ -51,7 +51,7 @@ use Logger;
 
 INTEGER, Unique id for vendor
 =cut
-has 'id'			=> (is => 'rw',	isa => 'Int');
+has 'id'			=> (is => 'rw',	isa => 'Maybe[Int]');
 
 =head2 name
 
