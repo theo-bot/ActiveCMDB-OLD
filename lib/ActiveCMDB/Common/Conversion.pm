@@ -51,6 +51,7 @@ our @EXPORT = qw(
 	cmdb_list_byname
 	cmdb_name_set
 	cmdb_oid_set
+	cmdb_export_conv
 );
 #########################################################################
 # Routines
@@ -257,4 +258,36 @@ sub cmdb_oid_set
 	}
 		
 	return %set
+}
+
+=head2 exportConv
+
+Generate a list of conversion commands to save the conversion table
+
+=cut
+
+sub cmdb_export_conv
+{
+	my($schema, $rs);
+	
+	$schema = ActiveCMDB::Model::CMDBv1->instance();
+	$rs = $schema->resultset("Conversion")->search(
+			undef,
+			{
+				order_by	=> qw/name value/
+			}
+	);
+	
+	if ( defined($rs) )
+	{
+		while(my $row = $rs->next)
+		{
+			printf('$CMDB_HOME/bin/cmdb_convert.pl -add -name %s -from "%s" -to "%s"', 
+				$row->name,
+				$row->value,
+				$row->conversion
+			);
+			print "\n";
+		}
+	}
 }

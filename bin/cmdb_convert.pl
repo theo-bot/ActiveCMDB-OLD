@@ -59,6 +59,7 @@ GetOptions(
 			'name=s'	=> \$name,
 			'from=s'	=> \$from,
 			'to=s'		=> \$to,
+			'export'	=> \&cmdb_export_conv,
 			'help'		=> \&help
 		   );
 
