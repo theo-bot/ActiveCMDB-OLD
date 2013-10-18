@@ -204,6 +204,8 @@ sub upload :Local {
 	
 	# Store object
 	$import->save();
+	
+	$c->forward('add');
 }
 
 sub discard :Local {
