@@ -58,7 +58,7 @@ Connect to a RabbitMQ broker.
  			password - Password
  			pwencr   - Is the password encrypted (0: No, 1: Yes)
  			prefix   - Default prefix for destinations
- 		
+ 			vhost	 - Virtual host within broker
 =cut
 
 sub connect {
@@ -81,7 +81,8 @@ sub connect {
 				$self->mq->connect($host, { 
 											user	 => $config->{user}, 
 											password => $config->{password},
-											port	 => $port 
+											port	 => $port,
+											vhost	 => $config->{vhost}
 										  }
 									);
 			};

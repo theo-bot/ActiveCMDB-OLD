@@ -50,6 +50,7 @@ Create a new instance of this class.
  			password - Password
  			pwencr   - Is the password encrypted (0: No, 1: Yes)
  			prefix   - Default prefix for destinations
+ 			vhost    - Virtual host within broker
 
 
 It does B<not> automatically subscribe to queue's/exchanges
