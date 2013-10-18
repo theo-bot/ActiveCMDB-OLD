@@ -106,6 +106,12 @@ sub auto : Private {
 	return 1;
 }
 
+sub blank :Local {
+	my($self, $c) = @_;
+	
+	$c->stash->{template} = "blank.tt";
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
