@@ -115,20 +115,6 @@
 </div>
 
 </form>
-<div id="searchWin" title="Search device">
-<table width="75%" class="ui-widget">
-	<tr align="left"><th>Table</th><th>Field</th><th>Operator</th><th>Value</th></tr>
-	<tr>
-		<td><select id="devTable"><option>device</option><option>interface</option><option>entity</option></select></td>
-		<td><select id="devField"></select></td>
-		<td><select id="devOper"><option value="eq">==</option><option value="ne">!=</option><option value="lk">like</option></select></td>
-		<td><input type="text" name="searchStr" id="searchStr" /></td>
-	</tr>
-	<tr>
-		<td colspan="4" rowspan="6"><select class="searchSelect" multiple="true" size="10" id="#devFound"></select>
-	</tr>
-</table>
-</div>
 
  <script src="/static/js/activecmdb.toolbar.js" ></script>
  <script type="text/javascript">

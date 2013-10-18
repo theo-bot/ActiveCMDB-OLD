@@ -115,10 +115,6 @@ $(function() {
 	
 	
 	
-	$( "#searchDev" ).click(function() {
-		$( "#searchWin").dialog( "open" );
-		return false;
-	});
 	
 	$( "#tabs" ).tabs({
 		ajaxOptions: {
@@ -134,6 +130,78 @@ $(function() {
         }
 	});
 	
+	
+	jQuery("#devSrcTable").jqGrid({ 
+		url:'/device/api?oper=list', 
+		hidegrid: false,
+		datatype: "json",
+		colNames:['Hostname', 'Address', 'Vendor','Type','Site'],
+		colModel: [
+		           	{
+		           		name:'hostname',
+		           		index:'hostname', 
+		           		width:128, 
+		           		editable:false, 
+		           		searchoptions: {sopt:['eq','ne','cn','bw']}, 
+		           		required:true, 
+		           	}, 
+		           	{
+		           		name:'mgtaddress',
+		           		index:'mgtaddress',
+		           		searchoptions: {sopt:['eq','ne','cn','bw']},
+		           		width:128, 
+		           		editable:false,
+		           		
+		           	},
+		           	{
+		           		name:'vendor',
+		           		index:'vendor', 
+		           		width:128, 
+		           		searchoptions: {sopt:['eq','ne','cn','bw']},
+		           		editable:false, 
+		           		required:false, 
+		           	},
+		           	{
+		           		name:'type',
+		           		index:'type',
+		           		width:128,
+		           		searchoptions: {sopt:['eq','ne','cn','bw']},
+		           		editable:false
+		           	},
+		           	{
+		           		name:'site',
+		           		index:'site', 
+		           		width:128, 
+		           		searchoptions: {sopt:['eq','ne','cn','bw']},
+		           		editable:false,
+		           		required:true,
+		           	},
+		          ],
+		rowNum:15, 
+		rowList:[15,30,45], 
+		pager: '#devSrcPager', 
+		sortname: 'device_id', 
+		viewrecords: true, 
+		sortorder: "asc", 
+		editurl: "/device/api", 
+		caption: "Search device",
+		ondblClickRow: function(id) {
+			var rowData = jQuery(this).getRowData(id);
+			var hostName = rowData['hostname'];
+			var myValue = parent.document.getElementById("hostname").value = hostName;
+		}
+	});
+	
+	jQuery("#devSrcTable").jqGrid('navGrid',"#devSrcPager",
+			{view:false, edit:false, add:false, save:false, del:false},
+			{height:350,reloadAfterSubmit:false, jqModal:false, closeOnEscape:true, bottominfo:"Fields marked with (*) are required"},
+			{height:350,reloadAfterSubmit:true,jqModal:false, closeOnEscape:true,bottominfo:"Fields marked with (*) are required", closeAfterAdd: true},
+			{reloadAfterSubmit:false,jqModal:false, closeOnEscape:true},
+			{closeOnEscape:true},
+			{height:350,jqModal:false,closeOnEscape:true}
+	); 
+	
+	jQuery("#devSrcTable").jqGrid('inlineNav',"#devSrcPager", {edit: false, add:false, cancel:false, save:false});
 	
 });
 

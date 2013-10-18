@@ -56,7 +56,7 @@ toolbar.attachEvent("onClick",function(id){
 			new_device();
 			break;
 		case "searchDevice":
-			$( "#searchWin").dialog( "open" );
+			search_device();
 			break;
 		case "discoDevice":
 			discover_device( $("#hostname").val() );
@@ -211,4 +211,21 @@ function delete_device()
 			},
 			'html'
 	);
+}
+
+function search_device()
+{
+	$.colorbox({
+		iframe:true,
+		width:740,
+		height:440,
+		initialWidth:740,
+		initialHeight:440,
+		href:'/device/search',
+		/*
+		onClosed:function(){
+			
+		}
+		*/
+	});
 }

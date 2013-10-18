@@ -60,6 +60,7 @@ use namespace::autoclean;
 use DateTime;
 use Data::Dumper;
 use POSIX;
+use Switch;
 use ActiveCMDB::Common::Conversion;
 use ActiveCMDB::Common::Device;
 use ActiveCMDB::Common::Location;
@@ -901,6 +902,129 @@ sub delete_device :Local {
 	
 	$c->response->body("Failed to update device parameters");
 	$c->response->status(200);
+}
+
+sub search :Local {
+	my($self, $c) = @_;
+	
+	$c->stash->{template} = 'device/search_container.tt';
+}
+
+sub api :Local {
+	my($self, $c) = @_;
+	
+	if ( defined($c->request->params->{oper}) ) {
+		$c->forward($c->request->params->{oper});
+	} else {
+		$c->log->warn("Forward operation not defined");
+	}
+}
+
+sub list :Local {
+	my($self, $c) = @_;
+	my($json,$rs);
+	my @rows = ();
+	my %schemes = ();
+	
+	$json = undef;
+	
+	my $rows	= $c->request->params->{rows} || 10;
+	my $page	= $c->request->params->{page} || 1;
+	my $order	= $c->request->params->{sidx} || 'hostname';
+	my $asc		= '-' . $c->request->params->{sord};
+	my $search = undef;
+	
+	my $options = {
+		rows		=> $rows,
+		page		=> $page,
+		order		=> $order,
+		
+	};
+	
+	#
+	# Create search filter
+	#
+	
+	my $orderBy		 = undef;
+	if ( $c->request->params->{_search} eq 'true' )
+	{
+		my $searchOper   = $c->request->params->{searchOper};
+		my $searchField  = $c->request->params->{searchField};
+		my $searchString = $c->request->params->{searchString};
+		
+		
+		
+		if ( $searchField eq 'vendor' )
+		{
+			$searchField = "vendors.vendor_name";
+		}
+		
+		if ( $searchField eq 'site' )
+		{
+			$searchField = "location.name";
+		}
+		
+		if ( $searchField eq 'type')
+		{
+			$searchField = "sysoids.descr";
+		}
+		
+		
+		switch ( $searchOper ) {
+			case 'cn'		{ $search = { $searchField => { like => '%'.$searchString.'%' } } }
+			case 'eq'		{ $search = { $searchField => $searchString } }
+			case 'ne'		{ $search = { $searchField => { '!=' => $searchString } } }
+			case 'bw'		{ $search = { $searchField => { like => $searchString.'%' } } }
+			else 			{ $search = { } }
+		}
+		
+		
+		
+	} else {
+		$search = { };
+	}
+	
+	switch ( $order ) {
+			case 'vendor'	{ $orderBy = 'vendor.vendor_name' }
+			case 'type'		{ $orderBy = 'sysoids.descr' }
+			case 'site'		{ $orderBy = 'location.name '}
+			else { $orderBy = $order }
+	}
+	
+	my $join         = { 'sysoids' => 'vendors'  };
+	$rs = $c->model("CMDBv1::IpDevice")->search(
+			$search,
+			{
+				'+select'	=> [ 'location.name', 'vendors.vendor_name', 'sysoids.descr' ],
+				'+as'		=> [ 'site_name', 'vendor_name', 'dev_type'],
+				join		=> [ $join, 'location' ],
+				order_by		=> { $asc => $orderBy }
+			}
+	);
+	
+	$json->{records} = $rs->count;
+	if ( $json->{records} > 0 ) {
+		$json->{total} = ceil($json->{records} / $c->request->params->{rows} );
+	} else {
+		$json->{total} = 0;
+	} 
+	@rows = ();
+	while ( my $row = $rs->next )
+	{
+		push(@rows, { id => $row->device_id, cell=> [
+														$row->hostname,
+														$row->mgtaddress,
+														$row->get_column('vendor_name'),
+														$row->get_column('dev_type'),
+														$row->get_column('site_name')
+											]
+					}
+			);
+	}
+	
+	$json->{rows} = [ @rows ];
+	$c->stash->{json} = $json;
+	$c->forward( $c->view('JSON') );
 }
 
 1;

@@ -377,6 +377,22 @@ __PACKAGE__->might_have(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+
+=head2 locations
+
+Type: might_have
+
+Realated object: L<ActiveCMDB::Schema::Result::Location>
+
+=cut
+
+__PACKAGE__->has_many(
+	"location",
+	"ActiveCMDB::Schema::Result::Location",
+	{ "foreign.location_id" => "self.location_id" },
+	{ cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 ip_devices_at
 
 Type: has_many
