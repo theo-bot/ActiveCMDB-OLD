@@ -71,6 +71,8 @@
 		<script src="/static/js/dhtmlxcommon.js" ></script>
 		<script src="/static/js/dhtmlxtoolbar.js" ></script>
 		<script src="/static/js/activecmdb.device.js"></script>
+		[% CASE "search" %]
+		<script src="/static/js/activecmdb.device.js"></script>
 		[% CASE "domain" %]
 		<script src="/static/js/activecmdb.domain.js"></script>
 		[% CASE "iptype" %]
