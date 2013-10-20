@@ -30,11 +30,9 @@
 %]
 <div class="cmdbTabDiv" >
 <form>
-<input type="hidden" id="siteType" name="siteType" value="[% site.ltype %]" >
+<input type="hidden" id="siteType" name="siteType" value="[% site.location_type %]" >
 <input type="hidden" id="device_id" value="[% device.device_id %]" />
-<script type="text/javascript">
-	updateSiteForm($("#siteType").val());
-</script>
+
 <table >
 <tr>
 	<td width="100">Location tree</td>
@@ -124,5 +122,7 @@
 <input type="button" id="setDeviceSite" class="cmdbButton" value="update" />
 </form>
 </div>
-
+<script type="text/javascript">
+	updateSiteForm($("#siteType").val());
+</script>
 [% END %]
