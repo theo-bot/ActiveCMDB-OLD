@@ -47,6 +47,9 @@ use ActiveCMDB::Common::Constants;
 use ActiveCMDB::Object::Journal;
 use ActiveCMDB::Object::Configuration;
 
+use constant OBJECT => 1;
+use constant DOMAIN => 2;
+
 #
 # Define custom types
 #
@@ -79,21 +82,41 @@ has 'os_type'		=> (is => 'rw', isa => 'Str', default => '');
 has 'os_version'	=> (is => 'rw', isa => 'Str', default => '');
 has 'domain_id'		=> (is => 'rw', isa => 'Maybe[Int]');
 # Security attributes
-has 'snmp_ro'		=> (is => 'rw', isa => 'Str');
-has 'snmp_rw'		=> (is => 'rw', isa => 'Str');
-has 'snmpv'			=> (is => 'rw', isa => 'SnmpVer', default => 1);
-has 'telnet_user'	=> (is => 'rw', isa => 'Str');
-has 'telnet_pwd'	=> (is => 'rw', isa => 'Str');
-has 'snmpv3_user'	=> (is => 'rw', isa => 'Str');
-has 'snmpv3_pass1'	=> (is => 'rw', isa => 'Str');
-has 'snmpv3_pass2'	=> (is => 'rw', isa => 'Str');
-has 'snmpv3_proto1'	=> (is => 'rw', isa => 'Proto1', default => 'md5');
-has 'snmpv3_proto2'	=> (is => 'rw', isa => 'Proto2', default => 'aes');
+has 'snmp_ro'		=> (is => 'rw', isa => 'Str', trigger => \&_security_source );
+has 'snmp_rw'		=> (is => 'rw', isa => 'Str', trigger => \&_security_source);
+has 'snmpv'			=> (is => 'rw', isa => 'SnmpVer', default => 1, trigger => \&_security_source);
+has 'telnet_user'	=> (is => 'rw', isa => 'Str', trigger => \&_security_source);
+has 'telnet_pwd'	=> (is => 'rw', isa => 'Str', trigger => \&_security_source);
+has 'snmpv3_user'	=> (is => 'rw', isa => 'Str', trigger => \&_security_source);
+has 'snmpv3_pass1'	=> (is => 'rw', isa => 'Str', trigger => \&_security_source);
+has 'snmpv3_pass2'	=> (is => 'rw', isa => 'Str', trigger => \&_security_source);
+has 'snmpv3_proto1'	=> (is => 'rw', isa => 'Proto1', default => 'md5', trigger => \&_security_source);
+has 'snmpv3_proto2'	=> (is => 'rw', isa => 'Proto2', default => 'aes', trigger => \&_security_source);
 has 'snmp_port'		=> (is => 'rw', isa => 'Int', default => 161);
 
 # Schema
-has 'schema'		=> (is => 'rw', isa => 'Object', default => sub { ActiveCMDB::Model::CMDBv1->instance() } );
+has 'schema'		=> (
+	is => 'rw', 
+	isa => 'Object', 
+	default => sub { ActiveCMDB::Model::CMDBv1->instance() } 
+);
 
+#
+has 'domain'		=> (is => 'rw', isa => 'Object');
+has 'domain_sec'	=> (is => 'rw', isa => 'Tof', default => 0);
+
+my %sec_source = (
+	snmp_ro			=> OBJECT,
+	snmp_rw			=> OBJECT,
+	snmpv			=> OBJECT,
+	telnet_user		=> OBJECT,
+	telnet_pwd		=> OBJECT,
+	snmpv3_user		=> OBJECT,
+	snmpv3_pass1	=> OBJECT,
+	snmpv3_pass2	=> OBJECT,
+	snmpv3_proto1	=> OBJECT,
+	snmpv3_proto2	=> OBJECT
+);
 
 =head1 Methods
 
@@ -128,6 +151,15 @@ sub find {
 				} 
 			}
 			
+			my $domain_sec =undef;
+			if ( defined($self->domain_id) ) {
+				my $domain = ActiveCMDB::Object::Ipdomain->new(domain_id => $self->domain_id);
+				if ( $domain->get_data() )
+				{
+					$domain_sec = $domain->security( $self->mgtaddress );
+				}
+			}
+			
 			# Get security parametrs;
 			$row = $self->schema->resultset("IpDeviceSec")->find({ device_id => $self->device_id });
 			if ( defined($row) )
@@ -136,8 +168,14 @@ sub find {
 				{
 					my $attr = $key->name;
 					next if ( $attr =~ /schema|device_id/ );
-					if ( $row->can($attr) && defined($row->$attr) ) {
+					if ( defined($row->$attr) ) {
 						$self->$attr($row->$attr);
+						$sec_source{$attr} = OBJECT;
+					} else { 
+						if ( defined($domain_sec) && defined($domain_sec->$attr) ) {
+							$self->$attr( $domain_sec->$attr );
+							$sec_source{$attr} = DOMAIN;
+						}
 					}
 				}
 			}
@@ -217,9 +255,15 @@ sub save {
 		$data = undef;
 		foreach $attr (@colums)
 		{
-			if ( $self->can($attr) && defined($self->$attr) )
+			next if ( exists $sec_source{$attr} && $sec_source{$attr} == DOMAIN );
+			if ( $self->can($attr)  )
 			{
-				$data->{$attr} = $self->$attr;
+				if ( defined($self->$attr)  )
+				{
+					$data->{$attr} = $self->$attr;
+				} else {
+					$data->{$attr} = undef;
+				}
 			}
 		}
 		$rs = $self->schema->resultset("IpDeviceSec")->update_or_create( $data );
@@ -482,6 +526,22 @@ sub verify_device_object
 			Logger->info("Assigned device_id ($id) via hostname");
 			$self->device_id($id);
 		}
+	}
+}
+
+sub _security_source
+{
+	my $self = shift;
+	my $pkg = __PACKAGE__;
+	my @caller = caller(1);
+	my $attr = $caller[3];
+	$attr =~ s/^.*://;
+	if ( $pkg ne $caller[0] )
+	{
+		Logger->debug("Value of $attr is set outside $pkg");
+		if ( exists $sec_source{$attr} ) {
+			$sec_source{$attr} = 1;
+		} 
 	}
 }
 
