@@ -79,6 +79,21 @@ has schema 		=> (
 	default	=> sub { ActiveCMDB::Model::CMDBv1->instance() }
 );
 
+has 'networks' => (
+		traits	=> ['Array'],
+		is		=> 'ro',
+		isa		=> 'ArrayRef',
+		default => sub { [] },
+		handles => {
+			all_nets	=> 'elements',
+			add_net		=> 'push',
+			sort_nets	=> 'sort',
+			net_count	=> 'count'
+		}
+);
+
+
+
 my %map = (
 	domain_id	=> 'domain_id',
 	domain_name	=> 'domain_name',
@@ -90,7 +105,7 @@ my %map = (
 sub get_data
 {
 	my($self) = @_;
-	
+	my $result = 0;
 	if ( defined($self->domain_id) )
 	{
 		try {
@@ -104,11 +119,56 @@ sub get_data
 						$self->$attr($row->$field);
 					}
 				}
+				
+				#
+				# Fetch networks
+				#
+				my $rs = $self->schema->resultset("IpDomainNetwork")->search(
+					{ 
+						domain_id => $self->domain_id		
+					},
+					{
+						columns	=> qw/network_id/,
+						order_by => qw/ip_order/						
+					}
+				);
+				
+				if ( defined($rs) && $rs->count > 0 )
+				{
+					while ( my $r = $rs->next )
+					{
+						my $net = ActiveCMDB::Object::Ipdomain::Network->new(network_id => $r->network_id);
+						$net->get_data();
+						$self->add_net($net);
+					}
+				}
+				
+				
+				$result = 1;
 				Logger->debug("Fetched ipdomain data");
 			}
 		} catch {
 			Logger->warn("Failed to fetch domain data: " . $_);
 		};
 		
-	}
+	} 
+	
+	return $result;
 }
+
+sub security
+{
+	my($self, $address) = @_;
+	
+	foreach my $net ($self->sort_nets())
+	{
+		if ( $net->contains($address) )
+		{
+			return $net;
+			last;
+		}
+	} 
+}
+
+__PACKAGE__->meta->make_immutable;
+1;
