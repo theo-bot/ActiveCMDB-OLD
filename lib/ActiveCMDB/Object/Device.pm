@@ -251,6 +251,14 @@ sub save {
  		}
 	
 		# Next save the security attributes to IpDeviceSec 
+		my $domain_sec =undef;
+		if ( defined($self->domain_id) ) {
+			my $domain = ActiveCMDB::Object::Ipdomain->new(domain_id => $self->domain_id);
+			if ( $domain->get_data() )
+			{
+				$domain_sec = $domain->security( $self->mgtaddress );
+			}
+		}
 		@colums = $self->schema->source("IpDeviceSec")->columns;
 		$data = undef;
 		foreach $attr (@colums)
@@ -260,12 +268,32 @@ sub save {
 			{
 				if ( defined($self->$attr)  )
 				{
-					$data->{$attr} = $self->$attr;
+					if ( exists $sec_source{$attr} && $self->$attr eq $domain_sec->$attr )
+					{
+						#
+						# The domain can handle this security parameter
+						#
+						$data->{$attr} = undef;
+							
+					} else {
+						#
+						# The security parameters differs from the domain,
+						# so we store it with the device
+						#
+						$data->{$attr} = $self->$attr;
+					}
 				} else {
+					#
+					# The data was not defined, so the domain will handle it.
+					#
 					$data->{$attr} = undef;
 				}
 			}
 		}
+		
+		#
+		# Pass the data to the database
+		#
 		$rs = $self->schema->resultset("IpDeviceSec")->update_or_create( $data );
 		if ( ! $rs->in_storage ) {
 			$rs->insert;
