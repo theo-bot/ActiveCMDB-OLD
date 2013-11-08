@@ -1,0 +1,11 @@
+-- activecmdb_setup.sql
+DROP DATABASE IF EXISTS [DBNAME];
+CREATE DATABASE [DBNAME];
+
+--
+-- Create database user
+--
+GRANT ALL ON [DBNAME].* TO '[DBUSER]'@'%' IDENTIFIED BY '[DBPASS]';
+GRANT ALL ON [DBNAME].* TO '[DBUSER]'@'localhost' IDENTIFIED BY '[DBPASS]';
+
+-- END OF SCRIPT
