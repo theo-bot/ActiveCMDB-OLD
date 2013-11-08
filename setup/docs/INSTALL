@@ -1,0 +1,45 @@
+
+1. Extract archive.
+
+ Extract the ActiveCMDB.x.y.z.tgz archive to the directory of your choosing.
+
+ For example
+ # cd /opt/
+ # mkdir ActiveCMDB
+ # chown <user>:<group> ActiveCMDB
+ # exit
+ $ cd /opt
+ $ tar xzvf $HOME/ActiveCMDB.x.y.z.tgz
+ $ cd ActiveCMDB/bin
+ $ vi activecmdb.sh
+
+ Update the CMDB_HOME variable with your enviroment
+ 
+ CMDB_HOME=/opt/ActiveCMDB 
+
+2. Source  ActiveCMDB enviroment
+
+$ . /opt/ActiveCMDB/bin/activecmdb.sh
+
+
+3. Update configuration
+
+ vi $CMDB_HOME/conf/cmdb.yml
+ 
+ Update the following sections:
+ 
+ - database
+ - cloud
+ - broker
+ 
+4. Generate encryption key pair 
+ 
+ $ cd $CMDB_HOME/bin
+ $ ./cmdb_genkey.pl -name activecmdb
+ 
+5. Configure databases
+
+ $ cd $CMDB_HOME/setup/bin
+ $ ./cmdb_setup.pl
+ 
+ 
