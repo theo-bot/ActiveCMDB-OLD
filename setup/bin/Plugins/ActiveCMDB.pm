@@ -73,5 +73,4 @@ sub PrepareDB
 	}
 	close(IN);
 	close(OUT);
-	exit;
 }
