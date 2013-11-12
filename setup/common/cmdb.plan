@@ -1,11 +1,202 @@
 {
    "steps" : {
+      "CMDB00045" : {
+         "depend" : "CMDB00034",
+         "args" : null,
+         "action" : "ip_device_net.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device net table"
+      },
+      "CMDB00041" : {
+         "depend" : "CMDB00033",
+         "args" : null,
+         "action" : "ip_device_entity.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device entity table"
+      },
+      "CMDB00033" : {
+         "depend" : "CMDB00013",
+         "args" : null,
+         "action" : "ip_device.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device table"
+      },
       "CMDB00004" : {
          "depend" : "CMDB00003",
+         "args" : null,
          "action" : "activecmdb_setup.ddl",
          "repeat" : "0",
          "type" : "3",
+         "exec_key" : null,
          "descr" : "Create database"
+      },
+      "CMDB00032" : {
+         "depend" : "CMDB00031",
+         "args" : null,
+         "action" : "ip_domain_network.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip domain network table"
+      },
+      "CMDB00019" : {
+         "depend" : "CMDB00004",
+         "args" : "",
+         "action" : "conversion.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create conversions table"
+      },
+      "CMDB00008" : {
+         "depend" : "CMDB00007",
+         "args" : null,
+         "action" : "user_roles.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create user roles table"
+      },
+      "CMDB00024" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "dist_endpoint.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create dist endpoint table"
+      },
+      "CMDB00031" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "ip_domain.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip domain table"
+      },
+      "CMDB00009" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "server.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create server table"
+      },
+      "CMDB00042" : {
+         "depend" : "CMDB00033",
+         "args" : null,
+         "action" : "ip_device_journal.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device journal table"
+      },
+      "CMDB00026" : {
+         "depend" : "CMDB00025",
+         "args" : null,
+         "action" : "dist_epmessage.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create dist ep message table"
+      },
+      "CMDB00020" : {
+         "depend" : "CMDB00004",
+         "args" : "",
+         "action" : "device_class.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create device class table"
+      },
+      "CMDB00040" : {
+         "depend" : "CMDB00033",
+         "args" : null,
+         "action" : "ip_device_at.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device at table"
+      },
+      "CMDB00010" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "process.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create process table"
+      },
+      "CMDB00028" : {
+         "depend" : "CMDB00027",
+         "args" : null,
+         "action" : "dist_rules.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create dist rules table"
+      },
+      "CMDB00050" : {
+         "depend" : "CMDB00002",
+         "args" : null,
+         "action" : "SetupCloud",
+         "repeat" : "0",
+         "type" : "1",
+         "exec_key" : null,
+         "descr" : "Initialize Riak"
+      },
+      "CMDB00027" : {
+         "depend" : "CMDB00026",
+         "args" : null,
+         "action" : "dist_model.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create dist model table"
+      },
+      "CMDB00044" : {
+         "depend" : "CMDB00033",
+         "args" : null,
+         "action" : "ip_device_maint.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device maintenance table"
+      },
+      "CMDB00039" : {
+         "depend" : "CMDB00037",
+         "args" : null,
+         "action" : "ip_device_int_vrf.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device int vrf table"
+      },
+      "CMDB00038" : {
+         "depend" : "CMDB00033",
+         "args" : null,
+         "action" : "ip_device_vlan.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create device vlan table"
+      },
+      "CMDB00007" : {
+         "depend" : "CMDB00006",
+         "args" : null,
+         "action" : "roles.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create roles table"
       },
       "CMDB00003" : {
          "depend" : "CMDB00002",
@@ -13,21 +204,260 @@
          "action" : "PrepareDB",
          "repeat" : "0",
          "type" : "1",
+         "exec_key" : null,
          "descr" : "Prepare Database configuration"
       },
-      "CMDB00001" : {
-         "action" : "CheckEnv",
-         "repeat" : "1",
-         "type" : "1",
-         "descr" : "Check CMDB_HOME enviroment variable"
+      "CMDB00017" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "cmdb_menu.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create menu table"
+      },
+      "CMDB00029" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "ip_config_data.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip config data table"
+      },
+      "CMDB00048" : {
+         "depend" : "CMDB00033",
+         "args" : null,
+         "action" : "ip_device_type.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device type table"
+      },
+      "CMDB00037" : {
+         "depend" : "CMDB00034",
+         "args" : null,
+         "action" : "ip_device_vrf.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create device vrf table"
+      },
+      "CMDB00014" : {
+         "depend" : "CMDB00004",
+         "args" : "",
+         "action" : "location.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create location table"
+      },
+      "CMDB00006" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "users.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create users table"
+      },
+      "CMDB00051" : {
+         "depend" : "CMDB00019",
+         "args" : null,
+         "action" : "$CMDB_HOME/setup/common/import_conversions.sh",
+         "repeat" : "0",
+         "type" : "2",
+         "exec_key" : null,
+         "descr" : "Import conversions"
+      },
+      "CMDB00016" : {
+         "depend" : "CMDB00004",
+         "args" : "",
+         "action" : "cmdb_audit.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create audit table"
+      },
+      "CMDB00023" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "disco_schemes.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create disco schames table"
       },
       "CMDB00002" : {
          "depend" : "CMDB00001",
+         "args" : null,
          "action" : "CheckConfig",
          "repeat" : "1",
          "type" : "1",
          "exec_key" : "config",
          "descr" : "Check configuration"
+      },
+      "CMDB00005" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "vendor.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create vendor table"
+      },
+      "CMDB00011" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "snmpmib.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create mibs table"
+      },
+      "CMDB00021" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "device_log.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create device log table"
+      },
+      "CMDB00043" : {
+         "depend" : "CMDB00033",
+         "args" : null,
+         "action" : "ip_device_mac.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device mac table"
+      },
+      "CMDB00036" : {
+         "depend" : "CMDB00034",
+         "args" : null,
+         "action" : "ip_device_int_vlan.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device int vlan table"
+      },
+      "CMDB00015" : {
+         "depend" : "CMDB00004",
+         "args" : "",
+         "action" : "cable.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create cable table"
+      },
+      "CMDB00034" : {
+         "depend" : "CMDB00033",
+         "args" : null,
+         "action" : "ip_device_int.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device int table"
+      },
+      "CMDB00030" : {
+         "depend" : "CMDB00029",
+         "args" : null,
+         "action" : "ip_config_object.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip config object table"
+      },
+      "CMDB00018" : {
+         "depend" : "CMDB00004",
+         "args" : "",
+         "action" : "contracts.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create contract table"
+      },
+      "CMDB00001" : {
+         "depend" : null,
+         "args" : null,
+         "action" : "CheckEnv",
+         "repeat" : "1",
+         "type" : "1",
+         "exec_key" : null,
+         "descr" : "Check CMDB_HOME enviroment variable"
+      },
+      "CMDB00013" : {
+         "depend" : "CMDB00004",
+         "args" : "",
+         "action" : "maintenance.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create maintenance table"
+      },
+      "CMDB00049" : {
+         "depend" : "CMDB00048",
+         "args" : null,
+         "action" : "ip_device_type_image.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device type image table"
+      },
+      "CMDB00046" : {
+         "depend" : "CMDB00033",
+         "args" : null,
+         "action" : "ip_device_sec.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device sec table"
+      },
+      "CMDB00025" : {
+         "depend" : "CMDB00024",
+         "args" : null,
+         "action" : "dist_message.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create dist message table"
+      },
+      "CMDB00022" : {
+         "depend" : "CMDB00004",
+         "args" : "",
+         "action" : "device_orders.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create device order table"
+      },
+      "CMDB00047" : {
+         "depend" : "CMDB00033",
+         "args" : null,
+         "action" : "ip_device_ticket.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device ticket table"
+      },
+      "CMDB00035" : {
+         "depend" : "CMDB00034",
+         "args" : null,
+         "action" : "ip_device_int_dlci.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create ip device int dlci table"
+      },
+      "CMDB00012" : {
+         "depend" : "CMDB00004",
+         "args" : null,
+         "action" : "security.ddl",
+         "repeat" : "0",
+         "type" : "3",
+         "exec_key" : null,
+         "descr" : "Create security table"
       }
    }
 }

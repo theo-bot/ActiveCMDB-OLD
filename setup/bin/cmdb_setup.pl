@@ -10,7 +10,14 @@ use strict;
 use Log::Log4perl qw(:easy);
 use Module::Find;
 use Switch;
+use Sys::Hostname;
+
 no strict "refs";
+
+#
+# Initialize variables
+#
+
 my %exec = ();
 my @chars = ("A".."Z", "a".."z");
 my $string;
@@ -51,6 +58,7 @@ if ( -r $plan ) {
 	open(FH, "<", $plan);
 	$logger->info("Plan opened");
 	my $data = do { local($/); <FH> };
+	close(FH);
 	my $coder = JSON::XS->new->ascii->pretty->allow_nonref;
 
 	$plan = $coder->decode($data);
@@ -61,12 +69,64 @@ if ( -r $plan ) {
 }
 
 #
+# Opening server installation status
+#
+my $ifolder = $ENV{HOME}.'/.ActiveCMDB';
+my $iserver = sprintf("%s/%s.json",$ifolder, GetHostname());
+if ( ! -d $ENV{HOME}.'/.ActiveCMDB' ) {
+	mkdir $ENV{HOME}.'/.ActiveCMDB';
+	chmod(0700, $ENV{HOME}.'/.ActiveCMDB');
+}
+if ( ! -f $iserver ) {
+	open(FH,">", $iserver);
+	my $data = undef;
+	$data->{last_update} = time();
+	my $coder = JSON::XS->new->ascii->pretty->allow_nonref;
+	print FH $coder->encode($data);
+	close(FH);
+} 
+
+if ( -r $iserver )
+{
+	open(FH, "<", $iserver);
+	my $data = do { local($/); <FH> };
+	my $coder = JSON::XS->new->ascii->pretty->allow_nonref;
+	$iserver = $coder->decode($data);
+	close(FH);
+}
+
+#
 # Executing steps
 #
 
 foreach my $step (sort keys %{$plan->{steps}})
 {
 	my($r,$v);
+
+	if ( defined($iserver->{steps}->{$step}) )
+	{
+		if ( defined($iserver->{steps}->{$step}->{status}) && $iserver->{steps}->{$step}->{status} == 1  && $iserver->{steps}->{$step}->{repeat} == 0 )
+		{
+			# Step already processes
+			next;
+		}
+		if ( defined($plan->{steps}->{$step}->{depend}) )
+		{
+			my $depend = $plan->{steps}->{$step}->{depend};
+			if ( defined($iserver->{steps}->{$depend}->{status}) && $iserver->{steps}->{$depend}->{status} == 1 )
+			{
+				$logger->info("Dependancy $depend completed");
+			} else {
+				$logger->fatal("Dependancy not completed");
+				exit 1;
+			}
+		}
+	} else {
+		$iserver->{steps}->{$step} = $plan->{steps}->{$step};
+		$iserver->{steps}->{$step}->{status} = 0;
+		SaveStatus($iserver);
+	}
+	
 	switch( $plan->{steps}->{$step}->{type} )
 	{
 		case 1		{ 
@@ -87,6 +147,13 @@ foreach my $step (sort keys %{$plan->{steps}})
 		$logger->info("Storing exec key $k");
 		$exec{$k} = $v;
 	}
+	if ( ! $r ) {
+		$logger->fatal("Error executing $step, check logs");
+	} else {
+		$iserver->{steps}->{$step}->{status} = 1;
+		SaveStatus($iserver);
+	}
+	
 	print $plan->{steps}->{$step}->{descr},"\n";
 }
 
@@ -105,7 +172,6 @@ sub PerlSub
 		@args = split(/\,/,$args);
 	}
 	$logger->info("Executing routine $sub");
-	print "@args\n";
 	return &$sub($config, @args);
 }
 
@@ -116,8 +182,11 @@ sub PerlScript
 	if ( defined($args) ) {
 		@args = split(/\,/,$args);
 	}
+	$script =~ s/\$CMDB_HOME/$ENV{CMDB_HOME}/g;
 	
-	return system($script, @args);
+	
+	my $result = system($script, @args);
+	if ( $result == 0 ) { return 1; } else { return 0; }
 }
 
 sub SqlScript
@@ -142,6 +211,7 @@ sub SqlScript
 	print $fh '[client]'."\n";
 	print $fh 'user=root'."\n";
 	print $fh 'password='.$exec{mysql_pwd}."\n";
+	print $fh 'database='.$exec{config}->section("cmdb::database::dbname");
 	close($fh);
 	chmod(0400, $exec{mysql_tmp});
 	$script = sprintf("%s/setup/sql/%s",$ENV{CMDB_HOME},$script);
@@ -149,5 +219,25 @@ sub SqlScript
 	my $cmd = sprintf("%s --defaults-file=%s < %s", $exec{mysql}, $exec{mysql_tmp}, $script);
 	$logger->info("Executing $cmd");
 	my $result = system($cmd);
+	if ( $result == 0 ) { return 1; } else { return 0; }
+}
+
+sub SaveStatus
+{
+	my($data) = @_;
+	my $ifolder = $ENV{HOME}.'/.ActiveCMDB';
+	my $iserver = sprintf("%s/%s.json",$ifolder, GetHostname());
+	open(FH,">", $iserver);
+	$data->{last_update} = time();
+	my $coder = JSON::XS->new->ascii->pretty->allow_nonref;
+	print FH $coder->encode($data);
+	close(FH);
+}
+
+sub GetHostname
+{
+	my $h = hostname();
+	$h =~ s/\..*//;
 	
+	return $h;
 }
