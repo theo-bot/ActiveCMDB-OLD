@@ -12,7 +12,7 @@ GetOptions(
 	"export"		=> \$export,
 	"help"			=> \$help,
 	"add"			=> \$add,
-	"delete"		=> \$delete.
+	"delete"		=> \$delete,
 	"oid=s"			=> \$oid,
 	"name=s"		=> \$name,
 	"value=s"		=> \$value,
