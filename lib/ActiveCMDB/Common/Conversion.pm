@@ -52,6 +52,8 @@ our @EXPORT = qw(
 	cmdb_name_set
 	cmdb_oid_set
 	cmdb_export_conv
+	cmdb_export_snmp
+	cmdb_add_snmp
 );
 #########################################################################
 # Routines
@@ -289,5 +291,77 @@ sub cmdb_export_conv
 			);
 			print "\n";
 		}
+	}
+}
+
+sub cmdb_export_snmp
+{
+	my($schema, $rs);
+	my %found = ();
+	
+	$schema = ActiveCMDB::Model::CMDBv1->instance();
+	$rs = $schema->resultset("Snmpmib")->search(
+			undef,
+			{
+				order_by => qw/oid value/
+			}
+	);
+	
+	while ( my $row = $rs->next )
+	{
+		my $v = $row->value;
+		if ( ! defined($v) ) { $v = 'null'; }
+		my $key = sprintf("%s - %s", $row->oid, $v);
+		if ( ! $found{$key} ) {
+			printf('$CMDB_HOME/bin/cmdb_snmp.pl -add -oid %s -name %s ', $row->oid, $row->oidname );
+			printf('-value "%s" ', $row->value ) if ( defined($row->value) );
+			printf('-mibvalue "%s"', $row->mibvalue ) if ( defined($row->mibvalue));
+			print "\n";
+			$found{$key} = 1;
+		}
+	}
+}
+
+sub cmdb_add_snmp
+{
+	my($oid,$name,$value, $mibvalue) = @_;
+	
+	my $result = 0;
+	my $data = undef;
+	$data->{oid}  = $oid;
+	$data->{name} = $name;
+	$data->{value}    = $value if defined($value);
+	$data->{mibvalue} = $mibvalue if defined($mibvalue);
+	
+	try {
+		my $schema = ActiveCMDB::Model::CMDBv1->instance();
+	
+		$schema->resultset("Snmpmib")->create( $data );
+		Logger->info("Created new conversion $name:$oid");
+		$result = 1;
+	} catch {
+		Logger->warn("Failed to create new conversion for $name:$oid");
+	}
+	
+	return $result;
+}
+
+sub cmdb_del_snmp($$)
+{
+	my($oid,$value) = @_;
+	
+	try {
+		my $schema = ActiveCMDB::Model::CMDBv1->instance();
+		my $row = $schema->resultset("Snmpmib")->find(
+						{
+							oid => $oid,
+							value => $value
+						}
+					);
+		if ( defined($row) ) {
+			$row->delete();
+		}
+	} catch {
+		Logger->warn("Failed to delete snmp oid/value");
 	}
 }
