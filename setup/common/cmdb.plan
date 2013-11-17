@@ -264,7 +264,7 @@
       "CMDB00051" : {
          "depend" : "CMDB00019",
          "args" : null,
-         "action" : "$CMDB_HOME/setup/common/import_conversions.sh",
+         "action" : "$CMDB_HOME/setup/bin/import_conversions.sh",
          "repeat" : "0",
          "type" : "2",
          "exec_key" : null,
@@ -422,6 +422,15 @@
          "type" : "3",
          "exec_key" : null,
          "descr" : "Create dist message table"
+      },
+      "CMDB00052" : {
+         "depend" : "CMDB00011",
+         "args" : null,
+         "action" : "$CMDB_HOME/setup/bin/import_snmp_value.sh",
+         "repeat" : "0",
+         "type" : "2",
+         "exec_key" : null,
+         "descr" : "Import snmp translations"
       },
       "CMDB00022" : {
          "depend" : "CMDB00004",
