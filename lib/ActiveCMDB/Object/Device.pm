@@ -168,7 +168,7 @@ sub find {
 				{
 					my $attr = $key->name;
 					next if ( $attr =~ /schema|device_id/ );
-					if ( defined($row->$attr) ) {
+					if ( $row->can($attr) && defined($row->$attr) ) {
 						$self->$attr($row->$attr);
 						$sec_source{$attr} = OBJECT;
 					} else { 
