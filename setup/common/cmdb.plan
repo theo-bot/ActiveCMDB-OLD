@@ -369,6 +369,15 @@
          "exec_key" : null,
          "descr" : "Create ip config object table"
       },
+      "CMDB00053" : {
+         "depend" : "CMDB00017",
+         "args" : null,
+         "action" : "$CMDB_HOME/setup/bin/create_menu.sh",
+         "repeat" : "0",
+         "type" : "2",
+         "exec_key" : null,
+         "descr" : "Setup main menu"
+      },
       "CMDB00018" : {
          "depend" : "CMDB00004",
          "args" : "",
