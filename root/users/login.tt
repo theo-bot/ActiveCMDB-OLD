@@ -37,7 +37,19 @@
 	<script type="text/javascript" src="/static/js/panelslide.js"></script>
 </head>
 <body>
+<script type='text/javascript'>
 
+try
+{
+  if ( top.document.domain != self.document.domain )
+  ;
+}
+catch(e)
+ {
+   top.location.href = self.location.href;
+ }
+
+</script>
 <div id="container"><!--CONTAINER STARTS-->
  
 <div id="header"><!--HEADER STARTS-->
