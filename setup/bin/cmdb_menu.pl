@@ -5,18 +5,19 @@ use strict;
 use Getopt::Long;
 use Switch;
 use ActiveCMDB::Object::menuItem;
+use ActiveCMDB::Common::Menu;
 use Data::Dumper;
 
-my($label,$icon,$active,$url, $parent, $before, $after);
+my($label,$icon,$active,$url, $parent, $before, $after,$export);
 my $action = "";
 my %attr = ();
 
 GetOptions(
-	"list"		=> \&list_items,
 	"label=s"		=> \$attr{label},
 	"delete"	=> sub { $action = "delete"; },
 	"edit"		=> sub { $action = "edit";   },
 	"add"		=> sub { $action = "add"; },
+	"export"	=> sub { $action = "export"; },
 	"icon=s"	=> \$attr{icon},
 	"active=i"	=> \$attr{active},
 	"url=s"		=> \$attr{url},
@@ -110,5 +111,4 @@ sub edit_menu_item
 		
 		$item->save();
 	}
-	
 }

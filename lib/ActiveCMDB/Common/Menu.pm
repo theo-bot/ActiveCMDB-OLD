@@ -34,10 +34,13 @@ package ActiveCMDB::Common::Menu;
 
 use Exporter;
 use ActiveCMDB::Object::menuItem;
+use ActiveCMDB::Model::CMDBv1;
+
 
 our @ISA = ('Exporter');
 our @EXPORT = qw(
 	CreateMenuItem
+	GetMenuItems
 );
 
 sub CreateMenuItem
@@ -75,4 +78,28 @@ sub CreateMenuItem
 	}
 	
 	return $data;
+}
+
+sub GetMenuItems
+{
+	my %items = ();
+	my $schema = ActiveCMDB::Model::CMDBv1->instance();
+	my $res = $schema->resultset("CmdbMenu")->search(
+		undef,
+		{
+			order_by => 'id',
+			columns  => qw/label/
+		}
+	);
+	if ( defined($res) )
+	{
+		while ( my $row = $res->next )
+		{
+			my $i = ActiveCMDB::Object::menuItem->new(label => $row->label);
+			$i->get_data();
+			$items{ $i->label } = $i;
+		}
+	}
+	
+	return %items;
 }
