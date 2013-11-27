@@ -46,6 +46,8 @@ class ActiveCMDB::Object::Ipdomain::Network with ActiveCMDB::Object::Methods
 	use NetAddr::IP;
 	use Moose::Util::TypeConstraints;
 	
+	with 'ActiveCMDB::Object::Methods';
+	
 	enum 'Proto1'  => ('md5', 'sha');
 	enum 'Proto2'  => ('des', 'aes');
 	
@@ -178,6 +180,17 @@ class ActiveCMDB::Object::Ipdomain::Network with ActiveCMDB::Object::Methods
 		return $net->contains( $ip );
 	}
 	
+	public method save
+	{
+		my $data = $self->to_hashref();
+		try {
+			$self->schema->resultset("IpDomainNetwork")->update_or_create($data);
+		} catch {
+			Logger->warn("Failed to store domain network");
+			use Data::Dumper;
+			Logger->debug(Dumper($data));
+		}
+	}
 };
 
 1;

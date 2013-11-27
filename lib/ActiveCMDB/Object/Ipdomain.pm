@@ -156,6 +156,38 @@ sub get_data
 	return $result;
 }
 
+sub save 
+{
+	my($self) = @_;
+	
+	my $data = $self->to_hashref(\%map);
+	try {
+		
+		#
+		# 1st save the domain data
+		#
+		
+		my $row = $self->schema->resultset("IpDomain")->update_or_create( $data );
+		if ( !defined($self->domain_id) )
+		{
+			$self->domain_id($row->domain_id);
+		} 
+		
+		#
+		# 2nd save the networks
+		#
+		foreach my $net ( $self->all_nets() )
+		{
+			$net->domain_id($self->domain_id);
+			$net->save();
+		}
+	} catch {
+		Logger->warn("Failed to save domain data");
+		use Data::Dumper;
+		Logger->debug(Dumper($data));
+	}
+}
+
 sub security
 {
 	my($self, $address) = @_;

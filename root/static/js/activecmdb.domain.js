@@ -53,16 +53,20 @@ $(document).ready(function(){
 		          rowNum:10, rowList:[10,20,30], 
 		          pager: '#netPager', 
 		          sortname: 'domain_id', 
+		          hidegrid: false,
 		          viewrecords: true, 
 		          sortorder: "desc", 
 		          editurl: "/ipdomain/network?domain_id=" + domain_id, 
-		          caption: "Networks"
+		          caption: "Networks",
+		          ondblClickRow: function(rowid){
+		        	  jQuery('#netTable').jqGrid('editGridRow', rowid);
+		          }
 	}); 
 
 	jQuery("#netTable").jqGrid('navGrid',"#netPager",
 			{
 				view:true, 
-				edit:true
+				edit:false
 			},
 			{
 				height:430,
