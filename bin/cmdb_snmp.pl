@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 
-#use v5.16.0;
+use v5.16.0;
 use Getopt::Long;
 use Pod::Usage;
 use ActiveCMDB::Common::Conversion;
