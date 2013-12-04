@@ -41,6 +41,7 @@ use Data::Dumper;
 use POSIX;
 use Switch;
 use Try::Tiny;
+use ActiveCMDB::Object::User;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -81,31 +82,19 @@ sub api: Local {
 
 sub edit :Local {
 	my($self, $c) = @_;
-	my($user_id);
+	my($user_id,$user);
 	
 	$user_id = $c->request->params->{id} || 0;
+	$user = ActiveCMDB::Object::User->new(id => $user_id );
+	$user->get_data();
 	
-	$c->stash->{user} = $c->model('CMDBv1::User')->find({ id => $user_id });
+	
+	$c->stash->{user} = $user;
 	
 	if ( $c->check_user_roles('admin'))
 	{
-		my $rs = $c->model('CMDBv1::UserRole')->search({ user_id => $user_id });
-		my @assigned  = ();
-		my @available = ();
-		my @h = ();
-		while ( my $row = $rs->next )
-		{
-			push(@assigned, { id => $row->role_id, role => $row->role->role });
-			push(@h, $row->role_id);
-		}
-		$rs = $c->model('CMDBv1::Role')->search({ id => { 'NOT IN' => [ @h ] } });
-		while ( my $row = $rs->next )
-		{
-			push(@available, { id => $row->id, role => $row->role });
-		}
-		
-		$c->stash->{available} = [ @available ];
-		$c->stash->{assigned} = [ @assigned ];
+		$c->stash->{available} = [ $user->available_roles() ];
+		$c->stash->{assigned}  = [ $user->assigned_roles() ];
 		$c->stash->{template} = 'users/edit.tt';
 	} else {
 		$c->stash->{template} = 'users/passwd.tt';
@@ -115,7 +104,6 @@ sub edit :Local {
 sub save :Local {
 	my($self, $c) = @_;
 	my @userRoles = ();
-	my($user_id, $transaction, $row, $rs, $user);
 	$c->log->info(Dumper($c->request->params));
 	
 	if ( defined($c->request->params->{userRoles}) )
@@ -131,131 +119,59 @@ sub save :Local {
 		}
 	}
 	
-	#
-	# Create transaction to save data
-	#
-	my $data = undef;
-	$data->{id}				= $c->request->params->{id} || undef;
-	$data->{username}		= $c->request->params->{username};
-	$data->{active}			= $c->request->params->{active} || 0;
-	$data->{email_address}	= $c->request->params->{email} || "";
-	$data->{first_name}		= $c->request->params->{first_name} || "";
-	$data->{last_name}		= $c->request->params->{last_name} || "";
+	my $user = ActiveCMDB::Object::User->new();
+	$user->id( $c->request->params->{id} || undef );
+	$user->username( $c->request->params->{username} );
+	$user->active( $c->request->params->{active} || 0 );
+	$user->first_name( $c->request->params->{first_name} || "" );
+	$user->last_name( $c->request->params->{last_name} || "" );
+	$user->email_address( $c->request->params->{email} || "" );
 	
-	if ( ! defined($data->{id}) && defined($data->{username}) )
+	if ( ! defined($user->id) && defined($user->username) && $user->exist() )
 	{
-		my $count = $c->model('CMDBv1::User')->search({ username => $data->{username}})->count;
-		if ( $count > 0 ) 
-		{
-			$c->response->body("Username already in use");
-			return;
-		}
+		$c->response->body("Username already in use");
+		return;
 	}
 	
-	
-	$transaction = sub {
-		$user = $c->model('CMDBv1::User')->update_or_create($data);
-		if ( ! $user->in_storage ) 
-		{
-			$user->insert;
-			$c->log->debug("New user id:" . $user->id);
-		} else {
-			$user_id = $c->request->params->{id};
-			$c->log->info("Updated user $user_id");
-		}
-		$user_id = $user->id;
-		
-		
-		$user = $c->model('CMDBv1::User')->find({ username => $c->request->params->{username} });
-		
-		
-		if ( defined($c->request->params->{newpass1}) && defined($c->request->params->{newpass2}) 
+	if ( defined($c->request->params->{newpass1}) && defined($c->request->params->{newpass2}) 
 			&& $c->request->params->{newpass1} eq $c->request->params->{newpass2}
 		) { 
 			$user->password($c->request->params->{newpass1});
-			$user->update;
 		} else {
 			$c->log->info("Password not updated");
 		}
-		
-	};
 	
-	$c->model('CMDBv1')->txn_do($transaction);
 	
-	#
-	# Create transaction to handle user roles
-	#
-	$transaction = sub {
-		
-		$rs = $c->model('CMDBv1::UserRole')->search(
-					{
-						user_id => $user_id,
-						role_id => { 'NOT IN' => [ @userRoles ]}
-					}
-				);
-		while ( $row = $rs->next ) {
-			$row->delete;
-		}
-		
-		foreach my $role ( @userRoles ) {
-			my $data = { user_id => $user_id, role_id => $role };
-			$c->model('CMDBv1::UserRole')->update_or_create($data);
-		} 
-	};
-	
-	# Execute transaction
-	$c->model('CMDBv1')->txn_do($transaction);
+	$user->save(@userRoles);
 	
 	$c->response->body('User saved');
-	
-	
 	
 }
 
 sub delete :Local {
 	my($self, $c) = @_;
-	my($user_id, $rs);
+	my($user_id, $user);
 	$user_id = $c->request->params->{id} || 0;
 	
-	$rs = $c->model('CMDBv1::User')->find({ id => $user_id });
-	
-	if ( defined($rs) ) {
-		$rs->delete;
-	}
+	$user = ActiveCMDB::Object::User->new(id => $user_id);
+	$user->get_data();
+	if ( defined($user->id) ) { $user->delete(); }
 	
 	$c->response->body('User deleted');
 }
 
 sub passwd :Local {
 	my($self, $c) = @_;
-	my($user, $current, $new1, $new2,$rs);
+	my($user, $name, $current, $new1, $new2,$res);
 	
 	$current = $c->request->params->{curpass};
 	$new1	 = $c->request->params->{newpass1};
 	$new2	 = $c->request->params->{newpass2};
-	$user    = $c->user->username;
+	$name    = $c->user->username;
 	
-	$rs = $c->model('CMDBv1::User')->find({ username => $user });
-	
-	if ( defined($rs) )
-	{
-		if ( $rs->check_password($current) )
-		{
-			if ( $new1 eq $new2 )
-			{
-				$rs->password($new1);
-				$rs->update;
-				$c->response->body('Password updated');
-			} else {
-				$c->response->body("Passwords don\'t match");
-			}
-		} else {
-			$c->response->body('Invalid user password');
-		}
-	} else {
-		$c->response->body('User not found');
-		$c->log->error("User $user not found");
-	}
+	$user = ActiveCMDB::Object::User->new(username => $name );
+	$user->get_data();
+	$c->response->body( $user->passwd($current, $new1, $new2) );
 }
 
 sub list: Local {

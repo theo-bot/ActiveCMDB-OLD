@@ -432,6 +432,15 @@
          "exec_key" : null,
          "descr" : "Create dist message table"
       },
+      "CMDB00055" : {
+         "depend" : "CMDB00054",
+         "args" : "-u admin -f ActiveCMDB -p admin -l Administrator -active -role admin",
+         "action" : "$CMDB_HOME/bin/cmdb_auth_admin.pl",
+         "repeat" : "0",
+         "type" : "2",
+         "exec_key" : null,
+         "descr" : "Add admin user"
+      },
       "CMDB00052" : {
          "depend" : "CMDB00011",
          "args" : null,
@@ -458,6 +467,15 @@
          "type" : "3",
          "exec_key" : null,
          "descr" : "Create ip device ticket table"
+      },
+      "CMDB00054" : {
+         "depend" : "CMDB00008",
+         "args" : "-add -role admin",
+         "action" : "$CMDB_HOME/bin/cmdb_auth_admin.pl",
+         "repeat" : "0",
+         "type" : "2",
+         "exec_key" : null,
+         "descr" : "Add admin role"
       },
       "CMDB00035" : {
          "depend" : "CMDB00034",

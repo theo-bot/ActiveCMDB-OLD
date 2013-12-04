@@ -40,9 +40,11 @@ use namespace::autoclean;
 use POSIX;
 use Switch;
 use Try::Tiny;
+use ActiveCMDB::Object::UserRole;
 BEGIN { extends 'Catalyst::Controller'; }
 
 =head2 index
+
 
 =cut
 
@@ -76,8 +78,9 @@ sub edit :Local {
 	if ( $c->check_user_roles('admin'))
 	{
 		my $role_id = $c->request->params->{id} || 0;
-	
-		$c->stash->{role} = $c->model('CMDBv1::Role')->find({ id => $role_id });
+		my $role = ActiveCMDB::Object::UserRole->new(id => $role_id);
+		$role->get_data();
+		$c->stash->{role} = $role;
 		$c->stash->{template} = 'roles/edit.tt';
 	} else {
 		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
@@ -103,8 +106,8 @@ sub create :Local {
 	if ( $c->check_user_roles('admin'))
 	{
 		my $role = $c->request->params->{role} || "";
-	
-		my $rs = $c->model('CMDBv1::Role')->create({ role => $role });
+		my $user_role = ActiveCMDB::Object::UserRole->new(role => $role);
+		$user_role->save();
 	
 		$c->response->redirect($c->uri_for($c->controller('Roles')->action_for('index')));
 	} else {
@@ -120,27 +123,11 @@ sub save :Local {
 	{
 		$id = $c->request->params->{id} || 0;
 		$role = $c->request->params->{role} || "";
-	
+		
 		if ( $role ne 'admin' && $role ne '' && $id != 1) 
 		{
-			try {
-			
-				$rs = $c->model('CMDBv1::Role')->update_or_create(
-							{
-								id => $id,
-								role => $role
-							}
-						);
-
-				if ( ! $rs->in_storage ) {
-					$rs->insert;
-					$c->response->body('Role created');
-				} else {
-					$c->response->body('Role updated');
-				}
-			} catch {
-				$c->response->body('Failed to update role');
-			};
+			my $user_role = ActiveCMDB::Object::UserRole->new(id => $id, role => $role);
+			$user_role->save();
 		} else {
 			$c->response->body('Unable to update admin role');
 		}
@@ -157,15 +144,9 @@ sub delete :Local {
 	
 	if ( $id > 1 )
 	{
-		try {
-			$rs = $c->model('CMDBv1::Role')->find({ id => $id } );
-			if ( defined($rs) ) {
-				$rs->delete;
-			}
-			$c->response->body('Role deleted');
-		} catch {
-			$c->response->body('Failed to delete role');
-		}
+		my $role = ActiveCMDB::Object::UserRole->new(id => $id);
+		$role->get_data();
+		$c->response->body( $role->delete() );
 	} else {
 		$c->response->body('Unable to delete admin role');
 	}
