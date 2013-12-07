@@ -43,6 +43,7 @@ use vars qw($cfg_state, $objects_mapper);
 				true false TRUE FALSE TCP_TIMEOUT
 				PRIO_HIGH PRIO_LOW PRIO_NORMAL
 				$m_repeat $cfg_state $objects_mapper
+				HTTP_OK HTTP_UNAUTHORIZED HTTP_INTERNAL_ERROR
 			);
 
 
@@ -83,6 +84,13 @@ use constant SNMP_LARGE_IFTABLE	=> 1000;
 use constant	PRIO_HIGH	=> 7;
 use constant	PRIO_LOW	=> 0;
 use constant	PRIO_NORMAL	=> 4;
+
+#
+# HTTP Status code
+#
+use constant	HTTP_OK				=> 200;
+use constant	HTTP_UNAUTHORIZED	=> 401;
+use constant	HTTP_INTERNAL_ERROR	=> 500;
 
 # 
 # Config states
