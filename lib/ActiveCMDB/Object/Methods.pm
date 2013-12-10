@@ -44,7 +44,7 @@ use Moose::Role;
 
 sub to_hashref
 {
-	my($self, $map) = @_;
+	my($self, $map, $skip_undef) = @_;
 	my($key,$attr,$data);
 	
 	$data = undef;
@@ -55,7 +55,10 @@ sub to_hashref
 		my %map = %{$map};
 		foreach $attr (keys %map)
 		{
-			$data->{ $map{$attr} } = $self->$attr;
+			if ( defined($self->$attr) || (!defined($skip_undef) && !defined($self->$attr)) ) {
+				$data->{ $map{$attr} } = $self->$attr;
+			}
+			
 		}	
 	} else {
 		foreach $key ( $self->meta->get_all_attributes )

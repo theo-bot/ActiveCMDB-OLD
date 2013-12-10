@@ -103,7 +103,7 @@ sub save
 	Logger->info("Saving user ");
 	if ( defined($self->username) )
 	{
-		my $data = $self->to_hashref(\%map);
+		my $data = $self->to_hashref(\%map,1);
 		Logger->debug(Dumper($data));
 		try {
 			
