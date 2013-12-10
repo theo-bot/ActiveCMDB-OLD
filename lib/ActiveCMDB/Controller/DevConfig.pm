@@ -41,6 +41,7 @@ package ActiveCMDB::Controller::DevConfig;
 
 use Moose;
 use namespace::autoclean;
+use ActiveCMDB::Common::Security;
 use ActiveCMDB::Object::Device;
 use ActiveCMDB::Object::Configuration;
 
@@ -49,23 +50,28 @@ BEGIN { extends 'Catalyst::Controller'; }
 sub view :Local {
 	my($self, $c) = @_;
 	
-	my $device_id = $c->request->params->{device_id};
-	my $config_id = $c->request->params->{config_id};
-	
-	my $device = ActiveCMDB::Object::Device->new(device_id => $device_id );
-	if ( $device->find() )
+	if ( cmdb_check_role($c,qw/deviceViewer deviceAdmin/) )
 	{
-		my $config = ActiveCMDB::Object::Configuration->new(device_id => $device_id, config_id => $config_id);
-		$config->get_data();
-		$config->get_object();
+		my $device_id = $c->request->params->{device_id};
+		my $config_id = $c->request->params->{config_id};
 	
-		$c->stash->{device}  = $device;
-		$c->stash->{devconfig} = $config;
-		$c->log->info("Device info loaded " . $config->config_type );
+		my $device = ActiveCMDB::Object::Device->new(device_id => $device_id );
+		if ( $device->find() )
+		{
+			my $config = ActiveCMDB::Object::Configuration->new(device_id => $device_id, config_id => $config_id);
+			$config->get_data();
+			$config->get_object();
+	
+			$c->stash->{device}  = $device;
+			$c->stash->{devconfig} = $config;
+			$c->log->info("Device info loaded " . $config->config_type );
+		} else {
+			$c->log->warn("Failed to load device info");
+		}
+		$c->stash->{template} = 'device/device_configobject.tt';
 	} else {
-		$c->log->warn("Failed to load device info");
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
 	}
-	$c->stash->{template} = 'device/device_configobject.tt';
 }
 
 

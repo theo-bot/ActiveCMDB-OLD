@@ -46,7 +46,9 @@ use Data::Dumper;
 use NetAddr::IP;
 use DateTime;
 use DateTime::Format::Strptime;
+use ActiveCMDB::Common::Security;
 use ActiveCMDB::Object::Ipdomain;
+use ActiveCMDB::Common::Constants;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -58,13 +60,16 @@ my $strp = DateTime::Format::Strptime->new(
 
 sub list_domains :Local {
     my ( $self, $c ) = @_;
-	my($rs, $json, $search);
-	my @rows = ();
+    
+    if ( cmdb_check_role($c, qw/networkViewer networkAdmin/) )
+    {
+		my($rs, $json, $search);
+		my @rows = ();
 	
-	my @domains = ();
-	my $rows	= $c->request->params->{rows} || 10;
+		my @domains = ();
+		my $rows	= $c->request->params->{rows} || 10;
 	
-    $rs =	$c->model('CMDBv1::IpDomain')->search(
+    	$rs =	$c->model('CMDBv1::IpDomain')->search(
     								{},
     								{
     									join	 => 'ip_domain_networks',
@@ -75,42 +80,50 @@ sub list_domains :Local {
     							);
     
      
-    $json->{records} = $rs->count;
-	if ( $json->{records} > 0 ) {
-		$json->{total} = ceil($json->{records} / $rows );
-	} else {
-		$json->{total} = 0;
-	} 
+    	$json->{records} = $rs->count;
+		if ( $json->{records} > 0 ) {
+			$json->{total} = ceil($json->{records} / $rows );
+		} else {
+			$json->{total} = 0;
+		} 
     
-    while ( my $row = $rs->next )
-	{
-		push(@rows, { id => $row->domain_id, cell=> [
-														$row->domain_name,
-														$row->get_column('tally')
-														
-													]
-					}
-			);
-	}
+    	while ( my $row = $rs->next )
+		{
+			push(@rows, { id => $row->domain_id, cell=> [
+															$row->domain_name,
+															$row->get_column('tally')										
+														]
+						}
+				);
+		}
 	
-	$json->{rows} = [ @rows ];
-	$c->stash->{json} = $json;
-	$c->log->debug(Dumper($json));
-	$c->forward( $c->view('JSON') );    
+		$json->{rows} = [ @rows ];
+		$c->stash->{json} = $json;
+		$c->log->debug(Dumper($json));
+		$c->forward( $c->view('JSON') );
+    } else {
+    	$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
+    }    
 }
 
 sub index :Private {
 	my($self, $c) = @_;
-	my $format = $config->section('cmdb::default::date_format');
-	$format =~ s/\%Y/yy/;
-	$format =~ s/\%m/mm/;
-	$format =~ s/\d%/dd/;
 	
-	$format =~ s/\%//g;
+	if ( cmdb_check_role($c, qw/networkViewer networkAdmin/) )
+	{
+		my $format = $config->section('cmdb::default::date_format');
+		$format =~ s/\%Y/yy/;
+		$format =~ s/\%m/mm/;
+		$format =~ s/\d%/dd/;
 	
-	$c->stash->{dateFormat} = $format;
+		$format =~ s/\%//g;
 	
-	$c->stash->{template} = 'domain/list.tt';
+		$c->stash->{dateFormat} = $format;
+	
+		$c->stash->{template} = 'domain/list.tt';
+	} else {
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
+	}
 }
 
 sub api :Local {
@@ -123,46 +136,50 @@ sub api :Local {
 
 sub view :Local {
 	my( $self, $c ) = @_;
-	my($domain_id, $rs, $row);
-	my @networks = ();
 	
-	$domain_id = $c->request->params->{domain_id};
-	$c->log->debug(Dumper($c->request->params));
-	
-	
-	if ( defined($domain_id) )
+	if ( cmdb_check_role($c, qw/networkViewer networkAdmin/) )
 	{
-		 my $domain = $c->model('CMDBv1::IpDomain')->find({ domain_id => $domain_id });
-		
-		if ( defined($domain) )
+		my($domain_id, $rs, $row);
+		my @networks = ();
+	
+		$domain_id = $c->request->params->{domain_id};
+		$c->log->debug(Dumper($c->request->params));
+	
+	
+		if ( defined($domain_id) )
 		{
-			$c->log->info("Domain record found");
-			$c->stash->{domain} = $domain;
-		} else {
-			$c->log->warn("Domain record not found.");
-		}
-		$rs = $c->model('CMDBv1::IpDomainNetwork')->search(
-					{
-						domain_id => $domain_id
-					},
-					{
-						order_by => [ qw/ip_network/ ]
-					}
-			);
+			my $domain = $c->model('CMDBv1::IpDomain')->find({ domain_id => $domain_id });
+		
+			if ( defined($domain) )
+			{
+				$c->log->info("Domain record found");
+				$c->stash->{domain} = $domain;
+			} else {
+				$c->log->warn("Domain record not found.");
+			}
+			$rs = $c->model('CMDBv1::IpDomainNetwork')->search(
+						{
+							domain_id => $domain_id
+						},
+						{
+							order_by => [ qw/ip_network/ ]
+						}
+				);
 			
-		while ( $row = $rs->next )
-		{
-			push(@networks, $row);
-		}
-		$c->stash->{networks} = [ @networks ];
+			while ( $row = $rs->next )
+			{
+				push(@networks, $row);
+			}
+			$c->stash->{networks} = [ @networks ];
 		
+		} else {
+			$c->log->warn("Domain id undefined.");
+		}
+	
+		$c->stash->{template} = 'domain/view.tt';
 	} else {
-		$c->log->warn("Domain id undefined.");
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
 	}
-	
-	$c->stash->{template} = 'domain/view.tt';
-	
-	
 }
 
 
@@ -176,176 +193,200 @@ sub network :Local {
 
 sub list :Local {
 	my($self, $c) = @_;
-	
-	my ($rs,$search);
-	my @data = ();
-	my @rows = ();
-	
-	my $json = undef;
-	
-	my $id 		= $c->request->params->{domain_id} || 0;
-	my $rows	= $c->request->params->{rows} || 10;
-	my $page	= $c->request->params->{page} || 1;
-	my $order	= $c->request->params->{sidx} || 'domain_id';
-	my $asc		= '-' . $c->request->params->{sord};
-	
-	
-	#
-	# Create search filter
-	#
-	if ( $c->request->params->{_search} eq 'true' )
+	if ( cmdb_check_role($c, qw/networkViewer networkAdmin/) )
 	{
-		my $searchOper   = $c->request->params->{searchOper};
-		my $searchField  = $c->request->params->{searchField};
-		my $searchString = $c->request->params->{searchString};
-		if ( $searchOper eq 'cn' ) {
-			$search = { $searchField => { like => '%'.$searchString.'%' } };
-		}
-		if ( $searchOper eq 'eq' ) {
-			$search = { $searchField => $searchString };
-		}
-		if ( $searchOper eq 'ne' ) {
-			$search = { $searchField => { '!=' => $searchString } };
-		}
+		my ($rs,$search);
+		my @data = ();
+		my @rows = ();
+	
+		my $json = undef;
+	
+		my $id 		= $c->request->params->{domain_id} || 0;
+		my $rows	= $c->request->params->{rows} || 10;
+		my $page	= $c->request->params->{page} || 1;
+		my $order	= $c->request->params->{sidx} || 'domain_id';
+		my $asc		= '-' . $c->request->params->{sord};
+	
+	
+		#
+		# Create search filter
+		#
+		if ( $c->request->params->{_search} eq 'true' )
+		{
+			my $searchOper   = $c->request->params->{searchOper};
+			my $searchField  = $c->request->params->{searchField};
+			my $searchString = $c->request->params->{searchString};
+			if ( $searchOper eq 'cn' ) {
+				$search = { $searchField => { like => '%'.$searchString.'%' } };
+			}
+			if ( $searchOper eq 'eq' ) {
+				$search = { $searchField => $searchString };
+			}
+			if ( $searchOper eq 'ne' ) {
+				$search = { $searchField => { '!=' => $searchString } };
+			}
 		
-	} else {
-		$search = { domain_id => $id };
-	}
+		} else {
+			$search = { domain_id => $id };
+		}
 	
-	#
-	# Get total for the query
-	#
-	$json->{records} = $c->model('CMDBv1::IpDomainNetwork')->search( $search )->count;
-	if ( $json->{records} > 0 ) {
-		$json->{total} = ceil($json->{records} / $rows );
-	} else {
-		$json->{total} = 0;
-	} 
+		#
+		# Get total for the query
+		#
+		$json->{records} = $c->model('CMDBv1::IpDomainNetwork')->search( $search )->count;
+		if ( $json->{records} > 0 ) {
+			$json->{total} = ceil($json->{records} / $rows );
+		} else {
+			$json->{total} = 0;
+		} 
 	
-	
-	#
-	# Get the data
-	#
-	$rs = $c->model('CMDBv1::IpDomainNetwork')->search(
-				$search,
-				{
-					order_by => { $asc => $order },
-					rows	 => $rows,
-					page	 => $page
-				}
-			);
-			
-	while ( my $row = $rs->next )
-	{
-		push(@rows, { id => $row->network_id, cell=> [	
-														$row->ip_network,
-														$row->ip_mask,
-														$row->ip_masklen,
-														$row->active,
-														$row->snmp_ro || "",
-														$row->snmp_rw || "",
-														$row->telnet_user || "",
-														$row->telnet_pwd || "",
-														$row->snmpv3_user || "",
-													] 
+		#
+		# Get the data
+		#
+		$rs = $c->model('CMDBv1::IpDomainNetwork')->search(
+					$search,
+					{
+						order_by => { $asc => $order },
+						rows	 => $rows,
+						page	 => $page
 					}
-			);
+				);
+			
+		while ( my $row = $rs->next )
+		{
+			push(@rows, { id => $row->network_id, cell=> [	
+															$row->ip_network,
+															$row->ip_mask,
+															$row->ip_masklen,
+															$row->active,
+															$row->snmp_ro || "",
+															$row->snmp_rw || "",
+															$row->telnet_user || "",
+															$row->telnet_pwd || "",
+															$row->snmpv3_user || "",
+														] 
+						}
+				);
+		}
+		$json->{rows} = [ @rows ];
+		#$c->log->debug(Dumper($json));
+		$c->stash->{json} = $json;
+	
+	
+		$c->forward( $c->view('JSON') );
+	} else {
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
 	}
-	$json->{rows} = [ @rows ];
-	#$c->log->debug(Dumper($json));
-	$c->stash->{json} = $json;
-	
-	
-	$c->forward( $c->view('JSON') );
 }
 
 sub edit :Local {
 	my($self, $c) = @_;
-	my($data,$rs,$net);
 	
-	$data = undef;
-	foreach my $f (qw/domain_id ip_network ip_mask ip_masklen active snmp_ro snmp_rw telnet_user telnet_pwd snmpv3_user snmpv3_pass1 snmpv3_pass2 snmpv3_proto1 snmpv3_proto2/)
+	if ( cmdb_check_role($c, qw/networkAdmin/) )
 	{
-		$data->{$f} = $c->request->params->{$f};
-	}
-	$data->{network_id} = $c->request->params->{id};
-	$net = NetAddr::IP->new($data->{ip_network});
-	if ( !defined($data->{ip_mask}) && defined($data->{ip_masklen}) )
-	{
-		$net = NetAddr::IP->new($data->{ip_network} . '/' . $data->{ip_masklen});
-		$data->{ip_mask} = $net->mask();
-	} elsif ( defined($data->{ip_mask}) && !defined($data->{ip_masklen}) ) {
-		$net = NetAddr::IP->new($data->{ip_network}, $data->{ip_mask});
-		$data->{ip_masklen} = $net->masklen();
-		
-	}
+		my($data,$rs,$net);
 	
-	if ( $data->{active} eq 'Yes' ) { $data->{active} = 1; } else { $data->{active} = 0; }
-	$c->model('CMDBv1::IpDomainNetwork')->update_or_create( $data );
-	$c->response->status(200);
-	$c->response->body('');
+		$data = undef;
+		foreach my $f (qw/domain_id ip_network ip_mask ip_masklen active snmp_ro snmp_rw telnet_user telnet_pwd snmpv3_user snmpv3_pass1 snmpv3_pass2 snmpv3_proto1 snmpv3_proto2/)
+		{
+			$data->{$f} = $c->request->params->{$f};
+		}
+		$data->{network_id} = $c->request->params->{id};
+		$net = NetAddr::IP->new($data->{ip_network});
+		if ( !defined($data->{ip_mask}) && defined($data->{ip_masklen}) )
+		{
+			$net = NetAddr::IP->new($data->{ip_network} . '/' . $data->{ip_masklen});
+			$data->{ip_mask} = $net->mask();
+		} elsif ( defined($data->{ip_mask}) && !defined($data->{ip_masklen}) ) {
+			$net = NetAddr::IP->new($data->{ip_network}, $data->{ip_mask});
+			$data->{ip_masklen} = $net->masklen();	
+		}
+	
+		if ( $data->{active} eq 'Yes' ) { $data->{active} = 1; } else { $data->{active} = 0; }
+		$c->model('CMDBv1::IpDomainNetwork')->update_or_create( $data );
+		$c->response->status(HTTP_OK);
+		$c->response->body('');
+	} else {
+		$c->response->status(HTTP_UNAUTHORIZED);
+		$c->response->body('');
+	}
 }
 
 sub add :Local {
 	my($self, $c) = @_;
 	
-	my($data,$rs,$net);
-	
-	$data = undef;
-	foreach my $f (qw/domain_id ip_network ip_mask ip_masklen active snmp_ro snmp_rw telnet_user telnet_pwd snmpv3_user snmpv3_pass1 snmpv3_pass2 snmpv3_proto1 snmpv3_proto2/)
+	if ( cmdb_check_role($c, qw/networkAdmin/) )
 	{
-		$data->{$f} = $c->request->params->{$f};
+		my($data,$rs,$net);
+	
+		$data = undef;
+		foreach my $f (qw/domain_id ip_network ip_mask ip_masklen active snmp_ro snmp_rw telnet_user telnet_pwd snmpv3_user snmpv3_pass1 snmpv3_pass2 snmpv3_proto1 snmpv3_proto2/)
+		{
+			$data->{$f} = $c->request->params->{$f};
+		}
+		$data->{network_id} = undef;
+		$net = NetAddr::IP->new($data->{ip_network});
+		if ( !$data->{ip_mask} && $data->{ip_masklen} )
+		{
+			$c->log->info("Add mask for network");
+			$net = NetAddr::IP->new($data->{ip_network} . '/' . $data->{ip_masklen});
+			$data->{ip_mask} = $net->mask();
+		} elsif ( $data->{ip_mask} && !$data->{ip_masklen} ) {
+			$c->log->info("Calculating mask length");
+			$net = NetAddr::IP->new($data->{ip_network}, $data->{ip_mask});
+			$data->{ip_masklen} = $net->masklen();
+		}
+	
+		if ( $data->{active} eq 'Yes' ) { $data->{active} = 1; } else { $data->{active} = 0; }
+	
+		$c->model('CMDBv1::IpDomainNetwork')->update_or_create( $data );
+		$c->log->debug(Dumper($data));
+	
+		$c->response->status(HTTP_OK);
+		$c->response->body('');
+	} else {
+		$c->response->status(HTTP_UNAUTHORIZED);
+		$c->response->body('');
 	}
-	$data->{network_id} = undef;
-	$net = NetAddr::IP->new($data->{ip_network});
-	if ( !$data->{ip_mask} && $data->{ip_masklen} )
-	{
-		$c->log->info("Add mask for network");
-		$net = NetAddr::IP->new($data->{ip_network} . '/' . $data->{ip_masklen});
-		$data->{ip_mask} = $net->mask();
-	} elsif ( $data->{ip_mask} && !$data->{ip_masklen} ) {
-		$c->log->info("Calculating mask length");
-		$net = NetAddr::IP->new($data->{ip_network}, $data->{ip_mask});
-		$data->{ip_masklen} = $net->masklen();
-		
-	}
-	
-	if ( $data->{active} eq 'Yes' ) { $data->{active} = 1; } else { $data->{active} = 0; }
-	
-	$c->model('CMDBv1::IpDomainNetwork')->update_or_create( $data );
-	$c->log->debug(Dumper($data));
-	
-	$c->response->status(200);
-	$c->response->body('');
 }
 
 sub del :Local {
 	my($self, $c) = @_;
-	my($row, $network_id);
 	
-	$network_id = int($c->request->params->{'id'});
-	$row = $c->model('CMDBv1::IpDomainNetwork')->find({ network_id => $network_id });
-	if ( defined($row) ) {
-		$row->delete;
+	if ( cmdb_check_role($c, qw/networkAdmin/) )
+	{
+		my($row, $network_id);
+	
+		$network_id = int($c->request->params->{'id'});
+		$row = $c->model('CMDBv1::IpDomainNetwork')->find({ network_id => $network_id });
+		if ( defined($row) ) {
+			$row->delete;
+		}
+		$c->response->status(HTTP_OK);
+		$c->response->body('');
+	} else {
+		$c->response->status(HTTP_UNAUTHORIZED);
+		$c->response->body('');
 	}
-	$c->response->status(200);
-	$c->response->body('');
 }
 
 sub update_domain :Local {
 	my($self, $c) = @_;
 	
-	my $domain_id = $c->request->params->{domain_id};
-	my $field     = $c->request->params->{field};
-	my $value	  = $c->request->params->{value};
-	my $domain = ActiveCMDB::Object::Ipdomain->new(domain_id => $domain_id);
-	$domain->get_data();
-	
-	$domain->$field($value);
-	$domain->save();
-	$c->response->status(200);
-	
-	
+	if ( cmdb_check_role($c, qw/networkAdmin/) )
+	{
+		my $domain_id = $c->request->params->{domain_id};
+		my $field     = $c->request->params->{field};
+		my $value	  = $c->request->params->{value};
+		my $domain = ActiveCMDB::Object::Ipdomain->new(domain_id => $domain_id);
+		$domain->get_data();
+		
+		$domain->$field($value);
+		$domain->save();
+		$c->response->status(HTTP_OK);
+	} else {
+		$c->response->status(HTTP_UNAUTHORIZED);
+	}
 }
 
 =head1 AUTHOR
