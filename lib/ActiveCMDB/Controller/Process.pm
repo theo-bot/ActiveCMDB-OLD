@@ -56,9 +56,13 @@ $config->load('cmdb');
 
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
-
-    $c->stash->{server_id} = $config->section("cmdb::default::server_id");
-    $c->stash->{template}  = "process/container.tt"; 
+	if ( cmdb_check_role($c,qw/processViewer processAdmin/) )
+	{
+    	$c->stash->{server_id} = $config->section("cmdb::default::server_id");
+    	$c->stash->{template}  = "process/container.tt";
+	} else {
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
+	} 
 }
 
 sub api :Local {
@@ -71,167 +75,182 @@ sub api :Local {
 
 sub list :Local {
 	my($self,$c) = @_;
-	my($json,$rs);
-	my @rows = ();
-	my $keys = ();
-	my @objects = ();
-	
-	$json = undef;
-	
-	my $rows	= $c->request->params->{rows} || 10;
-	my $page	= $c->request->params->{page} || 1;
-	my $order	= $c->request->params->{sidx} || 'domain_id';
-	my $asc		= $c->request->params->{sord};
-	my $search = "";
-	my %procStatus = cmdb_name_set('procStatus');
-	#
-	# Get keys for the query
-	#
-	$keys = $c->model("Cloud")->bucket("CmdbProcess")->get_keys;
-	
-	$json->{records} = scalar(@{$keys});
-	if ( $json->{records} > 0 ) {
-		$json->{total} = ceil($json->{records} / $rows );
-	} else {
-		$json->{total} = 0;
-	} 
-	
-	#
-	# Get the data
-	#
-	my @keys = @{ $keys };
-	foreach my $key ( @keys )
+	if ( cmdb_check_role($c,qw/processViewer processAdmin/) )
 	{
-		$c->log->debug("Fetching key:$key");
-		push(@objects, $c->model("Cloud")->get({key => $key})->data);
-	}
+		my($json,$rs);
+		my @rows = ();
+		my $keys = ();
+		my @objects = ();
+	
+		$json = undef;
+	
+		my $rows	= $c->request->params->{rows} || 10;
+		my $page	= $c->request->params->{page} || 1;
+		my $order	= $c->request->params->{sidx} || 'domain_id';
+		my $asc		= $c->request->params->{sord};
+		my $search = "";
+		my %procStatus = cmdb_name_set('procStatus');
+		#
+		# Get keys for the query
+		#
+		$keys = $c->model("Cloud")->bucket("CmdbProcess")->get_keys;
+	
+		$json->{records} = scalar(@{$keys});
+		if ( $json->{records} > 0 ) {
+			$json->{total} = ceil($json->{records} / $rows );
+		} else {
+			$json->{total} = 0;
+		} 
+	
+		#
+		# Get the data
+		#
+		my @keys = @{ $keys };
+		foreach my $key ( @keys )
+		{
+			$c->log->debug("Fetching key:$key");
+			push(@objects, $c->model("Cloud")->get({key => $key})->data);
+		}
 	
 	
-	@objects = sort { $a->{$order} cmp $b->{$order} } @objects;
+		@objects = sort { $a->{$order} cmp $b->{$order} } @objects;
 	
-	if ( $asc eq 'desc' ) {
-		@objects = reverse @objects;
-	}
+		if ( $asc eq 'desc' ) {
+			@objects = reverse @objects;
+		}
 	
-	
-	foreach my $object (@objects)
-	{
-		my $process_start	= sprintf("%s", DateTime->from_epoch( epoch => $object->{exectime} || 0 ));
-		$process_start =~ s/T/ /;
-		my $last_update		= sprintf("%s", DateTime->from_epoch( epoch => $object->{updated_at} || 0 ));
-		$last_update =~ s/T/ /;
+		foreach my $object (@objects)
+		{
+			my $process_start	= sprintf("%s", DateTime->from_epoch( epoch => $object->{exectime} || 0 ));
+			$process_start =~ s/T/ /;
+			my $last_update		= sprintf("%s", DateTime->from_epoch( epoch => $object->{updated_at} || 0 ));
+			$last_update =~ s/T/ /;
 		
-		push(@rows, { 	id => $object->{name} . '-' . $object->{server_id} . '-'. $object->{instance}, 
-						cell => [
-									$object->{name},
-									$object->{server_id},
-									$object->{instance},
-									$procStatus{ $object->{status} },
-									$object->{activity},
-									$process_start,
-									$object->{pid},
-									$object->{ppid},
-									$last_update
-								] 
-					}
-			);
+			push(@rows, { 	id => $object->{name} . '-' . $object->{server_id} . '-'. $object->{instance}, 
+							cell => [
+										$object->{name},
+										$object->{server_id},
+										$object->{instance},
+										$procStatus{ $object->{status} },
+										$object->{activity},
+										$process_start,
+										$object->{pid},
+										$object->{ppid},
+										$last_update
+									] 
+						}
+				);
+		}
+	
+		$json->{rows} = [ @rows ];
+	
+		$c->stash->{json} = $json;
+		$c->forward( $c->view('JSON') );
+	} else {
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
 	}
-	
-	$json->{rows} = [ @rows ];
-	
-	$c->stash->{json} = $json;
-	$c->forward( $c->view('JSON') );
 }
 
 sub view :Local
 {
 	my($self, $c) = @_;
-	my ($process);
-	my %states = ();
-	my %s = cmdb_name_set('procStatus');
 	
-	$states{&PROC_SHUTDOWN} = $s{&PROC_SHUTDOWN};
-	$states{&PROC_RUNNING} = $s{&PROC_RUNNING};
+	if ( cmdb_check_role($c,qw/processViewer processAdmin/) )
+	{
+		my ($process);
+		my %states = ();
+		my %s = cmdb_name_set('procStatus');
 	
-	my @pn;
-	@pn = split(/\-/, $c->request->params->{id});
-	$process = ActiveCMDB::Object::Process->new(name => $pn[0], server_id => $pn[1], instance => $pn[2]);
-	$process->get_data();
-	$c->log->debug(Dumper(%states));
-	$c->stash->{process} = $process;
-	$c->stash->{states} = \%states;
+		$states{&PROC_SHUTDOWN} = $s{&PROC_SHUTDOWN};
+		$states{&PROC_RUNNING} = $s{&PROC_RUNNING};
 	
-	$c->stash->{template} = "process/view.tt";
+		my @pn;
+		@pn = split(/\-/, $c->request->params->{id});
+		$process = ActiveCMDB::Object::Process->new(name => $pn[0], server_id => $pn[1], instance => $pn[2]);
+		$process->get_data();
+		$c->log->debug(Dumper(%states));
+		$c->stash->{process} = $process;
+		$c->stash->{states} = \%states;
 	
+		$c->stash->{template} = "process/view.tt";
+	
+	} else {
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
+	}
 }
-
 sub manage :Local {
 	my($self, $c) = @_;
-	my $update = false;
-	my @pn = ();
-	my($process, $procState, $pid, $broker, $message);
 	
-	@pn = split(/\-/, $c->request->params->{name});
-	$procState = $c->request->params->{procState};
-	$process = ActiveCMDB::Object::Process->new(name => $pn[0], server_id => $pn[1], instance => $pn[2]);
-	$process->get_data();
-	$c->log->debug("Current state ". $process->status . ". New state $procState");
-	if ( $process->status != $procState )
+	if ( cmdb_check_role($c,qw/processAdmin/) )
 	{
-		if ( $process->type eq 'process' && $procState == PROC_RUNNING )
+		my $update = false;
+		my @pn = ();
+		my($process, $procState, $pid, $broker, $message);
+	
+		@pn = split(/\-/, $c->request->params->{name});
+		$procState = $c->request->params->{procState};
+		$process = ActiveCMDB::Object::Process->new(name => $pn[0], server_id => $pn[1], instance => $pn[2]);
+		$process->get_data();
+		$c->log->debug("Current state ". $process->status . ". New state $procState");
+		if ( $process->status != $procState )
 		{
-			# Start process from fork
-			$update = true;
-			my $path = subst_envvar($process->path);
-			if ( -x $path ) {
-				if ( time() - $process->exectime <= 5 ) { sleep 5; }
-				$c->log->info("Starting $path");
-				if ( $pid = fork )
-				{
-					# Parent part
-					$process->pid($pid);
-					$process->exectime(time());
-					$process->update();
-					#	$self->status(2);
+			if ( $process->type eq 'process' && $procState == PROC_RUNNING )
+			{
+				# Start process from fork
+				$update = true;
+				my $path = subst_envvar($process->path);
+				if ( -x $path ) {
+					if ( time() - $process->exectime <= 5 ) { sleep 5; }
+					$c->log->info("Starting $path");
+					if ( $pid = fork )
+					{
+						# Parent part
+						$process->pid($pid);
+						$process->exectime(time());
+						$process->update();
+						#	$self->status(2);
 					
+					} else {
+						# Child part
+						#$logger->logdie("Cannot fork $!") unless defined $pid;
+						exec($path);
+					}
 				} else {
-					# Child part
-					#$logger->logdie("Cannot fork $!") unless defined $pid;
-					exec($path);
-		
+					$c->log->error("File $path is not executeable");
 				}
-			} else {
-				$c->log->error("File $path is not executeable");
 			}
-		}
-		if ( $procState == PROC_SHUTDOWN )
-		{
-			# Shutdown the process manager
-			$c->log->info("Shutdown process");
-			$broker = ActiveCMDB::Common::Broker->new( $config->section('cmdb::broker') );
-			$broker->init({ process => 'web'.$$ , subscribe => false });
-			$message = ActiveCMDB::Object::Message->new();
-			$message->from('web'.$$ );
-			$message->subject('Shutdown');
+			if ( $procState == PROC_SHUTDOWN )
+			{
+				# Shutdown the process manager
+				$c->log->info("Shutdown process");
+				$broker = ActiveCMDB::Common::Broker->new( $config->section('cmdb::broker') );
+				$broker->init({ process => 'web'.$$ , subscribe => false });
+				$message = ActiveCMDB::Object::Message->new();
+				$message->from('web'.$$ );
+				$message->subject('Shutdown');
 		
-			if ( defined( $process->parent ) ) {
-				$message->to('cmdb.' . $process->parent() );		
-			} else {
-				$message->to('cmdb.' . $process->process_name() );
+				if ( defined( $process->parent ) ) {
+					$message->to('cmdb.' . $process->parent() );		
+				} else {
+					$message->to('cmdb.' . $process->process_name() );
+				}
+				$message->payload($process->process_name());
+				$c->log->debug("Sending message to " . $message->to );
+				$broker->sendframe($message);
+				$update = true;
 			}
-			$message->payload($process->process_name());
-			$c->log->debug("Sending message to " . $message->to );
-			$broker->sendframe($message);
-			$update = true;
 		}
-	}
 	
-	if ( !$update ) {
-		$c->log->info("No update was required");
-	}
+		if ( !$update ) {
+			$c->log->info("No update was required");
+		}
 	
-	$c->response->status(200);
-	$c->response->body("done");
+		$c->response->status(HTTP_OK);
+		$c->response->body("done");
+	} else {
+		$c->response->body("Unauthorized");
+		$c->respose->status(HTTP_UNAUTHORIZED);
+	}
 }
 
 =head1 AUTHOR
