@@ -46,6 +46,8 @@ use Try::Tiny;
 use Data::Dumper;
 use Switch;
 use POSIX;
+use ActiveCMDB::Common::Constants;
+use ActiveCMDB::Common::Security;
 use ActiveCMDB::Object::Vendor;
 use ActiveCMDB::Common::Vendor;
 
@@ -60,24 +62,29 @@ BEGIN { extends 'Catalyst::Controller'; }
 sub index :Private {
     my ( $self, $c ) = @_;
 
-	#
-	# Get all vendors for schema
-	#
-	$c->stash->{vendors} = [ $c->model('CMDBv1::Vendor')->all ];
-	
-	#
-	# Add admin flag to template
-	#
-	if ( $c->check_user_roles('vendorAdmin') )
+	if ( cmdb_check_role($c,qw/vendorViewer vendorAdmin/) )
 	{
-		$c->stash->{admin} = 1;
+		#
+		# Get all vendors for schema
+		#
+		$c->stash->{vendors} = [ $c->model('CMDBv1::Vendor')->all ];
+	
+		#
+		# Add admin flag to template
+		#
+		if ( $c->check_user_roles('vendorAdmin') )
+		{
+			$c->stash->{admin} = 1;
+		} else {
+			$c->stash->{admin} = 0;
+		} 
+    	#
+    	# Add proper template
+    	#
+    	$c->stash->{template} = 'vendor/list.tt';
 	} else {
-		$c->stash->{admin} = 0;
-	} 
-    #
-    # Add proper template
-    #
-    $c->stash->{template} = 'vendor/list.tt';
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
+	}
 }
 
 sub api :Local {
@@ -90,69 +97,75 @@ sub api :Local {
 
 sub list :Local {
 	my($self, $c) = @_;
-	my($rs, $json, $search);
-	my @rows = ();
 	
-	my $rows	= $c->request->params->{rows} || 10;
-	my $page	= $c->request->params->{page} || 1;
-	my $order	= $c->request->params->{sidx} || 'vendor_name';
-	my $asc		= '-' . $c->request->params->{sord};
-	
-	#
-	# Create search filter
-	#
-	if ( $c->request->params->{_search} eq 'true' )
+	if ( cmdb_check_role($c,qw/vendorViewer vendorAdmin/) )
 	{
-		my $searchOper   = $c->request->params->{searchOper};
-		my $searchField  = $c->request->params->{searchField};
-		my $searchString = $c->request->params->{searchString};
+		my($rs, $json, $search);
+		my @rows = ();
+	
+		my $rows	= $c->request->params->{rows} || 10;
+		my $page	= $c->request->params->{page} || 1;
+		my $order	= $c->request->params->{sidx} || 'vendor_name';
+		my $asc		= '-' . $c->request->params->{sord};
+	
+		#
+		# Create search filter
+		#
+		if ( $c->request->params->{_search} eq 'true' )
+		{
+			my $searchOper   = $c->request->params->{searchOper};
+			my $searchField  = $c->request->params->{searchField};
+			my $searchString = $c->request->params->{searchString};
 		
-		switch ( $searchOper ) {
-			case 'cn'		{ $search = { $searchField => { like => '%'.$searchString.'%' } } }
-			case 'eq'		{ $search = { $searchField => $searchString } }
-			case 'ne'		{ $search = { $searchField => { '!=' => $searchString } } }
-			case 'bw'		{ $search = { $searchField => { like => $searchString.'%' } } }
-			else 			{ $search = { } }
+			switch ( $searchOper ) {
+				case 'cn'		{ $search = { $searchField => { like => '%'.$searchString.'%' } } }
+				case 'eq'		{ $search = { $searchField => $searchString } }
+				case 'ne'		{ $search = { $searchField => { '!=' => $searchString } } }
+				case 'bw'		{ $search = { $searchField => { like => $searchString.'%' } } }
+				else 			{ $search = { } }
+			}
+		} else {
+			$search = { };
 		}
-	} else {
-		$search = { };
-	}
-	$c->log->debug(Dumper($search));
+		$c->log->debug(Dumper($search));
 	
-	$rs = $c->model("CMDBv1::Vendor")->search(
-				$search,
-				{
-					rows		=> $rows,
-					page		=> $page,
-					order_by	=> { $asc => $order },
-				}
-	);
-	
-	$json->{records} = $rs->count;
-	if ( $json->{records} > 0 ) {
-		$json->{total} = ceil($json->{records} / $c->request->params->{rows} );
-	} else {
-		$json->{total} = 0;
-	} 
-	
-	while ( my $row = $rs->next )
-	{
-		
-		push(@rows, { id => $row->vendor_id, cell=> [
-														$row->vendor_name,
-														$row->vendor_support_phone,
-														$row->vendor_support_email,
-														$row->vendor_support_www
-													]
+		$rs = $c->model("CMDBv1::Vendor")->search(
+					$search,
+					{
+						rows		=> $rows,
+						page		=> $page,
+						order_by	=> { $asc => $order },
 					}
-			);
+		);
+	
+		$json->{records} = $rs->count;
+		if ( $json->{records} > 0 ) {
+			$json->{total} = ceil($json->{records} / $c->request->params->{rows} );
+		} else {
+			$json->{total} = 0;
+		} 
+	
+		while ( my $row = $rs->next )
+		{
+			push(@rows, { id => $row->vendor_id, cell=> [
+															$row->vendor_name,
+															$row->vendor_support_phone,
+															$row->vendor_support_email,
+															$row->vendor_support_www
+														]
+						}
+				);
+		}
+	
+		$c->log->debug(Dumper(\@rows));
+	
+		$json->{rows} = [ @rows ];
+		$c->stash->{json} = $json;
+		$c->forward( $c->view('JSON') );
+	} else {
+		$c->response->status(HTTP_UNAUTHORIZED);
+		$c->response->body('');
 	}
-	
-	$c->log->debug(Dumper(\@rows));
-	
-	$json->{rows} = [ @rows ];
-	$c->stash->{json} = $json;
-	$c->forward( $c->view('JSON') );
 }
 
 =head2 view
@@ -161,27 +174,32 @@ View or edit vendor data
 =cut
 sub edit :Local {
 	my( $self, $c ) = @_;
-	my($vendor, $id);
-	#
-	# Get vendor data
-	#
-	$id = int($c->request->params->{id});
-	$c->log->info("Fetching data for $id");
-	$vendor = ActiveCMDB::Object::Vendor->new(id => $id);
-	$vendor->get_data();
-	$c->log->info("Found vendor " . $vendor->name);
 	
-	$c->stash->{vendor} = $vendor;
-	
-	if ( $c->check_user_roles('vendorAdmin') )
+	if ( cmdb_check_role($c,qw/vendorAdmin/) )
 	{
-		$c->stash->{template} = 'vendor/edit.tt';
-	} else {
-		if ( $id > 0 ) {
-			$c->stash->{template} = 'vendor/view.tt';
-		}
-	}
+		my($vendor, $id);
+		#
+		# Get vendor data
+		#
+		$id = int($c->request->params->{id});
+		$c->log->info("Fetching data for $id");
+		$vendor = ActiveCMDB::Object::Vendor->new(id => $id);
+		$vendor->get_data();
+		$c->log->info("Found vendor " . $vendor->name);
 	
+		$c->stash->{vendor} = $vendor;
+	
+		if ( $c->check_user_roles('vendorAdmin') )
+		{
+			$c->stash->{template} = 'vendor/edit.tt';
+		} else {
+			if ( $id > 0 ) {
+				$c->stash->{template} = 'vendor/view.tt';
+			}
+		}
+	} else {
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
+	}
 }
 
 =head2 add :Local
