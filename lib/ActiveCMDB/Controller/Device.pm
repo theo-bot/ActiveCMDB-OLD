@@ -544,7 +544,7 @@ sub connections :Local {
 sub site :Local {
 	my($self, $c) = @_;
 	
-	if ( cmdb_check_role($c,qw/deviceViewer deviceAdmin/) )
+	if ( cmdb_check_role($c,qw/deviceViewer deviceAdmin/) && cmdb_check_role($c,qw/siteViewer siteAdmin/))
 	{
 		my($ref,$id,$device,$site);
 	
@@ -824,7 +824,7 @@ sub devconfig :Local {
 
 sub contract :Local {
 	my($self, $c) = @_;
-	if ( cmdb_check_role($c,qw/deviceViewer deviceAdmin/) )
+	if ( cmdb_check_role($c,qw/deviceViewer deviceAdmin/) &&  cmdb_check_role($c,qw/contractViewer contractAdmin/) )
 	{
 		my($ref, $id, $device, $contract, $vendor);
 	
