@@ -39,15 +39,9 @@
 <body>
 <script type='text/javascript'>
 
-try
-{
-  if ( top.document.domain != self.document.domain )
-  ;
+if ( top != window ) {
+	top.location = self.location.href;
 }
-catch(e)
- {
-   top.location.href = self.location.href;
- }
 
 </script>
 <div id="container"><!--CONTAINER STARTS-->
