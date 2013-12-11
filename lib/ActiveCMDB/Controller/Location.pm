@@ -71,7 +71,7 @@ sub index :Private {
 sub api: Local {
 	my($self, $c) = @_;
 
-	if ( cmdb_check_role($c,qw/siteAdmin/) )
+	if ( cmdb_check_role($c,qw/siteViewer siteAdmin/) )
 	{	
 		if ( defined($c->request->params->{oper}) ) {
 			$c->forward('/location/' . $c->request->params->{oper});
