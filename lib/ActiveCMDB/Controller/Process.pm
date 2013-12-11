@@ -40,6 +40,7 @@ use POSIX;
 use Moose;
 use Data::Dumper;
 use ActiveCMDB::Common;
+use ActiveCMDB::Common::Security;
 use ActiveCMDB::Common::Conversion;
 use ActiveCMDB::Common::Constants;
 use ActiveCMDB::Object::Process;
