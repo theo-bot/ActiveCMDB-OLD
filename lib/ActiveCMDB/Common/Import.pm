@@ -45,8 +45,10 @@ use Exporter;
 use Try::Tiny;
 use Logger;
 use ActiveCMDB::Common::Constants;
+use ActiveCMDB::Common::Security;
 use ActiveCMDB::Object::Import;
 use ActiveCMDB::Model::Cloud;
+use ActiveCMDB::Common::Conversion;
 use strict;
 use Data::Dumper;
 use Module::Load;
@@ -58,6 +60,7 @@ our @ISA = ('Exporter');
 our @EXPORT = qw(
 	cmdb_get_imports
 	cmdb_import_start
+	cmdb_import_types
 );
 
 no strict 'refs';
@@ -281,4 +284,21 @@ sub cmdb_import_start
 			$jobresult = 0;
 	}
 	return $jobresult;
+}
+
+sub cmdb_import_types
+{
+	my($c) = @_;
+	my %all = cmdb_name_set('importObject');
+	my %types = ();
+	foreach my $key (keys %all)
+	{
+		my $role = lc($key) . 'Admin';
+		if ( cmdb_check_role($c, $role) )
+		{
+			$types{$key} = $all{$key};
+		}
+	}
+	
+	return %types
 }
