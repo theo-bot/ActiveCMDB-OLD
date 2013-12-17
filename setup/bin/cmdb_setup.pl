@@ -127,7 +127,7 @@ foreach my $step (sort keys %{$plan->{steps}})
 		SaveStatus($iserver);
 	}
 	
-	switch( $plan->{steps}->{$step}->{type} )
+	switch( $plan->{steps}->{$step}->{stype} )
 	{
 		case 1		{ 
 						($r,$v) = PerlSub($plan->{steps}->{$step}->{action}, $plan->{steps}->{$step}->{args},$exec{config});
