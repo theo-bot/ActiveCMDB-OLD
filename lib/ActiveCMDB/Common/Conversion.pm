@@ -53,7 +53,8 @@ our @EXPORT = qw(
 	cmdb_oid_set
 	cmdb_export_conv
 	cmdb_export_snmp
-	cmdb_add_snmp
+	cmdb_snmp_add
+	cmdb_snmp_del
 );
 #########################################################################
 # Routines
@@ -322,17 +323,16 @@ sub cmdb_export_snmp
 	}
 }
 
-sub cmdb_add_snmp
+sub cmdb_snmp_add
 {
 	my($oid,$name,$value, $mibvalue) = @_;
 	
 	my $result = 0;
 	my $data = undef;
 	$data->{oid}  = $oid;
-	$data->{name} = $name;
+	$data->{oidname} = $name;
 	$data->{value}    = $value if defined($value);
 	$data->{mibvalue} = $mibvalue if defined($mibvalue);
-	
 	try {
 		my $schema = ActiveCMDB::Model::CMDBv1->instance();
 	
@@ -341,12 +341,13 @@ sub cmdb_add_snmp
 		$result = 1;
 	} catch {
 		Logger->warn("Failed to create new conversion for $name:$oid");
-	}
+		Logger->debug($_);
+	};
 	
 	return $result;
 }
 
-sub cmdb_del_snmp($$)
+sub cmdb_snmp_del($$)
 {
 	my($oid,$value) = @_;
 	
