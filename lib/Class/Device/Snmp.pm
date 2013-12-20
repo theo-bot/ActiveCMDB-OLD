@@ -47,7 +47,9 @@ sub snmp_get
 	
 	if ( !defined($self->comms) || ref $self->comms ne 'Net::SNMP' ) {
 		$self->snmp_connect($self->attr->snmp_ro);
-	} 
+	} else {
+		Logger->debug("Already connected with " . $self->comms);
+	}
 	
 	if ( defined($self->comms) ) {
 		Logger->debug("Requesting oid $oid");
