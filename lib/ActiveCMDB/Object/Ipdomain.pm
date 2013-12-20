@@ -41,6 +41,7 @@ use Moose;
 use Data::Dumper;
 use Try::Tiny;
 use ActiveCMDB::Model::CMDBv1;
+use ActiveCMDB::Object::Ipdomain::Network;
 
 =head1 ATTRIBUTES
 
