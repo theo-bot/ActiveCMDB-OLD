@@ -225,6 +225,7 @@ sub fetch_device :Local {
 			# If the sysobjectid is set, fetch those details
 			#
 			if ( defined($device->sysobjectid) ) {
+				$c->log->debug("Device sysobject id set to " . $device->sysobjectid );
 				$type = ActiveCMDB::Object::IpType->new(sysobjectid => $device->sysobjectid);
 				$type->find();
 				$json->{descr} = $type->descr;
@@ -232,6 +233,7 @@ sub fetch_device :Local {
 				$vendor->find();
 				$json->{vendor} = $vendor->name;
 			} else {
+				$c->log->debug("Device sysobjectid not set");
 				$json->{vendor} = '';
 				$json->{descr} = '';
 			}
@@ -246,7 +248,14 @@ sub fetch_device :Local {
 				$c->log->debug("Truncating description");
 				$json->{descr_tr} = substr($device->sysdescr(),0,57) . '...';
 			} else {
-				if ( defined($type) ) { $json->{descr_tr} = $type->sysdescr(); }
+				if ( defined($type) ) 
+				{
+					$c->log->debug("Setting descr_tr to " . $type->descr);
+					$json->{descr_tr} = $type->descr(); 
+				} else {
+					$c->log->warn("ERROR: Type object not defined");
+					$json->{descr_tr} = '';
+				}
 			}
 			$json->{sysdescr} = $device->sysdescr();
  			$json->{descr_tr} =~ s/\r//g;
@@ -264,6 +273,7 @@ sub fetch_device :Local {
  				$json->{os} = '';
  			}
 		}
+		#$c->log->debug(Dumper($json));
 		$c->stash->{json} = $json;
 		$c->forward( $c->view('JSON') );
 	} else {
