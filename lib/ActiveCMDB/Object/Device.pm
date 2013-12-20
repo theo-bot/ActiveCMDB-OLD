@@ -46,6 +46,7 @@ use Logger;
 use ActiveCMDB::Common::Constants;
 use ActiveCMDB::Object::Journal;
 use ActiveCMDB::Object::Configuration;
+use ActiveCMDB::Object::Ipdomain;
 
 use constant OBJECT => 1;
 use constant DOMAIN => 2;
@@ -164,10 +165,10 @@ sub find {
 			$row = $self->schema->resultset("IpDeviceSec")->find({ device_id => $self->device_id });
 			if ( defined($row) )
 			{
-				foreach my $key ( __PACKAGE__->meta->get_all_attributes )
+				foreach my $key ( keys %sec_source )
 				{
-					my $attr = $key->name;
-					next if ( $attr =~ /schema|device_id/ );
+					my $attr = $key;
+					next if ( $attr =~ /schema|device_id|configtime/ );
 					if ( $row->can($attr) && defined($row->$attr) ) {
 						$self->$attr($row->$attr);
 						$sec_source{$attr} = OBJECT;
@@ -268,7 +269,8 @@ sub save {
 			{
 				if ( defined($self->$attr)  )
 				{
-					if ( exists $sec_source{$attr} && $self->$attr eq $domain_sec->$attr )
+					# TODO: The domain doesn't support the snmpv attribut 
+					if ( exists $sec_source{$attr} && $domain_sec->can($attr) && $self->$attr eq $domain_sec->$attr )
 					{
 						#
 						# The domain can handle this security parameter
