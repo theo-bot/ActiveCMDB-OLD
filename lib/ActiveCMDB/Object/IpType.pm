@@ -65,7 +65,8 @@ sub find
 		{ 
 			$self->$attr($row->$attr());
 		}
-		
+	} else {
+		Logger->warn("Object type not found " . $self->sysobjectid);
 	}
 	
 }
