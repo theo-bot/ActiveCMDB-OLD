@@ -156,11 +156,11 @@ class ActiveCMDB::Object::Ipdomain::Network with ActiveCMDB::Object::Methods
 		my $row = $self->schema->resultset("IpDomainNetwork")->find( { network_id => $self->network_id } );
 		if ( defined($row) )
 		{
-			foreach my $key ( __PACKAGE__->meta->get_all_attributes )
+			foreach my $key ( $self->meta->get_all_attributes )
 			{
 				my $attr = $key->name;
 				
-				next if ( $attr =~ /schema|network_id/ );
+				next if ( $attr =~ /schema|network_id|configtime/ );
 				
 				Logger->debug("Parsing attribute $attr");
 				if ( defined($row->$attr) ) {
