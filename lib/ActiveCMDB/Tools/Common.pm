@@ -49,6 +49,7 @@ use Logger;
 use Data::UUID;
 use Net::DNS;
 use Moose::Role;
+use Data::Dumper;
 
 =head1 ATTRIBUTES
 
@@ -230,6 +231,8 @@ sub class_loader {
 		Logger->debug("Done $file")
 	}
 	closedir(DIR);
+	
+	#Logger->debug(Dumper($self->{classes}));
 	
 }
 
