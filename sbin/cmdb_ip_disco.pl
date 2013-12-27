@@ -53,7 +53,7 @@ our $instance;
 our $device;
 my $result = GetOptions (
 	"instance=i"	=> \$instance,
-	"disco=s"		=> \$device
+	"device=s"		=> \$device
 	);
 if ( !defined($instance)) {
 	Logger->warn("No instance defined");
