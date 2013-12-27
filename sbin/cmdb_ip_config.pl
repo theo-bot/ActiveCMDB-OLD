@@ -43,7 +43,12 @@ use Logger;
 # Process arguments
 #
 our $instance;
-my $result = GetOptions ("instance=i" => \$instance);
+our $device;
+
+my $result = GetOptions (
+	"instance=i" => \$instance,
+	"device=s"	 => \$device
+);
 if ( !defined($instance) ) {
 	Logger->warn("No instance defined");
 	exit 1;
@@ -55,7 +60,12 @@ my $fetcher = ActiveCMDB::Tools::ConfigFetcher->new({ instance => $instance });
 # Initialize myself
 #
 $fetcher->init({ instance => $instance});
-$fetcher->process();
+if ( !defined($device) )
+{
+	$fetcher->process();
+} else {
+	$fetcher->fetch_device($device);
+}
 
 exit;
 

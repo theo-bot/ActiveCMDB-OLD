@@ -54,13 +54,16 @@ use File::Basename;
 use strict;
 use warnings;
 use IO::Socket::IP;
+use Net::TFTP;
 
 use ActiveCMDB::ConfigFactory;
 use ActiveCMDB::Common::Broker;
 use ActiveCMDB::Common::Constants;
+use ActiveCMDB::Common::Device;
 use ActiveCMDB::Model::CMDBv1;
 use ActiveCMDB::Schema;
 use ActiveCMDB::Object::Configuration;
+use ActiveCMDB::Object::Process;
 use Data::Dumper;
 
 with 'ActiveCMDB::Tools::Common';
@@ -70,7 +73,6 @@ with 'ActiveCMDB::Tools::Common';
 #
 has 'servername'		=> (is => 'rw', isa => 'Str');
 has 'landing'		=> (is => 'rw', isa => 'HashRef');
-
 
 #
 # Constants
@@ -121,7 +123,7 @@ sub init {
 	#
 	# Disconnect fromn tty and start new session
 	#
-	$self->disconnect();
+	$self->process->disconnect();
 }
 
 =item process
@@ -196,7 +198,7 @@ sub process_device
 	
 	if ( defined($msg->payload) )
 	{
-		Logger->info("Processing order ".$msg->cid . " device_id ". $msg->payload->{device}->{device_id});
+		Logger->info("Processing order ". $msg->cid . " device_id ". $msg->payload->{device}->{device_id});
 		
 		$device = Class::Device->new( device_id => $msg->payload->{device}->{device_id} );
 		$device->get_data();
@@ -264,6 +266,29 @@ sub process_device
 	}
 }
 
+=item fetch_device
+
+Wrapper for process_device to fetch a config by name
+
+=cut
+
+sub fetch_device
+{
+	my($self, $hostname) = @_;
+	
+	my $device = cmdb_get_host_by_name($hostname);
+	if ( defined($device) )
+	{
+		my $payload = undef;
+		$payload->{device}->{device_id} = $device->device_id;
+		my $msg = ActiveCMDB::Object::Message->new();
+		$msg->payload($payload);
+		$msg->cid($self->uuid());
+		$self->process_device($msg);
+	} else {
+		Logger->warn("Device $hostname not found");
+	}
+}
 
 =item fetchers
 
@@ -282,6 +307,8 @@ by the NetConfig method.
 sub fetchers
 {
 	my($self, $class, %fetchers) = @_;
+	
+	#Logger->debug(Dumper($self->{classes}));
 	
 	if ( defined($class) && defined($self->{classes}->{$class}) )
 	{
