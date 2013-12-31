@@ -28,10 +28,7 @@
  *
 %]
 <br>
-<center>
 <input type="hidden" id="dateFormat" value="[% dateFormat %]" /> 
 <table id="contractTable"></table>
 <div id="contractPager"></div>
-</center>
-
 [% END %]

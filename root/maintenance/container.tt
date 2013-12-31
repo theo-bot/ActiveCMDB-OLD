@@ -29,10 +29,7 @@
  *
 %]
 <br>
-<center>
 <input type="hidden" id="dateFormat" value="[% dateFormat %]" /> 
 <table id="maintTable"></table>
 <div id="maintPager"></div>
-</center>
-
 [% END %]

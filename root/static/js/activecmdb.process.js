@@ -97,7 +97,9 @@ $(document).ready(function(){
 		           	}
 		          ],
 		rowNum:10, 
-		rowList:[10,20,30], 
+		rowList:[10,20,30],
+		height: 230,
+		hidegrid: false,
 		pager: '#processPager', 
 		sortname: 'server_id', 
 		viewrecords: true, 

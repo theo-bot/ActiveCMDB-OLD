@@ -58,6 +58,7 @@ $(document).ready(function(){
 		          }
 		         ],
 		rowNum:10, rowList:[10,20,30],
+		hidegrid: false,
 		sortname: 'journal_date', 
 		viewrecords: true, 
 		sortorder: "asc", 

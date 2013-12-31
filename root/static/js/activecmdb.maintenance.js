@@ -96,7 +96,9 @@ $(document).ready(function(){
 		           	}
 		          ],
 		rowNum:10, 
-		rowList:[10,20,30], 
+		rowList:[10,20,30],
+		height: 200,
+		hidegrid: false,
 		pager: '#maintPager', 
 		sortname: 'maint_id', 
 		viewrecords: true, 
