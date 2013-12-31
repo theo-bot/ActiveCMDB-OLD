@@ -29,9 +29,6 @@
  *
 %]
 <br>
-<center>
 <table id="typeTable"></table>
 <div id="typePager"></div>
-</center>
-
 [% END %]

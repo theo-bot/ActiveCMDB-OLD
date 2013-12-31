@@ -47,9 +47,12 @@ use Image::Info qw(image_info dim);
 use Data::Dumper;
 use ActiveCMDB::Common::Security;
 use ActiveCMDB::Common::Constants;
+use ActiveCMDB::Common::IpType;
+use ActiveCMDB::Object::IpType;
+use ActiveCMDB::Common::Vendor;
+use ActiveCMDB::Common::Conversion;
 
 BEGIN { extends 'Catalyst::Controller'; }
-
 
 sub index :Private {
     my ( $self, $c ) = @_;
@@ -149,121 +152,24 @@ sub list :Local {
 	}
 }
 
-sub edit :Local {
-	my($self, $c) = @_;
-	
-	if ( cmdb_check_role($c,qw/deviceAdmin/) )
-	{
-		my($data,$f);
-	
-		$data = undef;
-		foreach $f (qw/active descr disco_scheme sysobjectid vendor_id/)
-		{
-			$data->{$f} = $c->request->params->{$f};
-		}
-		$data->{type_id} = $c->request->params->{id} || undef;
-	
-		$c->model("CMDBv1::IpDeviceType")->update_or_create( $data );
-	
-		$c->response->status(HTTP_OK);
-		$c->response->body('');
-	} else {
-		$c->response->status(HTTP_UNAUTHORIZED);
-		$c->response->body('');
-	}
-}
-
-sub add :Local {
-	my($self, $c) = @_;
-	
-	if ( cmdb_check_role($c,qw/deviceAdmin/) )
-	{
-		my($data, $f);
-	
-		$data = undef;
-		foreach $f (qw/active descr disco_scheme sysobjectid vendor_id/)
-		{
-			$data->{$f} = $c->request->params->{$f};
-		}
-		$data->{type_id} = undef;
-	
-		$c->model("CMDBv1::IpDeviceType")->create( $data );
-	
-		$c->response->status(HTTP_OK);
-		$c->response->body('');
-	} else {
-		$c->response->status(HTTP_UNAUTHORIZED);
-		$c->response->body('');
-	}
-}
-
 sub del :Local {
 	my($self,$c) = @_;
 	
 	if ( cmdb_check_role($c,qw/deviceAdmin/) )
 	{
-		my($row,$id);
+		my($iptype,$id);
 	
 		$id = $c->request->params->{id};
-		$row = $c->model("CMDBv1::IpDeviceType")->find({ type_id => $id });
-		if ( defined($row) ) {
-			$row->delete;
+		$iptype = get_iptype_by_typeid($id);
+		if ( defined($iptype) && $iptype->descr ne 'GenericSnmp') {
+			$iptype->delete();
+			$c->response->status(HTTP_OK);
 		} else {
-			$c->log->warn("type_id $id not found to delete");
+			$c->response->status(HTTP_INTERNAL_ERROR);
 		}
 	
-		$c->response->status(HTTP_OK);
+		
 		$c->response->body('');
-	} else {
-		$c->response->status(HTTP_UNAUTHORIZED);
-		$c->response->body('');
-	}
-}
-
-=item vendors
-
-vendors - Get vendors to fill select option
-
-=cut
-
-sub vendors :Local {
-	my($self, $c) = @_;
-	
-	if ( cmdb_check_role($c,qw/deviceViewer deviceAdmin/) )
-	{
-		my($rs,$data);
-	
-		$data = "<select>";
-		$rs = $c->model('CMDBv1::Vendor')->search({}, {order_by => 'vendor_name'});
-		while (my $row = $rs->next)
-		{
-			$data .= sprintf("<option value='%d'>%s</option>", $row->vendor_id, $row->vendor_name);
-		}
-		$data .= "</select>";
-	
-		$c->response->body( $data );
-	} else {
-		$c->response->status(HTTP_UNAUTHORIZED);
-		$c->response->body('');	
-	}
-}
-
-sub disco :Local {
-	my($self, $c) = @_;
-	
-	if ( cmdb_check_role($c,qw/deviceViewer deviceAdmin/) )
-	{
-		my($rs, $data);
-	
-		$data = "<select>";
-		$rs = $c->model('CMDBv1::DiscoScheme')->search();
-		while (my $row = $rs->next)
-		{
-			$data .= sprintf("<option value='%d'>%s</option>", $row->scheme_id, $row->name);
-		}
-		$data .= "</select>";
-	
-		$c->response->body($data);
 	} else {
 		$c->response->status(HTTP_UNAUTHORIZED);
 		$c->response->body('');
@@ -275,14 +181,22 @@ sub image :Local {
 	
 	if ( cmdb_check_role($c,qw/deviceViewer deviceAdmin/) )
 	{
-		my($id,$row);
+		my($id,$type);
 	
 		$id = $c->request->params->{id};
 		$c->log->debug("Fetching image data for $id");
-		$row = $c->model("CMDBv1::IpDeviceTypeImage")->find({ type_id => $id });
-		if ( defined($row) ) {
-			$c->stash->{image} = $row->image;
-			$c->stash->{mimetype} = $row->mime_type;
+		$type = get_iptype_by_typeid($id);
+		
+		if ( defined($type) && ref($type) eq 'ActiveCMDB::Object::IpType' ) {
+			$c->log->info("Fetching image data");
+			if ( $type->image->get_data() )
+			{
+				$c->log->info("Image mimetype " . $type->image->mime_type);
+				$c->stash->{image} = $type->image->image;
+				$c->stash->{mimetype} = $type->image->mime_type;
+			} else {
+				$c->log->warn("No image data available");
+			}
 		} else {
 			$c->log->info("No image data found for $id");
 		}
@@ -300,7 +214,6 @@ sub storeimage :Local {
 	{
 		my($data,$upload);
 	
-		$data = undef;
 		$upload = $c->request->upload('image');
 	
 		if ( defined($upload) )
@@ -314,11 +227,10 @@ sub storeimage :Local {
 			}
 			if ( $info->{file_media_type} =~ /jpg|jpeg|png/ )
 			{
-				$data->{type_id} 	= $c->request->params->{id};
-				$data->{mime_type}	= $upload->type;
-				$data->{image}		= encode_base64($upload->slurp);
-			
-				$c->model("CMDBv1::IpDeviceTypeImage")->update_or_create($data);
+				my $type = get_iptype_by_typeid($c->request->params->{id});
+				$type->image->mime_type($upload->type);
+				$type->image->image(encode_base64($upload->slurp));
+				$type->image->save();
 			} else {
 				$c->log->warn("Attempt to upload invalid file type");
 			}
@@ -329,6 +241,70 @@ sub storeimage :Local {
 	} else {
 		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
 	}
+}
+
+sub view :Local {
+	my($self, $c) = @_;
+	
+	if ( cmdb_check_role($c,qw/deviceAdmin/) )
+	{
+		my $id = $c->request->params->{type_id};
+	
+		my $type = get_iptype_by_typeid($id);
+		$c->log->debug(ref $type);
+		if ( defined($type) && ref($type) eq 'ActiveCMDB::Object::IpType')
+		{
+			$c->log->info("Fetched data for a " . $type->descr);
+			$c->stash->{iptype} = $type;
+		}	
+		$c->stash->{schemas} = [ get_disco_schemes() ];
+	
+		my %vendors = cmdb_get_vendors();
+		my %netTypes = cmdb_name_set("networkType");
+		$c->stash->{vendors} = \%vendors;
+		$c->stash->{netTypes} = \%netTypes;
+		
+		$c->stash->{template} = 'device/type_view.tt';
+	} else {
+		$c->response->redirect($c->uri_for($c->controller('Root')->action_for('noauth')));
+	}
+}
+
+sub save :Local {
+	my($self, $c) = @_;
+	my $type;
+	
+	if ( cmdb_check_role($c,qw/deviceAdmin/) )
+	{
+		my $id = $c->request->params->{type_id};
+		if ( defined($id) && int($id) > 0 )
+		{
+			$type = get_iptype_by_typeid($id);
+			if ( $type->descr eq 'GenericSnmp' ) {
+				$c->response->status(HTTP_INTERNAL_ERROR);
+				$c->response->body('');
+				return;
+			}
+		} else { 
+			$type = ActiveCMDB::Object::IpType->new();
+		}
+		foreach my $attr (keys %{$type->map})
+		{
+			if ( defined($c->request->params->{$attr}) && $type->meta->get_attribute( $attr )->get_write_method  )
+			{
+				$type->$attr( $c->request->params->{$attr} )
+			}
+		}
+		if ( $type->save() )
+		{
+			$c->response->status(HTTP_OK);
+		} else {
+			$c->response->status(HTTP_INTERNAL_ERROR);
+		}
+	} else {
+		$c->response->status(HTTP_UNAUTHORIZED);
+	}
+	$c->response->body('');
 }
 
 =head1 AUTHOR

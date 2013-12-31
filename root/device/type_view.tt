@@ -1,0 +1,67 @@
+[% WRAPPER wrapper.tt extra="iptype" %]
+[%#
+ *
+ * 	Script:	root/device/type_view.tt
+ * 	___________________________________________________________
+ *
+ * 	Copyright (C) 2011-2015 Theo Bot
+ *
+ * 	http://www.activecmdb.org
+ *
+ * 	Topic: Purpose
+ *
+ * 	Template to generate a view/edit page for ip domains
+ *
+ * 	About: License
+ *
+ * 	This program is free software; you can redistribute it and/or
+ * 	modify it under the terms of the GNU General Public License
+ * 	as published by the Free Software Foundation; either version 2
+ * 	of the License, or (at your option) any later version.
+ *
+ * 	This program is distributed in the hope that it will be useful,
+ * 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * 	GNU General Public License for more details.
+ *
+ *  Topic: Version Control
+ *
+ *
+%]
+<br>
+<form id="typeForm">
+<input type="hidden" name="type_id" id="typeID" value="[% iptype.type_id %]" />
+<table>
+<tr>
+	<th>sysObjectID</th>
+	<td>:<input type="text" name="sysobjectid" id="typeOid" class="cmdbText" value="[% iptype.sysobjectid %]" />
+</tr>
+<tr>
+	<th>Description</th>
+	<td>:<input type="text" name="descr" id="typeDesc" class="cmdbText" value="[% iptype.descr %]" />
+</tr>
+<tr>
+	<th>Active</th>
+	<td>:<input type="checkbox" value="1" name="active" [% IF iptype.active == 1 %]checked[% END %] />
+</tr>
+<tr>
+	<th>Discovery model</th>
+	<td>:<select class="cmdbList" name="disco_scheme">[% FOREACH schema IN schemas %]<option value="[% schema.scheme_id %]">[% schema.name %]</option>[% END %]</select></td>
+</tr>
+<tr>
+	<th>Vendor</th>
+	<td>:<select class="cmdbList" name="vendor">[% FOREACH vendor IN vendors %]<option value="[% vendor.key %]" [% IF iptype.vendor_id == vendor.key %]selected[% END %]>[% vendor.value %]</option>[% END %]</select></td>
+</tr>
+<tr>
+	<th>Network type</th>
+	<td>:<select class="cmdbList" name="networktype">[% FOREACH nettype IN netTypes %]<option value="[% nettype.key %]" [% IF iptype.networktype == nettype.key %]selected[% END %]>[% nettype.value %]</option>[% END %]</select></td>
+</tr>
+</table>
+<div class="bottomLeft">
+	<input type="button" id="typeSave" value="Save" class="cmdbButton" />
+</div>
+<div class="bottomRight">
+	<input type="button" id="typeDisc" value="Discard" class="cmdbButton" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</div>
+</form>
+[% END %]

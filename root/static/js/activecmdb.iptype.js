@@ -77,22 +77,81 @@ $(document).ready(function(){
 		rowNum:10, rowList:[10,20,30], 
 		pager: '#typePager', 
 		sortname: 'vendor_id', 
-		viewrecords: true, 
+		viewrecords: true,
+		hidegrid: false,
 		sortorder: "asc", 
 		editurl: "/iptype/api", 
-		caption: "Networks",
-		
+		caption: "Device types",
+		ondblClickRow: function(id) {
+			$.colorbox({
+					iframe:true,
+					width:740,
+					height:650,
+					initialWidth:640,
+					initialHeight:650,
+					href:'/iptype/view?type_id=' + id,
+					onClosed:function(){ 
+						$("#typeTable").trigger("reloadGrid");
+					} 
+				});
+			},
 	}); 
 
 	jQuery("#typeTable").jqGrid('navGrid',"#typePager",
-			{view:true},
-			{height:350,reloadAfterSubmit:false, jqModal:false, closeOnEscape:true, bottominfo:"Fields marked with (*) are required"},
-			{height:350,reloadAfterSubmit:true,jqModal:false, closeOnEscape:true,bottominfo:"Fields marked with (*) are required", closeAfterAdd: true},
-			{reloadAfterSubmit:false,jqModal:false, closeOnEscape:true},
-			{closeOnEscape:true},
-			{height:350,jqModal:false,closeOnEscape:true}
+			{
+				view:false,
+				edit:false,
+				save:false, 
+				del:false, 
+				addfunc: function() { 
+					$.colorbox({
+						iframe:true,
+						width:740,
+						height:650,
+						initialWidth:640,
+						initialHeight:650,
+						href:'/iptype/view?type_id=',
+						onClosed:function(){
+							$("#typeTable").trigger("reloadGrid");
+						}
+					});
+				}
+			}
 	); 
 	jQuery("#typeTable").jqGrid('inlineNav',"#typePager", {edit: false, add:false, cancel:false, save:false});
+	
+	$("#typeSave").click(function() {
+		var typeData = $("#typeForm").serialize();
+		$.ajax({
+			url: "/iptype/save",
+			type: "POST",
+			dataType: "json",
+			data: typeData,
+			statusCode: {
+				200: function() { parent.$.fn.colorbox.close(); },
+				500: function() { alert('Failed to save'); }
+			}
+		});
+	});
+	
+	$('#typeDisc').click(function() {
+		var question = "Delete device type: " + $("#typeDesc").val() + ' (' + $('#typeOid').val() + ')';
+		var r = confirm(question);
+		if ( r == true )
+		{
+			var type_id = $('#typeID').val();
+			$.ajax({
+				url: "/iptype/del",
+				type: "POST",
+				dataType: "json",
+				data: { type_id: type_id },
+				statusCode: {
+						200: function() { parent.$.fn.colorbox.close(); },
+					500: function() { alert('Failed to delete'); }
+				}
+			});
+		}
+	});
 	
 });
 
