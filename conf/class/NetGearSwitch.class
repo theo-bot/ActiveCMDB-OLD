@@ -1,0 +1,16 @@
+class "NetGearSwitch" {
+	
+	super 'NetGear';
+	version '1.0';
+	enabled 1;
+	
+	interrogations {
+					bridgemib 5;
+				};
+	
+	oidset [
+				'1.3.6.1.4.1.4526.100.4.18'
+			];
+			
+	networkType 0;
+};
