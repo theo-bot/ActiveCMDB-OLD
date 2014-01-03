@@ -59,8 +59,8 @@ my $strp = DateTime::Format::Strptime->new(
 my $m_repeat = { 
 				0 => 'None',
 				1 => 'Daily',
-				1 => 'Weekly',
-				2 => 'Monthly',
+				2 => 'Weekly',
+				3 => 'Monthly',
 				4 => 'Yearly' 
 			}; 
 
@@ -195,17 +195,32 @@ sub edit :Local {
 	
 }
 
-sub add :Local {
+sub save :Local {
 	my($self, $c) = @_;
 	
 	if ( cmdb_check_role($c,qw/deviceAdmin/) )
 	{
 		my($sched, $res);
-	
-		$sched = ActiveCMDB::Object::Maintenance->new();
-	
-		$sched->set_start_time($c->request->params->{start_time});
-		$sched->set_end_time($c->request->params->{end_time});
+		if ( defined($c->request->params->{maint_id}) && int($c->request->params->{maint_id}) > 0 )
+		{
+			$sched = ActiveCMDB::Object::Maintenance->new(maint_id => int($c->request->params->{maint_id}));
+		} else {
+			$sched = ActiveCMDB::Object::Maintenance->new();
+		}
+		
+		#
+		# Process maintenance window
+		#
+		my $window = $c->request->params->{window};
+		if ( $window =~ /^(\d+);(\d+)$/ )
+		{
+			$sched->start_time($1 * 60 );
+			$sched->end_time($2 * 60 );
+		}
+		
+		#
+		# Process date values
+		#
 		if ( defined($c->request->params->{start_date}) && length($c->request->params->{start_date}) > 4 ) {
 			my $dt = $strp->parse_datetime($c->request->params->{start_date});
 			$sched->start_date( $dt->epoch() );
@@ -214,47 +229,24 @@ sub add :Local {
 			my $dt = $strp->parse_datetime($c->request->params->{end_date});
 			$sched->end_date( $dt->epoch() );
 		}
+		
+		#
+		# Other values
+		#
 		$sched->m_repeat( $c->request->params->{m_repeat} || 0 );
 		$sched->m_interval( $c->request->params->{m_interval} || 0 );
 		$sched->descr( $c->request->params->{descr} );
-		$res = $sched->save();
-	
-		$c->response->body('');
-		if ( $res ) {
+		
+		if ( $sched->save() )
+		{
 			$c->response->status(HTTP_OK);
 		} else {
 			$c->response->status(HTTP_INTERNAL_ERROR);
 		}
 	} else {
-		$c->response->body('');
 		$c->response->status(HTTP_UNAUTHORIZED);
 	}
-}
-
-sub intervals :Local
-{
-	my($self, $c) = @_;
-	
-	if ( cmdb_check_role($c,qw/deviceViewer deviceAdmin/) )
-	{
-		my($json, $data);
-	
-		$json = undef;
-	
-		$json = $m_repeat;
-	
-		$data = "<select>";
-		foreach my $i (keys %{$json} )
-		{
-			$data .= sprintf("<option value='%d'>%s</option>", $i, $json->{$i});
-		}
-		$data .= "</select>";
-	
-		$c->response->body($data);
-	} else {
-		$c->response->body('');
-		$c->response->status(HTTP_UNAUTHORIZED);
-	}
+	$c->response->body('');
 }
 
 sub moment2time
@@ -269,6 +261,18 @@ sub moment2time
 	return sprintf("%02d:%02d", $hours, $mins);
 }
 
+sub view :Local
+{
+	my($self, $c) = @_;
+	
+	my $maint_id = $c->request->params->{maint_id};
+	my $maint = ActiveCMDB::Object::Maintenance->new(maint_id => $maint_id);
+	$maint->get_data();
+	
+	$c->stash->{intervals} = $m_repeat;
+	$c->stash->{maint} = $maint;
+	$c->stash->{template} = 'maintenance/view.tt'; 
+}
 __PACKAGE__->meta->make_immutable;
 
 1;

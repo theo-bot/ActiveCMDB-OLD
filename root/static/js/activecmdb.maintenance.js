@@ -105,11 +105,28 @@ $(document).ready(function(){
 		sortorder: "asc", 
 		editurl: "/maintenance/api", 
 		caption: "Maintenance schedules",
-		
+		ondblClickRow: function(id) {
+			$.colorbox({
+					iframe:true,
+					width:740,
+					height:480,
+					initialWidth:640,
+					initialHeight:480,
+					href:'/maintenance/view?maint_id=' + id,
+					onClosed:function(){ 
+						$("#maintTable").trigger("reloadGrid");
+					} 
+			});
+		},
 	});
 	
 	jQuery("#maintTable").jqGrid('navGrid','#maintPager', 
-			{ view:true }, //options 
+			{
+				view:false,
+				edit:false,
+				save: false,
+				del: false
+			}, //options 
 			{
 				height:280,
 				reloadAfterSubmit:false,
@@ -149,5 +166,72 @@ $(document).ready(function(){
 			{reloadAfterSubmit:false}, // del options 
 			{} // search options 
 	);
+	
+	$('#startDate').datepicker({
+		dateFormat: "yy-mm-dd",
+				
+	});
+	
+	$('#endDate').datepicker({
+		dateFormat: "yy-mm-dd",
+		changeMonth: true,
+		changeYear: true
+	});
+	
+	/*
+	$('#MRepeat').spinner({
+		min: 0,
+		max: 99
+	})
+	*/
+	
+	$("#Slider5").slider({
+		from: 0,
+		to: 1439,
+		step: 5,
+		dimension: '',
+		scale: ['0:00','1:00','2:00','3:00','4:00','5:00','6:00','7:00','8:00','9:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','23:59'],
+		limits: false,
+		calculate: function( value ){
+			var hours = Math.floor( value / 60 );
+			var mins = ( value - hours*60 );
+			return (hours < 10 ? "0"+hours : hours) + ":" + ( mins == 0 ? "00" : mins );
+		}
+	});
+	
+	$('#maintSave').click(function() {
+		var maint = $('#maintForm').serialize();
+		$.ajax({
+			url: "/maintenance/save",
+			type: "POST",
+			dataType: "json",
+			data: maint,
+			statusCode: {
+				200: function() { parent.$.fn.colorbox.close(); },
+				401: function() { alert('Unauthorized'); }, 
+				500: function() { alert('Failed to save'); }
+			}
+		});
+	});
+	
+	$('#maintDisc').click(function() {
+		var question = "Delete maintenance schedule: " + $("#maintDesc");
+		var r = confirm(question);
+		if ( r == true )
+		{
+			var maint_id = $('#maintId').val();
+			$.ajax({
+				url: "/maintenance/del",
+				type: "POST",
+				dataType: "json",
+				data: { maint_id: maint_id },
+				statusCode: {
+					200: function() { parent.$.fn.colorbox.close(); },
+					401: function() { alert('Unauthorized'); },
+					500: function() { alert('Failed to delete'); }
+				}
+			});
+		}
+	});
 });
 

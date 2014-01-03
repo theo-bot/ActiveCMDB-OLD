@@ -1,0 +1,67 @@
+[% WRAPPER wrapper.tt extra="maintenance" %]
+[%#
+ *
+ * 	Script:	root/maintenance/view.tt
+ * 	___________________________________________________________
+ *
+ * 	Copyright (C) 2011-2015 Theo Bot
+ *
+ * 	http://www.activecmdb.org
+ *
+ * 	Topic: Purpose
+ *
+ * 	Template to list/edit maintenance schedules
+ *
+ * 	About: License
+ *
+ * 	This program is free software; you can redistribute it and/or
+ * 	modify it under the terms of the GNU General Public License
+ * 	as published by the Free Software Foundation; either version 2
+ * 	of the License, or (at your option) any later version.
+ *
+ * 	This program is distributed in the hope that it will be useful,
+ * 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * 	GNU General Public License for more details.
+ *
+ *  Topic: Version Control
+ *
+ *
+%]
+<form id="maintForm">
+<table>
+<tr>
+	<th>Description</th>
+	<td>:<input type="text" name="descr" id="maintDesc" class="cmdbText" value="[% maint.descr %]" /></td>
+</tr>
+<tr>
+	<th>Start date</th>
+	<td>:<input type="text" name="start_date" id="startDate" class="cmdbText" value="[% maint.datestr('start') %]" /></td>
+</tr>
+<tr>
+	<th>End date</th>
+	<td>:<input type="text" name="end_date" id="endDate" class="cmdbText" value="[% maint.datestr('end') %]" /></td>
+</tr>
+<tr>
+	<th>Repeat</th>
+	<td>:<input id="MRepeat" name="m_repeat" class="cmdbText" value="[% maint.m_repeat %]" size="2" maxlength="2" /></td>
+</tr>
+<tr>
+	<th>Interval</th>
+	<td>:<select id="Interval" name="m_interval" class="cmdbList">[% FOREACH interval IN intervals %]<option value="[% interval.key %]" [% IF maint.m_interval == interval.key %]selected[% END %]>[% interval.value %]</option>[% END %]</select></td>
+</tr>
+</table>
+<br>
+<div class="span4">
+	<b>Maintenance window</b><br><br>
+	<input id="Slider5" type="slider" name="window" value="[% maint.start_time div 60 %];[% maint.end_time div 60 %]" />
+</div>
+<input type="hidden" id="maintId" name="maint_id" value="[% maint.maint_id %]" />
+<div class="bottomLeft">
+	<input type="button" id="maintSave" value="Save" class="cmdbButton" />
+</div>
+<div class="bottomRight">
+	<input type="button" id="maintDisc" value="Discard" class="cmdbButton" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</div>
+</form>
+[% END %]

@@ -382,3 +382,7 @@ td, th {
 div.cirTree {
 	heigth: 120px;
 }
+
+.span4 {
+    width: 640px;
+}

@@ -44,13 +44,14 @@ use Logger;
 use DateTime;
 use ActiveCMDB::Common::Constants;
 use Data::Dumper;
+use POSIX qw(strftime);
 
 has 'maint_id'		=> (is => 'ro', isa => 'Int');
 has 'descr'			=> (is => 'rw', isa => 'Str');
 has 'start_date'	=> (is => 'rw', isa => 'Int|Undef', default => 0);
 has 'end_date'		=> (is => 'rw', isa => 'Int|Undef', default => 0 );
-has 'start_time'	=> (is => 'rw', isa => 'Int|Undef', writer => '_start_time', default => 0);
-has 'end_time'		=> (is => 'rw', isa => 'Int|Undef', writer => '_end_time', default => 0);
+has 'start_time'	=> (is => 'rw', isa => 'Int|Undef', default => 0);
+has 'end_time'		=> (is => 'rw', isa => 'Int|Undef', default => 0);
 has 'm_repeat'		=> (is => 'rw', isa => 'Int', default => 0);
 has 'm_interval'		=> (is => 'rw', isa => 'Int', default => 0);
 
@@ -75,12 +76,12 @@ sub get_data
 				my $attr = $key->name;
 				next if ( $attr =~ /maint_id|schema/ );
 				if ( $row->can($attr) && defined($row->$attr) ) {
-					if ( $attr =~ /end_time|start_time/ ) {
-						my $m = 'set_'.$attr;
-						$self->$m($row->$attr);	
-					} else {
+					#if ( $attr =~ /end_time|start_time/ ) {
+						#my $m = 'set_'.$attr;
+					#	$self->$m($row->$attr);	
+					#} else {
 						$self->$attr($row->$attr);
-					}
+					#}
 				}
 			}
 		}
@@ -119,44 +120,6 @@ sub save
 	}
 }
 
-sub set_start_time {
-	my($self, $t) = @_;
-	
-	if ( defined($t) )
-	{
-		if ( $t =~ /^\d+$/ ) {
-			$self->_start_time($t);
-		}
-		
-		if ( $t =~ /^(\d+):(\d+)$/ ) {
-			my $hours = $1;
-			my $mins  = $2;
-			my $moment = ( 3600 * $hours ) + ( 60 * $mins );
-			$self->_start_time($moment);
-		}
-		
-	}
-}
-
-
-sub set_end_time {
-	my($self, $t) = @_;
-	
-	if ( defined($t) )
-	{
-		if ( $t =~ /^\d+$/ ) {
-			$self->_end_time($t);
-		}
-		
-		if ( $t =~ /^(\d+):(\d+)$/ ) {
-			my $hours = $1;
-			my $mins  = $2;
-			my $moment = ( 3600 * $hours ) + ( 60 * $mins );
-			$self->_end_time($moment);
-		}
-		
-	}
-}
 
 sub is_active
 {
@@ -190,6 +153,17 @@ sub is_active
 			}
 		}
 	}
+}
+
+sub datestr
+{
+	my($self,$sel) = @_;
+	
+	my $ts = 0;
+	if ( $sel eq 'start' ) { $ts = $self->start_date };
+	if ( $sel eq 'end' ) { $ts = $self->end_date };
+	
+	return strftime "%Y-%m-%d", localtime($ts);
 }
 
 1;

@@ -1,7 +1,7 @@
 [% WRAPPER wrapper.tt extra="maintenance" %]
 [%#
  *
- * 	Script:	root/maintenance.tt
+ * 	Script:	root/maintenance/container.tt
  * 	___________________________________________________________
  *
  * 	Copyright (C) 2011-2015 Theo Bot

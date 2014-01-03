@@ -129,6 +129,7 @@ $(document).ready(function(){
 			data: typeData,
 			statusCode: {
 				200: function() { parent.$.fn.colorbox.close(); },
+				401: function() { alert('Unauthorized'); },
 				500: function() { alert('Failed to save'); }
 			}
 		});
@@ -146,7 +147,8 @@ $(document).ready(function(){
 				dataType: "json",
 				data: { type_id: type_id },
 				statusCode: {
-						200: function() { parent.$.fn.colorbox.close(); },
+					200: function() { parent.$.fn.colorbox.close(); },
+					401: function() { alert('Unauthorized'); },
 					500: function() { alert('Failed to delete'); }
 				}
 			});
