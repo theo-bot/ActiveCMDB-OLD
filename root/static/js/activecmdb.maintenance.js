@@ -57,10 +57,6 @@ $(document).ready(function(){
 		           		editable:true,
 		           		edittype: 'text',
 		           		required:true,
-		           		editoptions: {
-		           			size: 10,
-		           			maxlength: 10
-		           		}
 		           	},
 		           	{
 		           		name:'end_time',
@@ -68,10 +64,7 @@ $(document).ready(function(){
 		           		width:128, 
 		           		editable:true, 
 		           		required:true,
-		           		editoptions: {
-		           			size: 10,
-		           			maxlength: 10
-		           		}
+		           		
 		           	},
 		           	{
 		           		name:'m_repeat',
@@ -81,17 +74,11 @@ $(document).ready(function(){
 		           		required:true,
 		           		formatter:'integer',
 		           		formatOptions:{defaulValue:"0"},
-		           		editrules:{integer:true, minValue:0, maxValue:99}
 		           	},
 		           	{
 		           		name:'m_interval',
 		           		index:'m_interval',
 		           		width:64,
-		           		editable:true,
-		           		edittype:'select',
-		           		editoptions: {
-			        		  dataUrl: "/maintenance/api?oper=intervals"
-			        	}
 		           		
 		           	}
 		          ],
