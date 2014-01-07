@@ -114,6 +114,32 @@ sub save
 	return $result
 }
 
+sub delete
+{
+	my($self) = @_;
+	my $result = false;
+	
+	if ( defined($self->scheme_id) && $self->scheme_id > 0 )
+	{
+		try {
+			my $row = $self->schema->resultset($table)->find({ scheme_id => $self->scheme_id });
+			if ( defined($row) ) {
+				$row->delete();
+				$result = true;
+			} else {
+				Logger->warn("Row not found.");
+			}
+			$result = true;
+		} catch {
+			Logger->warn("Failed to delete row.");
+			Logger->debug($_);
+		}
+			
+	}
+	
+	return $result;
+}
+
 sub is_active
 {
 	my($self) = @_;
