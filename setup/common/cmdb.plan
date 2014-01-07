@@ -237,6 +237,17 @@
       "service" : "CMDB",
       "descr" : "Check CMDB_HOME enviroment variable"
    },
+   "CMDB00071" : {
+      "depend" : "CMDB00017",
+      "stype" : "1",
+      "args" : "-add -label Discovery -active 1 -parent Device -url /disco -icon refresh.png",
+      "service" : "CMDB",
+      "descr" : "Add discovery admin menu option",
+      "action" : "$CMDB_HOME/setup/bin//cmdb_menu.pl",
+      "stepid" : "71",
+      "repeat" : "0",
+      "exec_key" : ""
+   },
    "CMDB00061" : {
       "depend" : "CMDB00055",
       "stype" : "2",
