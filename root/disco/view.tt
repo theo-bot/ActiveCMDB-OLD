@@ -1,0 +1,63 @@
+[% WRAPPER wrapper.tt extra="disco" %]
+[%#
+ *
+ * 	Script:	root/disco/view.tt
+ * 	___________________________________________________________
+ *
+ * 	Copyright (C) 2011-2015 Theo Bot
+ *
+ * 	http://www.activecmdb.org
+ *
+ * 	Topic: Purpose
+ *
+ * 	Template to view/edit discovery schemes
+ *
+ * 	About: License
+ *
+ * 	This program is free software; you can redistribute it and/or
+ * 	modify it under the terms of the GNU General Public License
+ * 	as published by the Free Software Foundation; either version 2
+ * 	of the License, or (at your option) any later version.
+ *
+ * 	This program is distributed in the hope that it will be useful,
+ * 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * 	GNU General Public License for more details.
+ *
+ *  Topic: Version Control
+ *
+ *
+%]
+<form id="discoForm">
+<table>
+<tr>
+	<th>Name</th>
+	<td>:<input type="text" class="cmdbText" id="name" name="name" value="[% disco.name %]" [% IF disco.name == 'default' %]readonly[% END %] /></td>
+</tr>
+<tr>
+	<th>Active</th>
+	<td>:<input type="checkbox" name="active" value="1" [% IF disco.active == 1 %]checked[% END %] /></td>
+</tr>
+</table>
+<br>
+<div class="span4">
+	<b>Block1</b><br><br>
+	<input id="Slider1" type="slider" name="block1" value="[% disco.block1 %]" />
+</div>
+<br><br>
+<div class="span4">
+	<b>Block2</b><br><br>
+	<input id="Slider2" type="slider" name="block2" value="[% disco.block2 %]" />
+</div>
+
+<input type="hidden" id="schemeId" name="scheme_id" value="[% disco.scheme_id %]" />
+[% IF admin == 1 %]
+<div class="bottomLeft">
+	<input type="button" id="discoSave" value="Save" class="cmdbButton" />
+</div>
+<div class="bottomRight">
+	[% IF disco.name != 'default' && disco.scheme_id > 0 %]<input type="button" id="discoDisc" value="Discard" class="cmdbButton" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[% END %]
+</div>
+[% END %]
+</form>
+[% END %]
