@@ -89,6 +89,7 @@ use constant	PRIO_NORMAL	=> 4;
 # HTTP Status code
 #
 use constant	HTTP_OK				=> 200;
+use constant	HTTP_BAD_REQUEST	=> 400;
 use constant	HTTP_UNAUTHORIZED	=> 401;
 use constant	HTTP_INTERNAL_ERROR	=> 500;
 
