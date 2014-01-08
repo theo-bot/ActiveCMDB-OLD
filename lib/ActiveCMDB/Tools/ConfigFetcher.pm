@@ -124,6 +124,8 @@ sub init {
 	# Disconnect fromn tty and start new session
 	#
 	$self->process->disconnect();
+	
+	Logger->info("Initialization complete");
 }
 
 =item process
@@ -132,12 +134,12 @@ Process messages to discover devices
 
 =cut
 
-sub process
+sub processor
 {
 	my($self) = @_;
 	my($msg, $delay);
-	
-	while ( $self->running != PROC_SHUTDOWN )
+	Logger->info("Enter processing loop");
+	while ( $self->process->status != PROC_SHUTDOWN )
 	{
 		# Reset delay timer
 		$delay = 5;
@@ -155,7 +157,7 @@ sub process
 		#
 		# Check if there is a message at the broker
 		#
-		$msg = $self->broker->getframe({ process_type => $self->process_type });
+		$msg = $self->broker->getframe({ process_type => $self->process->type });
 		if ( $msg ) {
 			
 			switch ( $msg->subject )
@@ -179,7 +181,9 @@ sub process
 			$self->process->update($self->process->process_name);
 			sleep $delay;
 		}
-	}	
+	}
+	
+	Logger->info("Processing loop finised");	
 }
 
 =item process_device
@@ -364,66 +368,68 @@ sub store_config
 	foreach my $f ( @{$cfgdata->{files}} )
 	{
 		my $file = $f->{filename};
-		#try {
-    		open(FILE, $file); # or die ("Unable to open file $file. " . $!);
-    		binmode(FILE);
+		if ( -r $file )
+		{
+    		if ( open(FILE,"<", $file) )
+    		{
+    			binmode(FILE);
 
-    		$sum  = Digest::MD5->new->addfile(*FILE)->hexdigest;
-    		close(FILE);
+    			$sum  = Digest::MD5->new->addfile(*FILE)->hexdigest;
+    			close(FILE);
+    		} else {
+    			Logger->warn("Failed to open file $file");
+    		}
     		
-    		
-		#} catch {
-		#	Logger->warn("Failed to open $file:");
-		#	return false;
-		#};
-		
-		$count = $self->schema->resultset("IpConfigData")->search(
+    		$count = $self->schema->resultset("IpConfigData")->search(
 					{
 						device_id 	=> $device->device_id,
 						config_name	=> basename($file),
 						config_checksum	=> $sum
 					}
 				)->count;
+			
+			if ( $count == 0 )
+			{
+			
+				my $object = undef;
+			
+				$object = ActiveCMDB::Object::Configuration->new(device_id => $device->device_id);
+				$object->config_id($self->uuid);
+				$object->config_date(time());
+				$object->config_status(0);
+				$object->config_type($self->_get_filetype($file));
+				$object->config_name(basename($file));
+				$object->config_checksum($sum);
+				$object->config_data( do{
+											local $/; 
+											open(my $f1, '<', $file);
+											my $tmp1 = <$f1>; 
+											close $f1 or die $!; 
+											$tmp1
+										});
+			
+				my $transaction = sub { $object->save(); };
+			
+				$self->schema->txn_do( $transaction );
+			
+			} else {
+				Logger->info("Configuration already in store");
+			}
 		
-		if ( $count == 0 )
-		{
-			
-			my $object = undef;
-			
-			$object = ActiveCMDB::Object::Configuration->new();
-			$object->config_id($self->uuid);
-			$object->device_id($device->device_id);
-			$object->config_date(time());
-			$object->config_status(0);
-			$object->config_type($self->_get_filetype($file));
-			$object->config_name(basename($file));
-			$object->config_checksum($sum);
-			$object->config_data( do{
-										local $/; 
-										open(my $f1, '<', $file);
-										my $tmp1 = <$f1>; 
-										close $f1 or die $!; 
-										$tmp1
-									});
-			
-			my $transaction = sub { $object->save(); };
-			
-			$self->schema->txn_do( $transaction );
-			
+			# Unlink the landed file
+			#
+			if ( -f $file )
+			{
+				unlink($file);
+				Logger->debug("Removed $file from landing zone");
+			} else {
+				Logger->warn("No file to unlink for $file");
+			}	
+    		
 		} else {
-			Logger->info("Configuration already in store");
+			Logger->warn("Cannot read from file $file");	
 		}
-		
-		# Unlink the landed file
-		#
-		if ( -f $file )
-		{
-			unlink($file);
-			Logger->debug("Removed $file from landing zone");
-		} else {
-			Logger->warn("No file to unlink for $file");
-		}	
-	}
+	} # End foreach
 }
 
 sub _get_filetype
@@ -498,8 +504,8 @@ sub handle_signals
 		Logger->debug("Processing signal $sig");
 		switch ($sig)
 		{
-			case 'INT'		{ $self->status(PROC_SHUTDOWN); }
-			case 'TERM'		{ $self->status(PROC_SHUTDOWN); }
+			case 'INT'		{ $self->process->status(PROC_SHUTDOWN); }
+			case 'TERM'		{ $self->process->status(PROC_SHUTDOWN); }
 		}
 	}
 }

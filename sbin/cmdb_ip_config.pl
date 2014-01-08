@@ -62,8 +62,10 @@ my $fetcher = ActiveCMDB::Tools::ConfigFetcher->new({ instance => $instance });
 $fetcher->init({ instance => $instance});
 if ( !defined($device) )
 {
-	$fetcher->process();
+	Logger->info("Device wasn't defined, start processing loop");
+	$fetcher->processor();
 } else {
+	Logger->info("Device was defined, processing single device");
 	$fetcher->fetch_device($device);
 }
 
