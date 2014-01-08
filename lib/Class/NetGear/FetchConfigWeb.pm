@@ -107,7 +107,7 @@ sub FetchConfigWeb
 		#
 		$content  = sprintf("pwd=%s", $self->attr->telnet_pwd);
 		
-		$request = HTTP::Request->new(POST => $url_upload);
+		$request = HTTP::Request->new(POST => $url_login);
 		$request->content_type($form->enctype);
 		$request->content($content);
 		$response = $ua->request($request);
