@@ -54,7 +54,7 @@ process:
   config:
     queue: cmdb.config
     exchange: cmdb.config-x
-    maxproc: 0
+    maxproc: 1
     path: $CMDB_HOME/sbin/cmdb_ip_config.pl
     landing_zone: tdevelop.localdomain:/var/lib/tftpboot
     managed: 1
