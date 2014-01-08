@@ -174,15 +174,22 @@ sub snmp_set
 	if ( !defined($self->comms) ) {
 		Logger->debug("Communications handle not defined. Reconnecting");
 		$self->snmp_connect($self->attr->snmp_rw);
+		if ( $self->snmp_connect($self->attr->snmp_rw) )
+		{
+			$self->comms->timeout(10);
+		}
 	} 
 	
 	if ( ref $self->comms ne 'Net::SNMP' ) {
 		Logger->debug("Communications handle is of type " . ref $self->comms );
-		$self->snmp_connect($self->snmp_rw);
+		if ( $self->snmp_connect($self->attr->snmp_rw) )
+		{
+			$self->comms->timeout(10);
+		}
 	}
-	$self->comms->timeout(10);
+	
 
-	if ( defined($oid) && defined($value) )
+	if ( defined($oid) && defined($value) && defined($self->comms) )
 	{
 		Logger->debug("Setting oid: $oid with value: $value");
 		$res = $self->comms->set_request($oid, $type, $value);
