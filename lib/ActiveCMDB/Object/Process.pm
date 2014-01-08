@@ -316,7 +316,7 @@ sub update {
 	{
 		$data->{$attr} = $self->$attr();
 	}
-	
+	$ENV{CMDB_INSTANCE} = sprintf("%s-%d", $self->type, $self->instance);
 	
 	try {
 		my $object = $self->riak->get($self->process_name);

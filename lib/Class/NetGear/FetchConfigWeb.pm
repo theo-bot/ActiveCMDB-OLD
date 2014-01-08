@@ -85,7 +85,7 @@ sub FetchConfigWeb
 		my $url_upload = sprintf("http://%s/base/system/file_upload.html", $self->attr->mgtaddress);
 	
 	
-		my $cookie_file = sprintf("%s/var/tmp/lwpcookies.txt", $ENV{CMDB_HOME});
+		my $cookie_file = sprintf("%s/var/tmp/lwpcookies.%s.txt", $ENV{CMDB_HOME}, $ENV{CMDB_INSTANCE});
 	
 		$ua = LWP::UserAgent->new();
 		$ua->cookie_jar(HTTP::Cookies->new(file => $cookie_file, autosave =>1));
