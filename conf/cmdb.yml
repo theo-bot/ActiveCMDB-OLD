@@ -67,6 +67,7 @@ process:
     reprocess_limit: 60
     reprocess_intervall: 86400
     low_water: 60
+    order_maxage: 900
     challenge:
       interval: 30
       timeout: 30

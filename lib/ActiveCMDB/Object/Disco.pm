@@ -46,6 +46,8 @@ use POSIX;
 use Logger;
 use ActiveCMDB::Common::Constants;
 
+extends 'ActiveCMDB::Object::CmdbObject';
+
 has scheme_id	=> (is => 'rw', isa => 'Int');
 has name		=> (is => 'rw', isa => 'Str');
 has active		=> (is => 'rw', isa => 'Int', default => 0);
@@ -54,12 +56,7 @@ has block2		=> (is => 'rw', isa => 'Str', default => "0;0");
 
 with 'ActiveCMDB::Object::Methods';
 
-# Schema
-has 'schema'		=> (
-	is		=> 'rw', 
-	isa		=> 'Object', 
-	default => sub { ActiveCMDB::Model::CMDBv1->instance() } 
-);
+
 
 my %map = (
 	scheme_id	=> 'scheme_id',

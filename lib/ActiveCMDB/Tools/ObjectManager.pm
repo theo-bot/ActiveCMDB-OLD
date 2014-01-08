@@ -56,7 +56,9 @@ use ActiveCMDB::Object::Process;
 use ActiveCMDB::Object::Device;
 use ActiveCMDB::Object::User;
 use ActiveCMDB::Common::Crypto;
+use ActiveCMDB::Common::ObjectOrders;
 use ActiveCMDB::Object::Endpoint;
+use ActiveCMDB::Object::ObjectOrder;
 
 use Data::Dumper;
 
@@ -264,9 +266,7 @@ sub low_water
 	@follow_up = split(/\,/, $self->config->section("cmdb::process::object::follow_up"));
 	$low_water = $self->config->section("cmdb::process::object::low_water");
 	Logger->debug("Testing the low_water mark ($low_water)");
-	$count = $self->schema->resultset('DeviceOrder')->count({
-		dest => { -in => [ @follow_up ]}
-	});
+	$count = cmdb_count_object_orders(@follow_up);
 	
 	if ( $count < $low_water ) {
 		Logger->info("Low water mark reached");
@@ -339,6 +339,8 @@ sub process_devices
 				});
 	}
 	Logger->info("Done fetching");
+	
+	$self->expire_orders();
 }
 
 =item ack_order
@@ -348,12 +350,13 @@ sub process_devices
 sub ack_order
 {
 	my($self, $msg) = @_;
-	my($rs);
+	my($order);
 	
 	Logger->info("Acknowledged order " . $msg->cid);
-	$rs = $self->schema->resultset('DeviceOrder')->search({ cid => $msg->cid });
-	if ( $rs != 0 ) {
-		$rs->delete;
+	$order = ActiveCMDB::Object::ObjectOrder->new(cid => $msg->cid);
+	if ( $order->get_data() )
+	{
+		$order->delete();
 		Logger->debug("Order removed");
 	}
 	
@@ -372,6 +375,19 @@ sub ack_order
 	}
 }
 
+sub expire_orders
+{
+	my($self) = @_;
+	
+	foreach my $order ( cmdb_get_object_orders() )
+	{
+		if ( $order->is_expired( $self->config->section("cmdb::process::object::order_maxage") ) )
+		{
+			$order->delete();
+		}
+	}
+}
+
 =item process_device
 
 =cut
@@ -381,7 +397,7 @@ sub process_device
 	my($self, $args) = @_;
 	my($message, $p, $device);
 	
-	Logger->debug(Dumper($args));
+	#Logger->debug(Dumper($args));
 	$message = ActiveCMDB::Object::Message->new();
 	$message->from($self->process->name);
 	$message->reply_to($self->config->section("cmdb::broker::prefix") . $self->process->process_name );
@@ -410,7 +426,7 @@ sub process_device
 		}
 		
 		$p = undef;
-		$p->{device}->{device_id} = $args->{device_id};
+		$p->{device}->{device_id} = $device->device_id;
 		
 		$message->payload( $p );
 		$message->to( $dest );
@@ -471,14 +487,16 @@ sub create_order
 	my($self, $message, $dest, $device) = @_;
 	if ( defined($device) && defined($device->device_id) )
 	{
-		$self->schema->resultset('DeviceOrder')->create(
-						{
-							cid			=> $message->cid(),
-							device_id	=> $device->device_id,
-							ts			=> time(),
-							dest		=> $dest
-						}
-					);
+		Logger->info("Creating new order");
+		my $order = ActiveCMDB::Object::ObjectOrder->new(cid => $message->cid());
+		$order->device_id($device->device_id);
+		$order->ts(time());
+		$order->dest($dest);
+		if ( ! $order->save() ) {
+			Logger->warn("Failed to create order.");
+		}
+	} else {
+		Logger->warn("Cannot create order.");
 	}
 }
 

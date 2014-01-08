@@ -220,20 +220,27 @@ sub process_device
 	if ( defined($msg->payload ) )
 	{
 		
-		Logger->info("Processing order ".$msg->cid . " device_id ". $msg->payload->{device}->{device_id});
-		$self->interrogate_device($msg->payload->{device}->{device_id});
+		Logger->info("Processing order ".$msg->cid );
+		if ( defined($msg->payload->{device}->{device_id}) )
+		{
+			Logger->info("device_id ". $msg->payload->{device}->{device_id});
+			$self->interrogate_device($msg->payload->{device}->{device_id});
 		
 	
-		#
-		# Acknowledge the order to the sender
-		#
-		$message = ActiveCMDB::Object::Message->new();
-		$message->from($self->process->type);
-		$message->subject('AckProcessDevice');
-		$message->payload($msg->payload);
-		$message->cid($msg->cid);
-		$message->to($msg->reply_to);
-		$self->broker->sendframe($message);
+			#
+			# Acknowledge the order to the sender
+			#
+			$message = ActiveCMDB::Object::Message->new();
+			$message->from($self->process->type);
+			$message->subject('AckProcessDevice');
+			$message->payload($msg->payload);
+			$message->cid($msg->cid);
+			$message->to($msg->reply_to);
+			$self->broker->sendframe($message);
+		} else {
+			Logger->warn("Invalid message device_id was not set");
+			Logger->debug(Dumper($msg->payload));
+		}
 	} else {
 		Logger->warn("No device_id found in payload");
 	}
