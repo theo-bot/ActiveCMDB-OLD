@@ -54,10 +54,10 @@ use constant DOMAIN => 2;
 #
 # Define custom types
 #
-enum 'Tof' => (0, 1);	# True of False
-enum 'SnmpVer' => (1, 2, 3);
-enum 'Proto1'  => ('md5', 'sha');
-enum 'Proto2'  => ('des', 'aes');
+enum 'Tof' => [(0, 1)];	# True of False
+enum 'SnmpVer' => [(1, 2, 3)];
+enum 'Proto1'  => [('md5', 'sha')];
+enum 'Proto2'  => [('des', 'aes')];
 #
 # Define attributes
 #

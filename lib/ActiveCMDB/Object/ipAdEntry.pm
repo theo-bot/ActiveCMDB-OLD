@@ -40,14 +40,14 @@ use Try::Tiny;
 use Net::IP;
 use Logger;
 
-enum 'IpType' => (0, 4, 6);
+enum 'IpType' => [(0, 4, 6)];
 
 has 'device_id'			=> (is => 'ro',	isa => 'Int');
 has 'ipadentifindex'	=> (is => 'rw', isa => 'Int');
 has 'ipadentaddr'		=> (is => 'ro',	isa => 'Str');
 has 'ipadentnetmask'	=> (is => 'rw', isa => 'Str');
 has 'ipadentprefix'		=> (is => 'rw', isa => 'Int');
-has 'iptype'				=> (is => 'rw', isa => 'IpType', default => 0);
+has 'iptype' => (is => 'rw', isa => 'IpType', default => 0);
 has 'disco'				=> (is => 'rw', isa => 'Int');
 
 # Schema

@@ -48,8 +48,8 @@ class ActiveCMDB::Object::Ipdomain::Network with ActiveCMDB::Object::Methods
 	
 	with 'ActiveCMDB::Object::Methods';
 	
-	enum 'Proto1'  => ('md5', 'sha');
-	enum 'Proto2'  => ('des', 'aes');
+	enum 'Proto1'  => [('md5', 'sha')];
+	enum 'Proto2'  => [('des', 'aes')];
 	
 	has 'network_id' => (
 		is 		=> 'ro',
