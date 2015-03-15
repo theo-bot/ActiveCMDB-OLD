@@ -96,6 +96,7 @@ process:
     maxproc: 1
     path: $CMDB_HOME/sbin/cmdb_core_worker.pl
     managed: 1
+    maxjobs: 5
     
     
   

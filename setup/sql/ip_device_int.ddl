@@ -17,5 +17,5 @@ CREATE TABLE `ip_device_int` (
   PRIMARY KEY (`device_id`,`ifIndex`),
   KEY `CMDB0003` (`ifIndex`),
   KEY `CMDB0001` (`device_id`),
-  CONSTRAINT `fk_device_int_1` FOREIGN KEY (`device_id`) REFERENCES `ip_device` (`device_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT FK_CMDB002 FOREIGN KEY (`device_id`) REFERENCES `ip_device` (`device_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
